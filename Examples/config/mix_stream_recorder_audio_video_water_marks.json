@@ -1,0 +1,74 @@
+{
+    "appId": "xxx",
+    "token": "xxx",
+    "channelName": "rtest",
+    "useStringUid": true,
+    "useCloudProxy": false,
+    "userId": "123qwe",
+    "subAllAudio": true,
+    "subAudioUserList": [
+        "123"
+    ],
+    "subAllVideo": true,
+    "subVideoUserList": [
+        "123"
+    ],
+    "subStreamType": "high",
+    "isMix": true,
+    "layoutMode": "bestfit",
+    "maxResolutionUid": "123",
+    "recorderStreamType": "both",
+    "recorderPath": "recorder_mix_audio_video.mp4",
+    "audio": {
+        "sampleRate": 16000,
+        "numOfChannels": 1
+    },
+    "video": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 15
+    },
+    "waterMark": [
+        {
+            "type": "litera",
+            "litera": "你好,recorder test,ABC1234",
+            "fontFilePath": "./watermarks_res/Noto_Sans_SC/static/NotoSansSC-SemiBold.ttf",
+            "fontSize": 20,
+            "x": 0,
+            "y": 0,
+            "width": 600,
+            "height": 200,
+            "zorder": 0
+        },
+        {
+            "type": "time",
+            "fontFilePath": "./watermarks_res/Noto_Sans_SC/static/NotoSansSC-SemiBold.ttf",
+            "fontSize": 15,
+            "x": 0,
+            "y": 200,
+            "width": 300,
+            "height": 100,
+            "zorder": 0
+        },
+        {
+            "type": "picture",
+            "imgUrl": "./watermarks_res/agora.png",
+            "x": 0,
+            "y": 500,
+            "width": 400,
+            "height": 400,
+            "zorder": 0
+        }
+    ],
+    "encryption": {
+        "mode": "",
+        "key": "",
+        "salt": ""
+    },
+    "rotation": [
+        {
+            "uid": "123",
+            "degree": 90
+        }
+    ]
+}

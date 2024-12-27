@@ -1,0 +1,71 @@
+{
+    "appId": "*****",
+    "token": "*****",
+    "channelName": "recorderTest",
+    "useStringUid": false,
+    "useCloudProxy": false,
+    "userId": "0",
+    "subAllAudio": true,         // 是否订阅所有音频，如果为false,在SubAudioUserList中填入订阅的uid
+    "subAudioUserList": ["123"],
+    "subAllVideo": true,         // 是否订阅所有视频，如果为false,在SubVideoUserList中填入订阅的uid
+    "subVideoUserList": ["123"],
+    "subStreamType":"high",      // 订阅大小流， 大流为high, 小流为low
+    "isMix":true,             // 是否合流录制
+    "layoutMode":"bestfit",      // 合流录制布局，支持 default（默认布局）， bestfit（自适应布局）， vertical（垂直布局）
+    "maxResolutionUid": "123",   // 在vertical布局中，设定显示最大分辨率的uid
+    "recorderStreamType":"both",   // 录制类型， audio_only 只录音频，video_only 只录音频， both 音视频都录
+    "recorderPath":"recorderTest.mp4",  // 合流录制时为录制的文件名，单流录制为录制的目录，以每一个uid为名的mp4文件
+    "audio":{
+        "sampleRate": 16000,
+        "numOfChannels": 1
+    },
+    "video":{
+        "width":1920,
+        "height":1080,
+        "fps":15
+    },
+    "waterMark":[
+       {
+            "type": "litera",                                                     // 字幕水印
+            "litera":"你好,recorder test,ABC1234",                              // 字幕
+            "fontFilePath":"./Noto_Sans_SC/static/NotoSansSC-Regular.ttf",      // 字体路径
+            "fontSize": 15,                                                     // 字体大小
+            "x": 0,
+            "y": 0,
+            "width": 400,
+            "height":200,
+            "zorder":0
+        },
+        {           
+            "type": "time",                                                     // 时间戳水印
+            "fontFilePath":"./Noto_Sans_SC/static/NotoSansSC-Regular.ttf",
+            "fontSize": 15,
+            "x": 0,
+            "y": 800,
+            "width": 400,
+            "height":200,
+            "zorder":0
+        },
+        {
+            "type": "picture",          // 图片水印
+            "imgUrl":"xxx.png",
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height":100,
+            "zorder":0
+        }
+    ],
+    
+    "encryption":{              // 媒体流加密
+        "mode": "AES_128_ECB",  // 加密类型 AES_128_XTS, AES_128_ECB, AES_256_XTS, SM4_128_ECB, AES_128_GCM, AES_256_GCM, AES_128_GCM2, AES_256_GCM2
+        "key": "xxx",           
+        "salt": "xxx"
+    },
+    "rotation":[                    // 画面旋转
+        {
+            "uid": "123",
+            "degree": 90,           // 旋转的角度，0，90，180，270
+        }
+    ]
+}
