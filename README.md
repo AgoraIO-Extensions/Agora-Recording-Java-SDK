@@ -17,6 +17,7 @@
      - [编译](#编译)
      - [设置录制选项](#设置录制选项)
      - [开始录制](#开始录制)
+     - [结束录制](#结束录制)
    - [调用 API 录制](#调用-api-录制)
      - [前提条件](#前提条件-1)
      - [调用 API 实现录制](#调用-api-实现录制)
@@ -75,7 +76,7 @@
 下载的 SDK 为一个单独的 JAR 文件，需要手动解压出相应的 `so` 文件：
 
 ```sh
-jar xvf agora-sdk.jar
+jar xvf agora-recording-sdk.jar
 ```
 
 解压后的目录结构如下：
@@ -97,14 +98,14 @@ native      # 对应平台的 so 库文件，需要配置到运行的环境中
 #### 集成 SDK
 
 1. 在 `Examples` 目录下创建 `libs` 文件夹（如果没有的话）。
-2. 重命名下载的 JAR 为 `agora-sdk.jar`，放入 `libs` 目录。
+2. 重命名下载的 JAR 为 `agora-recording-sdk.jar`，放入 `libs` 目录。
 3. 将 JAR 解压出来的 `native` 文件放入 `libs` 目录。
 
 确保目录结构如下：
 
 ```
 libs/
-├── agora-sdk.jar
+├── agora-recording-sdk.jar
 └── native/
 ```
 
@@ -190,6 +191,14 @@ mkdir recorder_result
 ./script/TestCaseName.sh
 ```
 
+注：
+
+- **预制的执行脚本只是几种简单场景，实际可以根据具体情况随便修改其中一个脚本对应的json config文件即可。**
+
+#### 结束录制
+
+终端控制台输入 `1` 即可实现结束录制。
+
 #### 录制文件路径
 
 单流在 `Examples` 目录下指定文件夹下生成单流录制的 mp4 文件，mp4 文件名是 UID 开头的。
@@ -249,6 +258,8 @@ agoraMediaRtcRecorder.subscribeAllVideo(options);
 WatermarkConfig[] watermarks = new WatermarkConfig[1];
 agoraMediaRtcRecorder.enableAndUpdateVideoWatermarks(watermarks);
 ```
+
+- **设置水印位置不能超过视频的宽高。**
 
 1. 合流录制：
 
@@ -401,6 +412,19 @@ agoraService.release();
 
 - `filePath`：日志文件的路径。确保日志文件的目录存在且可写。
 - `fileSize`：SDK 日志文件的大小（字节），即每个日志文件的大小。
+
+**返回值**：
+
+- `0`: 成功
+- `< 0`: 失败
+
+##### `int setLogLevel(Constants.LogLevel level)`
+
+设置 SDK 日志文件的等级。
+
+**参数**：
+
+- `level`：日志文件的等级。
 
 **返回值**：
 
