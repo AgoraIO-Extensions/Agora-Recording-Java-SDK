@@ -1,107 +1,109 @@
 # Agora Recording Java SDK
 
-## 目录
+[中文](README.zh.md) | English
 
-1. [开发环境要求](#开发环境要求)
-   - [硬件环境](#硬件环境)
-   - [网络要求](#网络要求)
-   - [带宽需求](#带宽需求)
-   - [软件环境](#软件环境)
-2. [SDK下载](#SDK下载)
-3. [快速开始](#快速开始)
-   - [开通服务](#开通服务)
-   - [集成录制SDK](#集成录制SDK)
-   - [使用命令行录制](#使用命令行录制)
-     - [前提条件](#前提条件)
-     - [集成 SDK](#集成-sdk)
-     - [编译](#编译)
-     - [设置录制选项](#设置录制选项)
-     - [开始录制](#开始录制)
-     - [结束录制](#结束录制)
-   - [调用 API 录制](#调用-api-录制)
-     - [前提条件](#前提条件-1)
-     - [调用 API 实现录制](#调用-api-实现录制)
-       - [初始化服务](#初始化服务)
-       - [加入频道](#加入频道)
-       - [开始录制](#开始录制-1)
-       - [结束录制](#结束录制)
-4. [API 参考](#api-参考)
-    - [AgoraService 类](#agoraservice-类)
-    - [AgoraServiceConfiguration 类](#agoraserviceconfiguration-类)
-    - [AgoraMediaComponentFactory 类](#agoramediacomponentfactory-类)
-    - [AgoraMediaRtcRecorder 类](#agoramediartcrecorder-类)
-    - [IAgoraMediaRtcRecorderEventHandler 类](#iagoramediartcrecordereventhandler-类)
-    - [MediaRecorderConfiguration 类](#mediarecorderconfiguration-类)
-    - [AgoraParameter 类](#agoraparameter-类)
-5. [更新日志](#更新日志)
-6. [其他参考](#其他参考)
+## Table of Contents
 
-## 开发环境要求
+1. [Development Environment Requirements](#development-environment-requirements)
+   - [Hardware Environment](#hardware-environment)
+   - [Network Requirements](#network-requirements)
+   - [Bandwidth Requirements](#bandwidth-requirements)
+   - [Software Environment](#software-environment)
+2. [SDK Download](#sdk-download)
+3. [Quick Start](#quick-start)
+   - [Enable Service](#enable-service)
+   - [Integrate Recording SDK](#integrate-recording-sdk)
+   - [Recording via Command Line](#recording-via-command-line)
+     - [Prerequisites](#prerequisites)
+     - [Integrate SDK](#integrate-sdk)
+     - [Compile](#compile)
+     - [Set Recording Options](#set-recording-options)
+     - [Start Recording](#start-recording)
+     - [Stop Recording](#stop-recording)
+   - [Recording via API](#recording-via-api)
+     - [Prerequisites](#prerequisites-1)
+     - [Implement Recording via API](#implement-recording-via-api)
+       - [Initialize Service](#initialize-service)
+       - [Join Channel](#join-channel)
+       - [Start Recording](#start-recording-1)
+       - [Stop Recording](#stop-recording)
+4. [API Reference](#api-reference)
+   - [AgoraService Class](#agoraservice-class)
+   - [AgoraServiceConfiguration Class](#agoraserviceconfiguration-class)
+   - [AgoraMediaComponentFactory Class](#agoramediacomponentfactory-class)
+   - [AgoraMediaRtcRecorder Class](#agoramediartcrecorder-class)
+   - [IAgoraMediaRtcRecorderEventHandler Class](#iagoramediartcrecordereventhandler-class)
+   - [MediaRecorderConfiguration Class](#mediarecorderconfiguration-class)
+   - [AgoraParameter Class](#agoraparameter-class)
+5. [Changelog](#changelog)
+6. [Other References](#other-references)
 
-### 硬件环境
+## Development Environment Requirements
 
-- **操作系统**：Ubuntu 14.04+ 或 CentOS 6.5+（推荐 7.0）
-- **CPU 架构**：x86-64, arm64
+### Hardware Environment
 
-### 网络要求
+- **Operating System**: Ubuntu 14.04+ or CentOS 6.5+ (recommended 7.0)
+- **CPU Architecture**: x86-64
 
-- **公网 IP**
-- **域名访问**：允许访问 `.agora.io` 和 `.agoralab.co`
+### Network Requirements
 
-### 带宽需求
+- **Public IP**
+- **Domain Access**: Allow access to `.agora.io` and `.agoralab.co`
 
-根据需要同时录制的频道数量和频道内情况确定所需带宽。以下数据可供参考：
+### Bandwidth Requirements
 
-- 录制一个分辨率为 640 × 480 的画面需要的带宽约为 500 Kbps
-- 录制一个有两个人的频道则需 1 Mbps
-- 同时录制 100 个这样的频道，需要带宽为 100 Mbps
+The required bandwidth depends on the number of channels being recorded simultaneously and the situation within the channel. The following data can be used as a reference:
 
-### 软件环境
+- Recording a 640 × 480 resolution video requires approximately 500 Kbps of bandwidth.
+- Recording a channel with two people requires 1 Mbps.
+- Simultaneously recording 100 such channels requires 100 Mbps of bandwidth.
 
-- **构建工具**：Apache Maven 或其他构建工具
-- **JDK**：JDK 8+
+### Software Environment
 
-## SDK下载
+- **Build Tools**: Apache Maven or other build tools
+- **JDK**: JDK 8+
 
-联系获取最新 SDK
+## SDK Download
 
-## 快速开始
+Contact to get the latest SDK.
 
-### 开通服务
+## Quick Start
 
-参考 [官网开通服务](https://doc.shengwang.cn/doc/recording/java/get-started/enable-service)
+### Enable Service
 
-### 集成录制SDK
+Refer to [Enable Service on Official Website](https://doc.shengwang.cn/doc/recording/java/get-started/enable-service)
 
-下载的 SDK 为一个单独的 JAR 文件，需要手动解压出相应的 `so` 文件：
+### Integrate Recording SDK
+
+The downloaded SDK is a standalone JAR file, which needs to be manually extracted to obtain the `so` files:
 
 ```sh
 jar xvf agora-recording-sdk.jar
 ```
 
-解压后的目录结构如下：
+The extracted directory structure is as follows:
 
 ```
-io          # Java 的 class 类所在，无需关注
-META-INF    # JAR 文件和应用程序相关的元数据，无需关注
-native      # 对应平台的 so 库文件，需要配置到运行的环境中
+io          # Java class files, no need to pay attention
+META-INF    # Metadata related to JAR files and applications, no need to pay attention
+native      # Corresponding platform's so library files, need to configure into the running environment
 ```
 
-### 使用命令行录制
+### Recording via Command Line
 
-#### 前提条件
+#### Prerequisites
 
-开始前请确保你已经完成录制 SDK 的环境准备和集成工作。
+Before starting, ensure that you have completed the environment preparation and integration of the recording SDK.
 
-注：当录制 SDK 加入频道时，相当于一个哑客户端加入频道，因此需要跟声网 RTC SDK 加入相同的频道，并使用相同的 App ID 和频道场景。
+Note: When the recording SDK joins a channel, it is equivalent to a mute client joining the channel, so it needs to join the same channel as the Agora RTC SDK and use the same App ID and channel scenario.
 
-#### 集成 SDK
+#### Integrate SDK
 
-1. 在 `Examples` 目录下创建 `libs` 文件夹（如果没有的话）。
-2. 重命名下载的 JAR 为 `agora-recording-sdk.jar`，放入 `libs` 目录。
-3. 将 JAR 解压出来的 `native` 文件放入 `libs` 目录。
+1. Create a `libs` folder in the `Examples` directory (if not already present).
+2. Rename the downloaded JAR to `agora-recording-sdk.jar` and place it in the `libs` directory.
+3. Place the `native` files extracted from the JAR into the `libs` directory.
 
-确保目录结构如下：
+Ensure the directory structure is as follows:
 
 ```
 libs/
@@ -109,110 +111,110 @@ libs/
 └── native/
 ```
 
-#### 编译
+#### Compile
 
-进入 `Examples` 文件夹下，执行编译脚本：
+Navigate to the `Examples` folder and run the build script:
 
 ```sh
 cd Examples
 ./build.sh
 ```
 
-#### 设置录制选项
+#### Set Recording Options
 
-参考 `Examples/config` 文件夹下的不同参数，注意参数为 JSON 格式，所有修改务必保证 JSON 格式正确。
+Refer to the different parameters in the `Examples/config` folder. Note that the parameters are in JSON format, so ensure that any modifications are valid JSON.
 
-各个参数含义参考 `Examples/config/recorder_json.example`：
+Refer to `Examples/config/recorder_json.example` for the meaning of each parameter:
 
-以下是根据 JSON 文件详细介绍每个参数的含义：
+The following is a detailed explanation of each parameter based on the JSON file:
 
-| 参数名               | 类型            | 说明                                                                                     |
-|--------------------|---------------|----------------------------------------------------------------------------------------|
-| appId              | String        | 项目的 App ID，需要和 RTC SDK 中的 App ID 一致。                                           |
-| token              | String        | 频道的 Token，如果频道设置了安全模式，需要传入 Token。                                         |
-| channelName        | String        | 频道名称，需要和 RTC SDK 中的频道名称一致。                                                 |
-| useStringUid       | Boolean       | 是否使用字符串类型的用户 ID。                                                              |
-| useCloudProxy      | Boolean       | 是否使用云代理服务。                                                                       |
-| userId             | String        | 用户 ID。                                                                                 |
-| subAllAudio        | Boolean       | 是否订阅所有音频。如果为 false，需要在 subAudioUserList 中填入订阅的用户 ID。                        |
-| subAudioUserList   | String []     | 订阅音频的用户 ID 列表，仅在 subAllAudio 为 false 时生效。                                      |
-| subAllVideo        | Boolean       | 是否订阅所有视频。如果为 false，需要在 subVideoUserList 中填入订阅的用户 ID。                        |
-| subVideoUserList   | String []     | 订阅视频的用户 ID 列表，仅在 subAllVideo 为 false 时生效。                                      |
-| subStreamType      | String        | 订阅的流类型，支持 `high`（大流）和 `low`（小流）。                                             |
-| isMix              | Boolean       | 是否合流录制。                                                                             |
-| layoutMode         | String        | 合流录制布局模式，支持 `default`（默认布局），`bestfit`（自适应布局），`vertical`（垂直布局）。             |
-| maxResolutionUid   | String        | 在 vertical 布局中，设定显示最大分辨率的用户 ID。                                              |
-| recorderStreamType | String        | 录制类型，支持 `audio_only`（只录音频），`video_only`（只录视频），`both`（音视频都录）。              |
-| recorderPath       | String        | 录制文件路径。合流录制时为录制的文件名;单流录制时为录制的目录，以每一个用户 ID 为名的 mp4 文件。           |
-| audio              | Object        | 音频设置。                                                                                 |
-| audio.sampleRate   | Integer       | 音频采样率。                                                                               |
-| audio.numOfChannels| Integer       | 音频通道数量。                                                                             |
-| video              | Object        | 视频设置。                                                                                 |
-| video.width        | Integer       | 视频宽度。                                                                                 |
-| video.height       | Integer       | 视频高度。                                                                                 |
-| video.fps          | Integer       | 视频帧率。                                                                                 |
-| waterMark          | Object[]      | 水印设置。                                                                                 |
-| waterMark[].type   | String        | 水印类型，支持 `litera`（字幕水印），`time`（时间戳水印），`picture`（图片水印）。                      |
-| waterMark[].litera | String        | 字幕内容，仅在 type 为 `litera` 时生效。                                                      |
-| waterMark[].fontFilePath | String | 字体文件路径。                                                                              |
-| waterMark[].fontSize | Integer     | 字体大小。                                                                                 |
-| waterMark[].x      | Integer       | 水印的 X 坐标。                                                                             |
-| waterMark[].y      | Integer       | 水印的 Y 坐标。                                                                             |
-| waterMark[].width  | Integer       | 水印的宽度。                                                                                |
-| waterMark[].height | Integer       | 水印的高度。                                                                                |
-| waterMark[].zorder | Integer       | 水印的层级。                                                                                |
-| waterMark[].imgUrl | String        | 图片水印的 URL，仅在 type 为 `picture` 时生效。                                               |
-| encryption         | Object        | 媒体流加密设置。                                                                            |
-| encryption.mode    | String        | 加密类型，支持 `AES_128_XTS`，`AES_128_ECB`，`AES_256_XTS`，`SM4_128_ECB`，`AES_128_GCM`，`AES_256_GCM`，`AES_128_GCM2`，`AES_256_GCM2`。 |
-| encryption.key     | String        | 加密密钥。                                                                                 |
-| encryption.salt    | String        | 加密盐值。                                                                                 |
-| rotation           | Object[]      | 画面旋转设置。                                                                              |
-| rotation[].uid     | String        | 需要旋转画面的用户 ID。                                                                       |
-| rotation[].degree  | Integer       | 旋转的角度，支持 0，90，180，270。                                                           |
+| Parameter Name           | Type      | Description                                                                                                                                                         |
+| ------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| appId                    | String    | The App ID of the project, which needs to be consistent with the App ID in the RTC SDK.                                                                             |
+| token                    | String    | The token of the channel. If the channel is set to secure mode, a token is required.                                                                                |
+| channelName              | String    | The channel name, which needs to be consistent with the channel name in the RTC SDK.                                                                                |
+| useStringUid             | Boolean   | Whether to use string type user ID.                                                                                                                                 |
+| useCloudProxy            | Boolean   | Whether to use cloud proxy service.                                                                                                                                 |
+| userId                   | String    | User ID.                                                                                                                                                            |
+| subAllAudio              | Boolean   | Whether to subscribe to all audio. If false, fill in the user IDs to subscribe to in subAudioUserList.                                                              |
+| subAudioUserList         | String [] | List of user IDs to subscribe to audio, only effective when subAllAudio is false.                                                                                   |
+| subAllVideo              | Boolean   | Whether to subscribe to all video. If false, fill in the user IDs to subscribe to in subVideoUserList.                                                              |
+| subVideoUserList         | String [] | List of user IDs to subscribe to video, only effective when subAllVideo is false.                                                                                   |
+| subStreamType            | String    | Stream type to subscribe to, supports `high` (high stream) and `low` (low stream).                                                                                  |
+| isMix                    | Boolean   | Whether to record in mixed mode.                                                                                                                                    |
+| layoutMode               | String    | Layout mode for mixed recording, supports `default` (default layout), `bestfit` (adaptive layout), `vertical` (vertical layout).                                    |
+| maxResolutionUid         | String    | In vertical layout, set the user ID to display the maximum resolution.                                                                                              |
+| recorderStreamType       | String    | Recording type, supports `audio_only` (audio only), `video_only` (video only), `both` (both audio and video).                                                       |
+| recorderPath             | String    | Recording file path. For mixed recording, it is the recording file name; for single stream recording, it is the directory, with mp4 files named after each user ID. |
+| audio                    | Object    | Audio settings.                                                                                                                                                     |
+| audio.sampleRate         | Integer   | Audio sample rate.                                                                                                                                                  |
+| audio.numOfChannels      | Integer   | Number of audio channels.                                                                                                                                           |
+| video                    | Object    | Video settings.                                                                                                                                                     |
+| video.width              | Integer   | Video width.                                                                                                                                                        |
+| video.height             | Integer   | Video height.                                                                                                                                                       |
+| video.fps                | Integer   | Video frame rate.                                                                                                                                                   |
+| waterMark                | Object[]  | Watermark settings.                                                                                                                                                 |
+| waterMark[].type         | String    | Watermark type, supports `litera` (subtitle watermark), `time` (timestamp watermark), `picture` (image watermark).                                                  |
+| waterMark[].litera       | String    | Subtitle content, only effective when type is `litera`.                                                                                                             |
+| waterMark[].fontFilePath | String    | Font file path.                                                                                                                                                     |
+| waterMark[].fontSize     | Integer   | Font size.                                                                                                                                                          |
+| waterMark[].x            | Integer   | X coordinate of the watermark.                                                                                                                                      |
+| waterMark[].y            | Integer   | Y coordinate of the watermark.                                                                                                                                      |
+| waterMark[].width        | Integer   | Width of the watermark.                                                                                                                                             |
+| waterMark[].height       | Integer   | Height of the watermark.                                                                                                                                            |
+| waterMark[].zorder       | Integer   | Layer order of the watermark.                                                                                                                                       |
+| waterMark[].imgUrl       | String    | URL of the image watermark, only effective when type is `picture`.                                                                                                  |
+| encryption               | Object    | Media stream encryption settings.                                                                                                                                   |
+| encryption.mode          | String    | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                 |
+| encryption.key           | String    | Encryption key.                                                                                                                                                     |
+| encryption.salt          | String    | Encryption salt.                                                                                                                                                    |
+| rotation                 | Object[]  | Video rotation settings.                                                                                                                                            |
+| rotation[].uid           | String    | User ID of the video to be rotated.                                                                                                                                 |
+| rotation[].degree        | Integer   | Rotation angle, supports 0, 90, 180, 270.                                                                                                                           |
 
-注：
+Note:
 
-- **执行录制前务必填写 JSON 中的 appId 和 token 参数。**
-- **appId 和 channelName 的设置必须与声网 RTC SDK 中设置的一致。**
-- **单流模式下，填入的 recorderPath 文件夹名，目前需要手动在 Examples 文件夹下创建，例如，"recorderPath": "recorder_result/"，需要确保 Examples/recorder_result/ 目录存在。**
+- **Before executing the recording, be sure to fill in the appId and token parameters in the JSON.**
+- **The appId and channelName settings must be consistent with those in the Agora RTC SDK.**
+- **In single stream mode, the recorderPath folder name needs to be manually created in the Examples folder, for example, "recorderPath": "recorder_result/", ensure that the Examples/recorder_result/ directory exists.**
 
-#### 开始录制
+#### Start Recording
 
-进入示例目录并手动创建单流配置的文件夹：
+Navigate to the example directory and manually create the folder for single stream configuration:
 
 ```sh
 cd Examples
 mkdir recorder_result
 ```
 
-根据测试场景，运行测试脚本：
+Run the test script according to the test scenario:
 
 ```sh
 ./script/TestCaseName.sh
 ```
 
-注：
+Note:
 
-- **预制的执行脚本只是几种简单场景，实际可以根据具体情况随便修改其中一个脚本对应的json config文件即可。**
+- **The pre-configured scripts are just simple scenarios. You can modify any one of the script's corresponding json config files according to the specific situation.**
 
-#### 结束录制
+#### Stop Recording
 
-终端控制台输入 `1` 即可实现结束录制。
+Enter `1` in the terminal console to stop recording.
 
-#### 录制文件路径
+#### Recording File Path
 
-单流在 `Examples` 目录下指定文件夹下生成单流录制的 mp4 文件，mp4 文件名是 UID 开头的。
-合流在 `Examples` 目录下生成合流的录制 mp4 文件，文件名是 JSON 配置的。
+For single stream, mp4 files are generated in the specified folder under the `Examples` directory, with the file name starting with the UID.
+For mixed stream, the mp4 file is generated in the `Examples` directory with the file name specified in the JSON configuration.
 
-### 调用 API 录制
+### Recording via API
 
-#### 前提条件
+#### Prerequisites
 
-开始前请确保你已经完成录制 SDK 的环境准备和集成工作，包括配置 jar 和对应平台的 so。
+Before starting, ensure that you have completed the environment preparation and integration of the recording SDK, including configuring the jar and corresponding platform's so files.
 
-#### 调用 API 实现录制
+#### Implement Recording via API
 
-##### 初始化服务
+##### Initialize Service
 
 ```java
 AgoraServiceConfiguration config = new AgoraServiceConfiguration();
@@ -224,11 +226,11 @@ config.setUseStringUid(false);
 agoraService.initialize(config);
 ```
 
-注：
+Note:
 
-- **appId：项目的 App ID，需要和你传入 RTC SDK 中的 App ID 一致。**
+- **appId: The App ID of the project, which needs to be consistent with the App ID in the RTC SDK.**
 
-##### 加入频道
+##### Join Channel
 
 ```java
 AgoraMediaComponentFactory factory = agoraService.createAgoraMediaComponentFactory();
@@ -241,11 +243,11 @@ agoraMediaRtcRecorder.registerRecorderEventHandler(handler);
 agoraMediaRtcRecorder.joinChannel("token", "channelName", "0");
 ```
 
-注：
+Note:
 
-- **channelName：和 RTC SDK 加入的频道名必须一致。**
+- **channelName: Must be consistent with the channel name joined by the RTC SDK.**
 
-##### 开始录制
+##### Start Recording
 
 ```java
 agoraMediaRtcRecorder.subscribeAllAudio();
@@ -259,9 +261,9 @@ WatermarkConfig[] watermarks = new WatermarkConfig[1];
 agoraMediaRtcRecorder.enableAndUpdateVideoWatermarks(watermarks);
 ```
 
-- **设置水印位置不能超过视频的宽高。**
+- **The watermark position cannot exceed the width and height of the video.**
 
-1. 合流录制：
+1. Mixed Recording:
 
 ```java
 // set recorder config
@@ -271,46 +273,46 @@ agoraMediaRtcRecorder.setRecorderConfig(mediaRecorderConfiguration);
 agoraMediaRtcRecorder.startRecording();
 ```
 
-2. 单流录制
+2. Single Stream Recording
 
-监听音视频回调，调用单流录制接口。
+Listen for audio and video callbacks, and call the single stream recording interface.
 
 ```java
-    public static class AgoraMediaRtcRecorderEventHandler implements IAgoraMediaRtcRecorderEventHandler {
-        @Override
-        public void onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed) {
-            new Thread() {
-                @Override
-                public void run() {
+public static class AgoraMediaRtcRecorderEventHandler implements IAgoraMediaRtcRecorderEventHandler {
+    @Override
+    public void onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed) {
+        new Thread() {
+            @Override
+            public void run() {
+                MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
+                agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
+
+                agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
+            }
+        }.start();
+    }
+
+    @Override
+    public void onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed) {
+        new Thread() {
+            @Override
+            public void run() {
+                if (isMix) {
+                    VideoMixingLayout layout = new VideoMixingLayout();
+                    agoraMediaRtcRecorder.setVideoMixingLayout(layout);
+                } else {
                     MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
                     agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
 
                     agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
                 }
-            }.start();
-        }
-
-        @Override
-        public void onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed) {
-            new Thread() {
-                @Override
-                public void run() {
-                    if (isMix) {
-                        VideoMixingLayout layout = new VideoMixingLayout();
-                        agoraMediaRtcRecorder.setVideoMixingLayout(layout);
-                    } else {
-                        MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
-                        agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
-
-                        agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
-                    }
-                }
-            }.start();
-        }
+            }
+        }.start();
     }
+}
 ```
 
-##### 结束录制
+##### Stop Recording
 
 ```java
 agoraMediaRtcRecorder.unsubscribeAllAudio();
@@ -330,824 +332,859 @@ agoraMediaRtcRecorder.release();
 agoraService.release();
 ```
 
-##### 获取录制文件路径
+##### Get Recording File Path
 
-单流在 `Examples` 目录下指定文件夹下生成单流录制的 mp4 文件，mp4 文件名是 UID 开头的。
-合流在 `Examples` 目录下生成合流的录制 mp4 文件，文件名是 MediaRecorderConfiguration 对象配置的。
+For single stream, mp4 files are generated in the specified folder under the `Examples` directory, with the file name starting with the UID.
+For mixed stream, the mp4 file is generated in the `Examples` directory with the file name specified in the MediaRecorderConfiguration object.
 
-## API 参考
+## API Reference
 
-### `AgoraService` 类
+### `AgoraService` Class
 
-#### 简介
+#### Overview
 
-`AgoraService` 类提供了初始化和管理 Agora 服务的核心功能，是使用 Agora 录制功能的主要入口。
+The `AgoraService` class provides core functionalities for initializing and managing Agora services. It is the primary entry point for using Agora's recording features.
 
-#### 方法
+#### Methods
 
 ##### `AgoraService()`
 
-构造一个 `AgoraService` 实例并初始化本地组件。一次只能初始化一个 `AgoraService` 实例。
+Constructs an `AgoraService` instance and initializes local components. Only one `AgoraService` instance can be initialized at a time.
 
 ##### `long getNativeHandle()`
 
-获取与此 `AgoraService` 实例关联的本地句柄。
+Retrieves the native handle associated with this `AgoraService` instance.
 
-**返回值**：
+**Returns**:
 
-- 返回用于本地方法调用的本地句柄值。
+- The native handle value used for local method calls.
 
 ##### `int release()`
 
-释放 `AgoraService` 对象及其关联的资源。调用此方法后，实例将失效。
+Releases the `AgoraService` object and its associated resources. After calling this method, the instance becomes invalid.
 
-**返回值**：
+**Returns**:
 
-- `0`: 成功
-- `< 0`: 失败
+- `0`: Success
+- `< 0`: Failure
 
 ##### `int initialize(AgoraServiceConfiguration config)`
 
-使用指定的配置初始化 `AgoraService` 对象。
+Initializes the `AgoraService` object with the specified configuration.
 
-**参数**：
+**Parameters**:
 
-- `config`：包含初始化参数的配置对象。
+- `config`: The configuration object containing initialization parameters.
 
-**返回值**：
+**Returns**:
 
-- `0`: 成功
-- `< 0`: 失败
+- `0`: Success
+- `< 0`: Failure
 
 ##### `AgoraMediaComponentFactory createAgoraMediaComponentFactory()`
 
-创建并返回一个 `AgoraMediaComponentFactory` 对象，用于创建媒体组件。
+Creates and returns an `AgoraMediaComponentFactory` object for creating media components.
 
-**返回值**：
+**Returns**:
 
-- 返回一个 `AgoraMediaComponentFactory` 实例。
+- An `AgoraMediaComponentFactory` instance.
 
 ##### `AgoraParameter getAgoraParameter()`
 
-创建并返回一个 `AgoraParameter` 对象，用于参数管理。
+Creates and returns an `AgoraParameter` object for parameter management.
 
-**返回值**：
+**Returns**:
 
-- 成功时返回一个 `AgoraParameter` 实例。
-- 失败时返回 `null`。
+- On success, returns an `AgoraParameter` instance.
+- On failure, returns `null`.
 
 ##### `static String getSdkVersion()`
 
-获取 SDK 版本。
+Retrieves the SDK version.
 
-**返回值**：
+**Returns**:
 
-- 返回 SDK 版本。
+- The SDK version.
 
 ##### `int setLogFile(String filePath, int fileSize)`
 
-设置 SDK 日志文件的路径和大小。
+Sets the path and size of the SDK log file.
 
-**参数**：
+**Parameters**:
 
-- `filePath`：日志文件的路径。确保日志文件的目录存在且可写。
-- `fileSize`：SDK 日志文件的大小（字节），即每个日志文件的大小。
+- `filePath`: The path to the log file. Ensure the directory exists and is writable.
+- `fileSize`: The size of the SDK log file (in bytes), i.e., the size of each log file.
 
-**返回值**：
+**Returns**:
 
-- `0`: 成功
-- `< 0`: 失败
+- `0`: Success
+- `< 0`: Failure
 
 ##### `int setLogLevel(Constants.LogLevel level)`
 
-设置 SDK 日志文件的等级。
+Sets the log level for the SDK log file.
 
-**参数**：
+**Parameters**:
 
-- `level`：日志文件的等级。
+- `level`: The log level.
 
-**返回值**：
+**Returns**:
 
-- `0`: 成功
-- `< 0`: 失败
+- `0`: Success
+- `< 0`: Failure
 
-### `AgoraServiceConfiguration` 类
+### `AgoraServiceConfiguration` Class
 
-#### 简介
+#### Overview
 
-`AgoraServiceConfiguration` 类用于配置和初始化 Agora 服务实例。此类包含所有初始化和配置 Agora 服务实例所需的设置。
+The `AgoraServiceConfiguration` class is used to configure and initialize an Agora service instance. This class contains all the settings needed to initialize and configure the Agora service instance.
 
-#### 属性
+#### Properties
 
 - **enableAudioProcessor**
 
-  是否启用音频处理模块。
-  - `true`：启用音频处理模块（默认）。
-  - `false`：禁用音频处理模块。如果禁用音频处理模块，则无法创建音频轨道。
+  Indicates whether to enable the audio processing module.
+
+  - `true`: Enables the audio processing module (default).
+  - `false`: Disables the audio processing module. If the audio processing module is disabled, audio tracks cannot be created.
 
 - **enableAudioDevice**
 
-  是否启用音频设备模块。音频设备模块用于管理音频设备，例如录音和播放音频。
-  - `true`：启用音频设备模块（默认）。音频录制和播放可用。
-  - `false`：禁用音频设备模块。音频录制和播放不可用。
-  
-  注意：如果将 `enableAudioDevice` 设置为 `false`，并且将 `enableAudioProcessor` 设置为 `true`，则无法使用音频设备，但可以推送 PCM 音频数据。
+  Indicates whether to enable the audio device module. The audio device module manages audio devices such as recording and playback.
+
+  - `true`: Enables the audio device module (default). Audio recording and playback are available.
+  - `false`: Disables the audio device module. Audio recording and playback are unavailable.
+
+  Note: If `enableAudioDevice` is set to `false` and `enableAudioProcessor` is set to `true`, audio devices cannot be used, but PCM audio data can be pushed.
 
 - **enableVideo**
 
-  是否启用视频。
-  - `true`：启用视频。
-  - `false`：禁用视频（默认）。
+  Indicates whether to enable video.
+
+  - `true`: Enables video.
+  - `false`: Disables video (default).
 
 - **context**
 
-  用户上下文对象。对于 Android，它是活动的上下文。
+  The user context object. For Android, it is the context of the activity.
 
 - **appId**
 
-  项目的 App ID。
+  The App ID of the project.
 
 - **areaCode**
 
-  支持的区域代码，默认值为 `AREA_CODE_GLOB`。
+  The supported area code. The default value is `AREA_CODE_GLOB`.
 
 - **channelProfile**
 
-  频道配置文件。默认频道配置文件为 `CHANNEL_PROFILE_LIVE_BROADCASTING`。
+  The channel profile. The default channel profile is `CHANNEL_PROFILE_LIVE_BROADCASTING`.
 
 - **license**
 
-  用于连接频道时的验证许可证。根据许可证收费。
+  The authentication license used when connecting to a channel. Charges are based on the license.
 
 - **audioScenario**
 
-  音频场景。默认值为 `AUDIO_SCENARIO_DEFAULT`。
+  The audio scenario. The default value is `AUDIO_SCENARIO_DEFAULT`.
 
 - **logConfig**
 
-  用户自定义日志路径、日志大小和日志级别的配置。
+  Configuration for custom log path, log size, and log level.
 
 - **useStringUid**
 
-  是否启用字符串用户 ID。
+  Indicates whether to enable string user IDs.
 
 - **useExternalEglContext**
 
-  是否在当前线程中使用 EGL 上下文作为 SDK 的根 EGL 上下文，该上下文由所有与 EGL 相关的模块共享，例如摄像头捕获和视频渲染。
-  注意：此属性仅适用于 Android。
+  Indicates whether to use the EGL context in the current thread as the root EGL context for the SDK. This context is shared by all EGL-related modules, such as camera capture and video rendering.
+  Note: This property is only applicable to Android.
 
 - **domainLimit**
 
-  是否启用域限制。
-  - `true`：仅连接到已通过 DNS 解析的服务器。
-  - `false`：连接到没有限制的服务器（默认）。
+  Indicates whether to enable domain limitation.
 
-### `AgoraMediaComponentFactory` 类
+  - `true`: Only connects to servers resolved via DNS.
+  - `false`: Connects to servers without limitations (default).
 
-#### 简介
+### `AgoraMediaComponentFactory` Class
 
-`AgoraMediaComponentFactory` 类用于创建 Agora 媒体组件的工厂类。此类提供创建媒体录制组件实例的功能。
+#### Overview
 
-#### 方法
+The `AgoraMediaComponentFactory` class is a factory class for creating Agora media components. It provides functionalities to create instances of media recording components.
+
+#### Methods
 
 - **AgoraMediaComponentFactory(long handle)**
 
-  构造一个 `AgoraMediaComponentFactory` 实例。
-  - 参数:
-    - `handle`: 工厂实例的本地句柄。
+  Constructs an `AgoraMediaComponentFactory` instance.
+
+  - Parameters:
+    - `handle`: The native handle for the factory instance.
 
 - **AgoraMediaRtcRecorder createMediaRtcRecorder()**
 
-  创建一个新的 `AgoraMediaRtcRecorder` 实例。
-  - 返回值:
-    - 一个新的 `AgoraMediaRtcRecorder` 实例。
-  - 异常:
-    - `RuntimeException`: 如果本地录制器创建失败。
+  Creates a new `AgoraMediaRtcRecorder` instance.
+
+  - Returns:
+    - A new `AgoraMediaRtcRecorder` instance.
+  - Exceptions:
+    - `RuntimeException`: If the local recorder creation fails.
 
 - **int release()**
 
-  释放与工厂关联的本地资源。
-  - 返回值:
-    - 释放操作的结果。
-      - `0`: 成功。
-      - `< 0`: 失败。
+  Releases the local resources associated with the factory.
 
-### `AgoraMediaRtcRecorder` 类
+  - Returns:
+    - The result of the release operation.
+      - `0`: Success.
+      - `< 0`: Failure.
 
-#### 简介
+### `AgoraMediaRtcRecorder` Class
 
-`AgoraMediaRtcRecorder` 类提供了录制 Agora RTC 媒体流的功能。此类允许录制来自 Agora RTC 频道的音频和视频流，并提供流混合、加密和选择性订阅的选项。
+#### Overview
 
-#### 方法
+The `AgoraMediaRtcRecorder` class provides functionalities for recording Agora RTC media streams. This class allows recording audio and video streams from an Agora RTC channel, with options for stream mixing, encryption, and selective subscription.
+
+#### Methods
 
 - **AgoraMediaRtcRecorder(long handle)**
 
-  构造一个 `AgoraMediaRtcRecorder` 实例。
-  - 参数:
-    - `handle`: 录制器实例的本地句柄。
+  Constructs an `AgoraMediaRtcRecorder` instance.
+
+  - Parameters:
+    - `handle`: The native handle for the recorder instance.
 
 - **int initialize(AgoraService service, boolean enableMix)**
 
-  使用指定的服务和混合设置初始化录制器。
-  - 参数:
-    - `service`: 必须在调用此方法之前初始化的 Agora 服务实例。
-    - `enableMix`: 是否启用流混合。
-  - 返回值:
-    - `0`: 初始化成功。
-    - 负值: 初始化失败。
+  Initializes the recorder with the specified service and mixing settings.
+
+  - Parameters:
+    - `service`: The Agora service instance that must be initialized before calling this method.
+    - `enableMix`: Whether to enable stream mixing.
+  - Returns:
+    - `0`: Initialization successful.
+    - Negative value: Initialization failed.
 
 - **int joinChannel(String token, String channelName, String userId)**
 
-  加入一个 Agora RTC 频道。
-  - 参数:
-    - `token`: 用于身份验证的令牌。
-    - `channelName`: 要加入的频道名称。名称不能超过 64 字节，可以包含小写字母、大写字母、数字、空格和特殊字符。
-    - `userId`: 本地用户的用户 ID。如果为 `null`，系统会自动分配一个。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Joins an Agora RTC channel.
+
+  - Parameters:
+    - `token`: The token for authentication.
+    - `channelName`: The name of the channel to join. The name cannot exceed 64 bytes and can include lowercase letters, uppercase letters, numbers, spaces, and special characters.
+    - `userId`: The user ID of the local user. If `null`, the system will automatically assign one.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int leaveChannel()**
 
-  离开当前频道。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Leaves the current channel.
+
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int enableEncryption(boolean enabled, EncryptionConfig config)**
 
-  启用或禁用内置加密。
-  - 参数:
-    - `enabled`: 是否启用内置加密。
-    - `config`: 加密配置参数。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Enables or disables built-in encryption.
 
-  注意：如果启用加密，RTMP 流功能将被禁用。
+  - Parameters:
+    - `enabled`: Whether to enable built-in encryption.
+    - `config`: The encryption configuration parameters.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
+
+  Note: If encryption is enabled, the RTMP stream feature will be disabled.
 
 - **int subscribeAllAudio()**
 
-  订阅频道中所有远程用户的音频流。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Subscribes to the audio streams of all remote users in the channel.
+
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int subscribeAllVideo(VideoSubscriptionOptions options)**
 
-  订阅频道中所有远程用户的视频流。
-  - 参数:
-    - `options`: 视频订阅选项，包括流类型和其他参数。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Subscribes to the video streams of all remote users in the channel.
+
+  - Parameters:
+    - `options`: Video subscription options, including stream type and other parameters.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int unsubscribeAllAudio()**
 
-  停止订阅频道中所有远程用户的音频流。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Stops subscribing to the audio streams of all remote users in the channel.
+
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int unsubscribeAllVideo()**
 
-  停止订阅频道中所有远程用户的视频流。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Stops subscribing to the video streams of all remote users in the channel.
+
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int subscribeAudio(String userId)**
 
-  订阅指定远程用户的音频流。
-  - 参数:
-    - `userId`: 要订阅其音频的远程用户的 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - `-2`: userId 无效。
-    - 其他负值: 方法调用失败。
+  Subscribes to the audio stream of a specified remote user.
+
+  - Parameters:
+    - `userId`: The ID of the remote user whose audio is to be subscribed to.
+  - Returns:
+    - `0`: Method call successful.
+    - `-2`: Invalid userId.
+    - Other negative values: Method call failed.
 
 - **int unsubscribeAudio(String userId)**
 
-  停止订阅指定远程用户的音频流。
-  - 参数:
-    - `userId`: 要停止订阅其音频的远程用户的 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - `-2`: userId 无效。
-    - 其他负值: 方法调用失败。
+  Stops subscribing to the audio stream of a specified remote user.
+
+  - Parameters:
+    - `userId`: The ID of the remote user whose audio subscription is to be stopped.
+  - Returns:
+    - `0`: Method call successful.
+    - `-2`: Invalid userId.
+    - Other negative values: Method call failed.
 
 - **int subscribeVideo(String userId, VideoSubscriptionOptions options)**
 
-  订阅指定远程用户的视频流。
-  - 参数:
-    - `userId`: 要订阅其视频的远程用户的 ID。
-    - `options`: 视频订阅选项，包括流类型和其他参数。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - `-2`: userId 无效。
-    - 其他负值: 方法调用失败。
+  Subscribes to the video stream of a specified remote user.
+
+  - Parameters:
+    - `userId`: The ID of the remote user whose video is to be subscribed to.
+    - `options`: Video subscription options, including stream type and other parameters.
+  - Returns:
+    - `0`: Method call successful.
+    - `-2`: Invalid userId.
+    - Other negative values: Method call failed.
 
 - **int unsubscribeVideo(String userId)**
 
-  停止订阅指定远程用户的视频流。
-  - 参数:
-    - `userId`: 要停止订阅其视频的远程用户的 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - `-2`: userId 无效。
-    - 其他负值: 方法调用失败。
+  Stops subscribing to the video stream of a specified remote user.
+
+  - Parameters:
+    - `userId`: The ID of the remote user whose video subscription is to be stopped.
+  - Returns:
+    - `0`: Method call successful.
+    - `-2`: Invalid userId.
+    - Other negative values: Method call failed.
 
 - **int setVideoMixingLayout(VideoMixingLayout layout)**
 
-  设置混合视频流的布局。
-  - 参数:
-    - `layout`: 混合视频流的布局配置。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Sets the layout for mixed video streams.
+
+  - Parameters:
+    - `layout`: The layout configuration for mixed video streams.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int setRecorderConfig(MediaRecorderConfiguration config)**
 
-  配置录制器设置。此方法必须在开始录制之前调用。
-  - 参数:
-    - `config`: 录制器配置参数。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Configures the recorder settings. This method must be called before starting the recording.
+
+  - Parameters:
+    - `config`: The recorder configuration parameters.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int setRecorderConfigByUid(MediaRecorderConfiguration config, String userId)**
 
-  配置指定用户的录制器设置。
-  - 参数:
-    - `config`: 录制器配置参数。
-    - `userId`: 要配置其录制设置的用户 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Configures the recorder settings for a specified user.
+
+  - Parameters:
+    - `config`: The recorder configuration parameters.
+    - `userId`: The user ID of the user whose recorder settings are to be configured.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int startRecording()**
 
-  开始录制过程。请确保在调用此方法之前使用 `setRecorderConfig` 配置录制器。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Starts the recording process. Ensure to configure the recorder using `setRecorderConfig` before calling this method.
+
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int stopRecording()**
 
-  停止录制过程。此方法停止所有正在进行的录制并保存录制的文件。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Stops the recording process. This method stops all ongoing recordings and saves the recorded files.
+
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int startSingleRecordingByUid(String userId)**
 
-  开始指定用户的录制过程。
-  - 参数:
-    - `userId`: 要开始录制的用户 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Starts the recording process for a specified user.
+
+  - Parameters:
+    - `userId`: The user ID of the user whose recording is to be started.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int stopSingleRecordingByUid(String userId)**
 
-  停止指定用户的录制过程。
-  - 参数:
-    - `userId`: 要停止录制的用户 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Stops the recording process for a specified user.
+
+  - Parameters:
+    - `userId`: The user ID of the user whose recording is to be stopped.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int registerRecorderEventHandler(IAgoraMediaRtcRecorderEventHandler handler)**
 
-  注册录制事件的事件处理程序。处理程序接收各种录制事件的回调，例如状态变化、错误和录制进度更新。
-  - 参数:
-    - `handler`: 实现 `IAgoraMediaRtcRecorderEventHandler` 接口的事件处理程序。
-  - 返回值:
-    - `0`: 注册成功。
-    - 负值: 注册失败。
+  Registers an event handler for recording events. The handler receives callbacks for various recording events, such as state changes, errors, and recording progress updates.
+
+  - Parameters:
+    - `handler`: The event handler implementing the `IAgoraMediaRtcRecorderEventHandler` interface.
+  - Returns:
+    - `0`: Registration successful.
+    - Negative value: Registration failed.
 
 - **int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handle)**
 
-  注销先前注册的事件处理程序。
-  - 参数:
-    - `handle`: 要注销的事件处理程序。
-  - 返回值:
-    - `0`: 注销成功。
-    - 负值: 注销失败。
+  Unregisters a previously registered event handler.
+
+  - Parameters:
+    - `handle`: The event handler to be unregistered.
+  - Returns:
+    - `0`: Unregistration successful.
+    - Negative value: Unregistration failed.
 
 - **int enableAndUpdateVideoWatermarks(WatermarkConfig[] watermarkConfigs)**
 
-  为流添加水印。
-  - 参数:
-    - `watermarkConfigs`: 水印配置。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Adds watermarks to the stream.
+
+  - Parameters:
+    - `watermarkConfigs`: The watermark configurations.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int disableVideoWatermarks()**
 
-  禁用流的水印。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Disables watermarks on the stream.
+
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int enableAndUpdateVideoWatermarksByUid(WatermarkConfig[] watermarkConfigs, String userId)**
 
-  为指定用户的流添加水印。
-  - 参数:
-    - `watermarkConfigs`: 水印配置。
-    - `userId`: 要添加水印的用户 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Adds watermarks to the stream of a specified user.
+
+  - Parameters:
+    - `watermarkConfigs`: The watermark configurations.
+    - `userId`: The user ID of the user whose stream watermarks are to be added.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int disableVideoWatermarksByUid(String userId)**
 
-  禁用指定用户流的水印。
-  - 参数:
-    - `userId`: 要禁用水印的用户 ID。
-  - 返回值:
-    - `0`: 方法调用成功。
-    - 负值: 方法调用失败。
+  Disables watermarks on the stream of a specified user.
+
+  - Parameters:
+    - `userId`: The user ID of the user whose stream watermarks are to be disabled.
+  - Returns:
+    - `0`: Method call successful.
+    - Negative value: Method call failed.
 
 - **int release()**
 
-  释放与录制器关联的本地资源。
-  - 返回值:
-    - 释放操作的结果。
-      - `0`: 成功。
-      - `< 0`: 失败。
+  Releases the local resources associated with the recorder.
 
-### `IAgoraMediaRtcRecorderEventHandler` 类
+  - Returns:
+    - The result of the release operation.
+      - `0`: Success.
+      - `< 0`: Failure.
 
-#### 简介
+### `IAgoraMediaRtcRecorderEventHandler` Interface
 
-`IAgoraMediaRtcRecorderEventHandler` 接口定义了 SDK 与 Agora 频道之间连接状态变化时的回调方法，以及其他与录制相关的事件回调。
+#### Overview
 
-#### 方法
+The `IAgoraMediaRtcRecorderEventHandler` interface defines callback methods for changes in connection state between the SDK and the Agora channel, as well as other recording-related events.
 
-- `onConnected(String channelId, String userId)`
+#### Methods
 
-  当 SDK 与 Agora 频道的连接状态变为 `CONNECTION_STATE_CONNECTED(3)` 时触发。
+- **onConnected(String channelId, String userId)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：用户 ID。
+  Triggered when the connection state between the SDK and the Agora channel becomes `CONNECTION_STATE_CONNECTED(3)`.
 
-- `onDisconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The user ID.
 
-  当 SDK 与 Agora 频道的连接状态变为 `CONNECTION_STATE_DISCONNECTED(1)` 时触发。
+- **onDisconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：用户 ID。
-    - `reason`：连接状态变化的原因。参见 `Constants.ConnectionChangedReasonType`。
+  Triggered when the connection state between the SDK and the Agora channel becomes `CONNECTION_STATE_DISCONNECTED(1)`.
 
-- `onReconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The user ID.
+    - `reason`: The reason for the connection state change. See `Constants.ConnectionChangedReasonType`.
 
-  当 SDK 与 Agora 频道的连接状态再次变为 `CONNECTION_STATE_CONNECTED(3)` 时触发。
+- **onReconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：用户 ID。
-    - `reason`：连接状态变化的原因。参见 `Constants.ConnectionChangedReasonType`。
+  Triggered when the connection state between the SDK and the Agora channel becomes `CONNECTION_STATE_CONNECTED(3)` again.
 
-- `onConnectionLost(String channelId, String userId)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The user ID.
+    - `reason`: The reason for the connection state change. See `Constants.ConnectionChangedReasonType`.
 
-  当 SDK 与 Agora 频道失去连接时触发。
+- **onConnectionLost(String channelId, String userId)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：用户 ID。
+  Triggered when the SDK loses connection with the Agora channel.
 
-- `onUserJoined(String channelId, String userId)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The user ID.
 
-  当远端用户加入频道时触发。
+- **onUserJoined(String channelId, String userId)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：用户 ID。
+  Triggered when a remote user joins the channel.
 
-- `onUserLeft(String channelId, String userId, Constants.UserOfflineReasonType reason)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The user ID.
 
-  当远端用户离开频道时触发。
+- **onUserLeft(String channelId, String userId, Constants.UserOfflineReasonType reason)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：用户 ID。
-    - `reason`：远端用户离开频道的原因。参见 `Constants.UserOfflineReasonType`。
+  Triggered when a remote user leaves the channel.
 
-- `onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The user ID.
+    - `reason`: The reason the remote user left the channel. See `Constants.UserOfflineReasonType`.
 
-  当 SDK 解码出第一帧远端视频时触发。
+- **onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
-    - `width`：视频流的宽度（像素）。
-    - `height`：视频流的高度（像素）。
-    - `elapsed`：从用户连接到 Agora 频道到解码出第一帧视频的时间（毫秒）。
+  Triggered when the SDK decodes the first frame of remote video.
 
-- `onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The remote user ID.
+    - `width`: The width of the video stream (pixels).
+    - `height`: The height of the video stream (pixels).
+    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the first video frame being decoded.
 
-  当 SDK 解码出第一帧远端音频时触发。
+- **onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
-    - `elapsed`：从用户连接到 Agora 频道到解码出第一帧音频的时间（毫秒）。
+  Triggered when the SDK decodes the first frame of remote audio.
 
-- `onAudioVolumeIndication(String channelId, String userId, int speakerNumber, int totalVolume)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The remote user ID.
+    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the first audio frame being decoded.
 
-  报告正在说话的用户、说话者的音量以及本地用户是否在说话。
+- **onAudioVolumeIndication(String channelId, String userId, int speakerNumber, int totalVolume)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
-    - `speakerNumber`：说话者的总数。
-    - `totalVolume`：音频混音后的总音量，范围为 0（最低音量）到 255（最高音量）。
+  Reports the users who are speaking, the volume of the speaker, and whether the local user is speaking.
 
-- `onActiveSpeaker(String channelId, String userId)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The remote user ID.
+    - `speakerNumber`: The total number of speakers.
+    - `totalVolume`: The total volume after audio mixing, ranging from 0 (lowest volume) to 255 (highest volume).
 
-  当检测到活跃说话者时触发。
+- **onActiveSpeaker(String channelId, String userId)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：活跃说话者的用户 ID。`userId` 为 `0` 表示本地用户。
+  Triggered when an active speaker is detected.
 
-- `onUserVideoStateChanged(String channelId, String userId, Constants.RemoteVideoState state, Constants.RemoteVideoStateReason reason, int elapsed)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The user ID of the active speaker. A `userId` of `0` indicates the local user.
 
-  当远端用户的视频状态变化时触发。
+- **onUserVideoStateChanged(String channelId, String userId, Constants.RemoteVideoState state, Constants.RemoteVideoStateReason reason, int elapsed)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
-    - `state`：当前视频状态。参见 `Constants.RemoteVideoState`。
-    - `reason`：状态变化的原因。参见 `Constants.RemoteVideoStateReason`。
-    - `elapsed`：从用户连接到 Agora 频道到状态变化的时间（毫秒）。
+  Triggered when the video state of a remote user changes.
 
-- `onUserAudioStateChanged(String channelId, String userId, Constants.RemoteAudioState state, Constants.RemoteAudioStateReason reason, int elapsed)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The remote user ID.
+    - `state`: The current video state. See `Constants.RemoteVideoState`.
+    - `reason`: The reason for the state change. See `Constants.RemoteVideoStateReason`.
+    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the state change.
 
-  当远端用户的音频状态变化时触发。
+- **onUserAudioStateChanged(String channelId, String userId, Constants.RemoteAudioState state, Constants.RemoteAudioStateReason reason, int elapsed)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
-    - `state`：当前音频状态。参见 `Constants.RemoteAudioState`。
-    - `reason`：状态变化的原因。参见 `Constants.RemoteAudioStateReason`。
-    - `elapsed`：从用户连接到 Agora 频道到状态变化的时间（毫秒）。
+  Triggered when the audio state of a remote user changes.
 
-- `onRemoteVideoStats(String channelId, String userId, RemoteVideoStatistics stats)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The remote user ID.
+    - `state`: The current audio state. See `Constants.RemoteAudioState`.
+    - `reason`: The reason for the state change. See `Constants.RemoteAudioStateReason`.
+    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the state change.
 
-  报告远端视频的统计信息。
+- **onRemoteVideoStats(String channelId, String userId, RemoteVideoStatistics stats)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
-    - `stats`：当前视频的统计信息。
+  Reports the statistics of the remote video.
 
-- `onRemoteAudioStats(String channelId, String userId, RemoteAudioStatistics stats)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The remote user ID.
+    - `stats`: The statistics of the current video.
 
-  报告远端音频的统计信息。
+- **onRemoteAudioStats(String channelId, String userId, RemoteAudioStatistics stats)**
 
-  - 参数：
-    - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
-    - `stats`：当前音频的统计信息。
+  Reports the statistics of the remote audio.
 
-- `onRecorderStateChanged(String channelId, String userId, Constants.RecorderState state, Constants.RecorderReasonCode reason, String fileName)`
+  - Parameters:
+    - `channelId`: The channel ID.
+    - `userId`: The remote user ID.
+    - `stats`: The statistics of the current audio.
 
-  当录制状态变化时触发。
+- **onRecorderStateChanged(String channelId, String userId, Constants.RecorderState state, Constants.RecorderReasonCode reason, String fileName)**
 
-  - 参数：
-    - `channelId`：频道名称。
-    - `userId`：用户 ID。
-    - `state`：当前录制状态。参见 `Constants.RecorderState`。
-    - `reason`：状态变化的原因。参见 `Constants.RecorderReasonCode`。
-    - `fileName`：录制的文件名。
+  Triggered when the recording state changes.
 
-- `onRecorderInfoUpdated(String channelId, String userId, RecorderInfo info)`
+  - Parameters:
+    - `channelId`: The channel name.
+    - `userId`: The user ID.
+    - `state`: The current recording state. See `Constants.RecorderState`.
+    - `reason`: The reason for the state change. See `Constants.RecorderReasonCode`.
+    - `fileName`: The name of the recorded file.
 
-  当录制信息更新时触发。
+- **onRecorderInfoUpdated(String channelId, String userId, RecorderInfo info)**
 
-  - 参数：
-    - `channelId`：频道名称。
-    - `userId`：用户 ID。
-    - `info`：录制文件的信息。参见 `RecorderInfo`。
+  Triggered when the recording information is updated.
 
-### `MediaRecorderConfiguration` 类
+  - Parameters:
+    - `channelId`: The channel name.
+    - `userId`: The user ID.
+    - `info`: The information of the recorded file. See `RecorderInfo`.
 
-#### 简介
+### `MediaRecorderConfiguration` Class
 
-`MediaRecorderConfiguration` 类用于配置录制文件的相关参数。
+#### Overview
 
-#### 属性
+The `MediaRecorderConfiguration` class is used to configure parameters related to the recording file.
 
-- `storagePath`
+#### Properties
 
-  录制文件的绝对路径（包括文件名扩展名）。例如：
+- **`storagePath`**
+
+  The absolute path of the recording file (including the file name and extension). For example:
+
   - Windows: `C:\Users\<user_name>\AppData\Local\Agora\<process_name>\example.mp4`
   - iOS: `/App Sandbox/Library/Caches/example.mp4`
   - macOS: `/Library/Logs/example.mp4`
   - Android: `/storage/emulated/0/Android/data/<package name>/files/example.mp4`
   - Linux: `result/example.mp4`
 
-  **注意**：确保指定的路径存在且可写。
+  **Note**: Ensure that the specified path exists and is writable.
 
-- `containerFormat`
+- **`containerFormat`**
 
-  录制文件的格式。参见 `Constants.MediaRecorderContainerFormat`。
+  The format of the recording file. Refer to `Constants.MediaRecorderContainerFormat`.
 
-- `streamType`
+- **`streamType`**
 
-  录制内容类型。参见 `Constants.MediaRecorderStreamType`。
+  The type of content to be recorded. Refer to `Constants.MediaRecorderStreamType`.
 
-- `maxDurationMs`
+- **`maxDurationMs`**
 
-  最大录制时长，单位为毫秒。默认值为 120000 毫秒。
+  The maximum recording duration in milliseconds. The default value is 120,000 milliseconds (2 minutes).
 
-- `recorderInfoUpdateInterval`
+- **`recorderInfoUpdateInterval`**
 
-  更新录制信息的时间间隔，单位为毫秒。取值范围为 [1000, 10000]。根据设置的值，SDK 会触发 `IMediaRecorderObserver#onRecorderInfoUpdated` 回调来报告更新的录制信息。
+  The interval for updating recording information, in milliseconds. The value range is [1000, 10000]. Based on the set value, the SDK triggers the `IMediaRecorderObserver#onRecorderInfoUpdated` callback to report updated recording information.
 
-- `width`
+- **`width`**
 
-  录制视频的宽度，单位为像素。默认值为 1280。
+  The width of the recording video in pixels. The default value is 1280.
 
-- `height`
+- **`height`**
 
-  录制视频的高度，单位为像素。默认值为 720。
+  The height of the recording video in pixels. The default value is 720.
 
-- `fps`
+- **`fps`**
 
-  录制视频的帧率，单位为帧每秒。默认值为 30。
+  The frame rate of the recording video, in frames per second. The default value is 30.
 
-- `sampleRate`
+- **`sampleRate`**
 
-  录制音频的采样率，单位为 Hz。默认值为 48000。
+  The sample rate of the recording audio, in Hz. The default value is 48,000 Hz.
 
-- `channelNum`
+- **`channelNum`**
 
-  录制音频的声道数。默认值为 1（单声道）。
+  The number of audio channels for recording. The default value is 1 (mono).
 
-- `videoSourceType`
+- **`videoSourceType`**
 
-  外部视频源的类型。参见 `Constants.VideoSourceType`。
+  The type of external video source. Refer to `Constants.VideoSourceType`.
 
-### `AgoraParameter` 类
+### `AgoraParameter` Class
 
-#### 简介
+#### Overview
 
-`AgoraParameter` 类提供了获取和设置 Agora SDK 配置参数的功能，支持多种数据类型，包括布尔值、整数、无符号整数、浮点数、字符串、对象和数组。
+The `AgoraParameter` class provides functionalities to get and set Agora SDK configuration parameters, supporting various data types including boolean, integer, unsigned integer, floating-point, string, object, and array.
 
-#### 方法
+#### Methods
 
-- `void release()`
+- **`void release()`**
 
-  释放与此参数实例关联的所有资源。调用此方法后，实例将变为无效。
+  Releases all resources associated with this parameter instance. After calling this method, the instance becomes invalid.
 
-- `int setBool(String key, boolean value)`
+- **`int setBool(String key, boolean value)`**
 
-  设置布尔类型的参数值。
+  Sets a boolean parameter value.
 
-  - 参数：
-    - `key`：参数键。
-    - `value`：要设置的布尔值。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `key`: The parameter key.
+    - `value`: The boolean value to set.
+  - Returns: `0` on success, negative value on failure.
 
-- `int setInt(String key, int value)`
+- **`int setInt(String key, int value)`**
 
-  设置整数类型的参数值。
+  Sets an integer parameter value.
 
-  - 参数：
-    - `key`：参数键。
-    - `value`：要设置的整数值。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `key`: The parameter key.
+    - `value`: The integer value to set.
+  - Returns: `0` on success, negative value on failure.
 
-- `int setUInt(String key, int value)`
+- **`int setUInt(String key, int value)`**
 
-  设置无符号整数类型的参数值。
+  Sets an unsigned integer parameter value.
 
-  - 参数：
-    - `key`：参数键。
-    - `value`：要设置的无符号整数值。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `key`: The parameter key.
+    - `value`: The unsigned integer value to set.
+  - Returns: `0` on success, negative value on failure.
 
-- `int setNumber(String key, double value)`
+- **`int setNumber(String key, double value)`**
 
-  设置浮点数类型的参数值。
+  Sets a floating-point parameter value.
 
-  - 参数：
-    - `key`：参数键。
-    - `value`：要设置的浮点数值。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `key`: The parameter key.
+    - `value`: The floating-point value to set.
+  - Returns: `0` on success, negative value on failure.
 
-- `int setString(String key, String value)`
+- **`int setString(String key, String value)`**
 
-  设置字符串类型的参数值。
+  Sets a string parameter value.
 
-  - 参数：
-    - `key`：参数键。
-    - `value`：要设置的字符串值。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `key`: The parameter key.
+    - `value`: The string value to set.
+  - Returns: `0` on success, negative value on failure.
 
-- `int setObject(String key, String value)`
+- **`int setObject(String key, String value)`**
 
-  设置 JSON 格式的对象类型参数值。
+  Sets an object parameter value in JSON format.
 
-  - 参数：
-    - `key`：参数键。
-    - `value`：表示对象的 JSON 字符串。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `key`: The parameter key.
+    - `value`: The JSON string representing the object.
+  - Returns: `0` on success, negative value on failure.
 
-- `int setArray(String key, String value)`
+- **`int setArray(String key, String value)`**
 
-  设置 JSON 格式的数组类型参数值。
+  Sets an array parameter value in JSON format.
 
-  - 参数：
-    - `key`：参数键。
-    - `value`：表示数组的 JSON 字符串。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `key`: The parameter key.
+    - `value`: The JSON string representing the array.
+  - Returns: `0` on success, negative value on failure.
 
-- `boolean getBool(String key)`
+- **`boolean getBool(String key)`**
 
-  获取布尔类型的参数值。
+  Gets a boolean parameter value.
 
-  - 参数：
-    - `key`：参数键。
-  - 返回值：与键关联的布尔值。
-  - 异常：如果无法获取参数，将抛出 `IllegalStateException`。
+  - Parameters:
+    - `key`: The parameter key.
+  - Returns: The boolean value associated with the key.
+  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
 
-- `int getInt(String key)`
+- **`int getInt(String key)`**
 
-  获取整数类型的参数值。
+  Gets an integer parameter value.
 
-  - 参数：
-    - `key`：参数键。
-  - 返回值：与键关联的整数值。
-  - 异常：如果无法获取参数，将抛出 `IllegalStateException`。
+  - Parameters:
+    - `key`: The parameter key.
+  - Returns: The integer value associated with the key.
+  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
 
-- `int getUInt(String key)`
+- **`int getUInt(String key)`**
 
-  获取无符号整数类型的参数值。
+  Gets an unsigned integer parameter value.
 
-  - 参数：
-    - `key`：参数键。
-  - 返回值：与键关联的无符号整数值。
-  - 异常：如果无法获取参数，将抛出 `IllegalStateException`。
+  - Parameters:
+    - `key`: The parameter key.
+  - Returns: The unsigned integer value associated with the key.
+  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
 
-- `double getNumber(String key)`
+- **`double getNumber(String key)`**
 
-  获取浮点数类型的参数值。
+  Gets a floating-point parameter value.
 
-  - 参数：
-    - `key`：参数键。
-  - 返回值：与键关联的浮点数值。
-  - 异常：如果无法获取参数，将抛出 `IllegalStateException`。
+  - Parameters:
+    - `key`: The parameter key.
+  - Returns: The floating-point value associated with the key.
+  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
 
-- `String getString(String key)`
+- **`String getString(String key)`**
 
-  获取字符串类型的参数值。
+  Gets a string parameter value.
 
-  - 参数：
-    - `key`：参数键。
-  - 返回值：与键关联的字符串值，未找到时返回 null。
+  - Parameters:
+    - `key`: The parameter key.
+  - Returns: The string value associated with the key, or `null` if not found.
 
-- `String getObject(String key)`
+- **`String getObject(String key)`**
 
-  获取 JSON 格式的对象类型参数值。
+  Gets an object parameter value in JSON format.
 
-  - 参数：
-    - `key`：参数键。
-  - 返回值：表示对象的 JSON 字符串，未找到时返回 null。
+  - Parameters:
+    - `key`: The parameter key.
+  - Returns: The JSON string representing the object, or `null` if not found.
 
-- `String getArray(String key, String args)`
+- **`String getArray(String key, String args)`**
 
-  获取 JSON 格式的数组类型参数值。
+  Gets an array parameter value in JSON format.
 
-  - 参数：
-    - `key`：参数键。
-    - `args`：数组检索的附加参数。
-  - 返回值：表示数组的 JSON 字符串，未找到时返回 null。
+  - Parameters:
+    - `key`: The parameter key.
+    - `args`: Additional parameters for array retrieval.
+  - Returns: The JSON string representing the array, or `null` if not found.
 
-- `int setParameters(String parameters)`
+- **`int setParameters(String parameters)`**
 
-  使用 JSON 字符串一次性设置多个参数。
+  Sets multiple parameters at once using a JSON string.
 
-  - 参数：
-    - `parameters`：包含多个参数键值对的 JSON 字符串。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - Parameters:
+    - `parameters`: A JSON string containing multiple parameter key-value pairs.
+  - Returns: `0` on success, negative value on failure.
 
-- `String convertPath(String filePath)`
+- **`String convertPath(String filePath)`**
 
-  将文件路径转换为特定平台的格式。
+  Converts a file path to a platform-specific format.
 
-  - 参数：
-    - `filePath`：要转换的原始文件路径。
-  - 返回值：转换后的特定平台文件路径，转换失败时返回 null。
+  - Parameters:
+    - `filePath`: The original file path to convert.
+  - Returns: The platform-specific file path, or `null` if the conversion fails.
 
-## 更新日志
+## Changelog
 
-## 其他参考
+## Additional References
 
-详细参考官网（<https://doc.shengwang.cn/doc/recording/java/landing-page>）
+For detailed references, please visit the official website: [Agora Documentation](https://doc.shengwang.cn/doc/recording/java/landing-page)
