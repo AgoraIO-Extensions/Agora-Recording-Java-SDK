@@ -146,6 +146,8 @@ The following is a detailed explanation of each parameter based on the JSON file
 | maxResolutionUid         | String    | In vertical layout, set the user ID to display the maximum resolution.                                                                                              |
 | recorderStreamType       | String    | Recording type, supports `audio_only` (audio only), `video_only` (video only), `both` (both audio and video).                                                       |
 | recorderPath             | String    | Recording file path. For mixed recording, it is the recording file name; for single stream recording, it is the directory, with mp4 files named after each user ID. |
+| maxDuration              | Integer   | Recording duration, in seconds.                                                                                                                                     |
+| recoverFile              | Boolean   | Whether to write h264 and aac files simultaneously during recording, allowing recovery of mp4 files after program crash.                                            |
 | audio                    | Object    | Audio settings.                                                                                                                                                     |
 | audio.sampleRate         | Integer   | Audio sample rate.                                                                                                                                                  |
 | audio.numOfChannels      | Integer   | Number of audio channels.                                                                                                                                           |

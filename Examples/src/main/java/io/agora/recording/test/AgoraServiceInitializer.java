@@ -37,12 +37,15 @@ public class AgoraServiceInitializer {
             }
         }
 
-        if (recorderConfig.isUseCloudProxy()) {
-            AgoraParameter parameter = agoraService.getAgoraParameter();
+        AgoraParameter parameter = agoraService.getAgoraParameter();
+        if (recorderConfig.isUseCloudProxy()) {    
             if (parameter != null) {
                 parameter.setBool("rtc.enable_proxy", true);
                 SampleLogger.info("set the Cloud_Proxy Open!");
             }
+        }
+        if (recorderConfig.isRecoverFile()) {
+            parameter.setBool("che.media_recorder_recover_files", true);
         }
 
         if (factory == null) {

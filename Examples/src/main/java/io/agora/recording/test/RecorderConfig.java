@@ -20,6 +20,8 @@ public class RecorderConfig {
     private String maxResolutionUid;
     private String recorderStreamType;
     private String recorderPath;
+    private int maxDuration;
+    private boolean recoverFile;
     private AudioConfig audio;
     private VideoConfig video;
     private List<WaterMark> waterMark;
@@ -34,6 +36,8 @@ public class RecorderConfig {
         waterMark = new ArrayList<>();
         encryption = new Encryption();
         rotation = new ArrayList<>();
+        maxDuration = 120;
+        recoverFile = false;
     }
 
     public static class AudioConfig {
@@ -411,6 +415,22 @@ public class RecorderConfig {
         this.recorderPath = recorderPath;
     }
 
+    public int getMaxDuration() {
+        return maxDuration;
+    }
+
+    public void setMaxDuration(int maxDuration) {
+        this.maxDuration = maxDuration;
+    }
+
+    public boolean isRecoverFile() {
+        return recoverFile;
+    }
+
+    public void setRecoverFile(boolean recoverFile) {
+        this.recoverFile = recoverFile;
+    }
+
     public AudioConfig getAudio() {
         return audio;
     }
@@ -470,6 +490,8 @@ public class RecorderConfig {
                 ", maxResolutionUid='" + maxResolutionUid + '\'' +
                 ", recorderStreamType='" + recorderStreamType + '\'' +
                 ", recorderPath='" + recorderPath + '\'' +
+                ", maxDuration=" + maxDuration +
+                ", recoverFile=" + recoverFile +
                 ", audio=" + audio +
                 ", video=" + video +
                 ", waterMark=" + waterMark +

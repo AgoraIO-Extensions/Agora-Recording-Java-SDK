@@ -24,6 +24,7 @@ import io.agora.recording.WatermarkLitera;
 import io.agora.recording.WatermarkOptions;
 import io.agora.recording.WatermarkTimestamp;
 import io.agora.recording.test.utils.SampleLogger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     private final String taskId;
@@ -36,6 +37,9 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     private List<String> singleRecordingUserList = new CopyOnWriteArrayList<>();
     private VideoLayoutManager videoLayoutManager;
     private Constants.RecorderState recorderState = io.agora.recording.Constants.RecorderState.RECORDER_STATE_ERROR;
+    private AtomicBoolean startRecordingDone = new AtomicBoolean(false);
+    private List<String> waitForUpdateUIUserIds = new CopyOnWriteArrayList<>();
+
 
     public RecordingSession(String taskId, RecorderConfig recorderConfig, ThreadPoolExecutor taskExecutorService) {
         this.taskId = taskId;
@@ -103,6 +107,8 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         agoraMediaRtcRecorder.joinChannel(recorderConfig.getToken(),
                 recorderConfig.getChannelName(),
                 recorderConfig.getUserId());
+
+        startRecordingDone.set(false);
     }
 
     private void setConfigBeforeStartRecording(String userId) {
@@ -165,21 +171,23 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
 
     }
 
-    public void startRecordingByUserId(String userId, int width, int height) {
+    public void startRecording(String userId, int width, int height) {
         if (null == agoraMediaRtcRecorder) {
             SampleLogger.info("startRecording agoraMediaRtcRecorder is null");
             return;
         }
-        SampleLogger.info("[" + taskId + "]startRecordingByUserId userId:" + userId + " width:" + width + " height:"
+        SampleLogger.info("[" + taskId + "]startRecording userId:" + userId + " width:" + width + " height:"
                 + height);
         if (singleRecordingUserList.contains(userId)) {
-            SampleLogger.info("[" + taskId + "]startRecordingByUserId userId:" + userId + " is already recording");
+            SampleLogger.info("[" + taskId + "]startRecording userId:" + userId + " is already recording");
             return;
         }
+
         MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
         mediaRecorderConfiguration.setWidth(width != 0 ? width : recorderConfig.getVideo().getWidth());
         mediaRecorderConfiguration.setHeight(height != 0 ? height : recorderConfig.getVideo().getHeight());
         mediaRecorderConfiguration.setFps(recorderConfig.getVideo().getFps());
+        mediaRecorderConfiguration.setMaxDurationMs(recorderConfig.getMaxDuration() * 1000);
         if (io.agora.recording.utils.Utils.isNullOrEmpty(userId)) {
             mediaRecorderConfiguration.setStoragePath(recorderConfig.getRecorderPath());
         } else {
@@ -192,22 +200,36 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                         .convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()));
         mediaRecorderConfiguration
                 .setVideoSourceType(io.agora.recording.Constants.VideoSourceType.VIDEO_SOURCE_CAMERA_SECONDARY);
-        mediaRecorderConfiguration.setMaxDurationMs(24 * 60 * 60 * 1000);
 
         setConfigBeforeStartRecording(userId);
 
+        SampleLogger.info("[" + taskId + "]startRecording mediaRecorderConfiguration:" + mediaRecorderConfiguration);
+
         int ret = -1;
         if (io.agora.recording.utils.Utils.isNullOrEmpty(userId)) {
-            agoraMediaRtcRecorder.setRecorderConfig(mediaRecorderConfiguration);
+            ret = agoraMediaRtcRecorder.setRecorderConfig(mediaRecorderConfiguration);
+            SampleLogger.info("[" + taskId + "]startRecording setRecorderConfig ret:" + ret);
             ret = agoraMediaRtcRecorder.startRecording();
+            SampleLogger
+                    .info("[" + taskId + "]startRecording  ret:" + ret);
         } else {
-            agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
+            ret = agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
+            SampleLogger.info("[" + taskId + "]startRecording setRecorderConfigByUid ret:" + ret);
             ret = agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
             singleRecordingUserList.add(userId);
+            SampleLogger
+                    .info("[" + taskId + "]startRecordingByUserId userId:" + userId + " ret:"
+                            + ret);
         }
-        SampleLogger
-                .info("[" + taskId + "]startRecordingByUserId startSingleRecordingByUid userId:" + userId + " ret:"
-                        + ret);
+        startRecordingDone.set(true);
+
+        if (!waitForUpdateUIUserIds.isEmpty()) {
+            for (String waitUserId : waitForUpdateUIUserIds) {
+                taskExecutorService.submit(() -> videoLayoutManager.addUser(waitUserId));
+            }
+            waitForUpdateUIUserIds.clear();
+        }
+
     }
 
     public void stopRecording() {
@@ -258,6 +280,9 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             videoLayoutManager.release();
             videoLayoutManager = null;
         }
+
+        startRecordingDone.set(false);
+        waitForUpdateUIUserIds.clear();
     }
 
     public void stopRecordingByUserId(String userId) {
@@ -278,7 +303,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         SampleLogger.info("onConnected channelId:" + channelId + " userId:" + userId);
         taskExecutorService.submit(() -> {
             if (recorderConfig.isMix()) {
-                startRecordingByUserId("", 0, 0);
+                startRecording("", 0, 0);
             }
         });
 
@@ -312,7 +337,11 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                     .recorderIsVideo(io.agora.recording.test.utils.Utils
                             .convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
                     && null != videoLayoutManager) {
-                taskExecutorService.submit(() -> videoLayoutManager.addUser(userId));
+                if (startRecordingDone.get()) {
+                    taskExecutorService.submit(() -> videoLayoutManager.addUser(userId));
+                } else {
+                    waitForUpdateUIUserIds.add(userId);
+                }
             }
         }
     }
@@ -347,7 +376,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                         .convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))) {
             if (recorderConfig.isSubAllVideo()
                     || (!recorderConfig.isSubAllVideo() && recorderConfig.getSubVideoUserList().contains(userId))) {
-                taskExecutorService.submit(() -> startRecordingByUserId(userId, width, height));
+                taskExecutorService.submit(() -> startRecording(userId, width, height));
             }
         }
     }
@@ -360,7 +389,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                 recorderConfig.getRecorderStreamType()) == Constants.MediaRecorderStreamType.STREAM_TYPE_AUDIO) {
             if (recorderConfig.isSubAllAudio()
                     || (!recorderConfig.isSubAllAudio() && recorderConfig.getSubAudioUserList().contains(userId))) {
-                taskExecutorService.submit(() -> startRecordingByUserId(userId, 0, 0));
+                taskExecutorService.submit(() -> startRecording(userId, 0, 0));
             }
         }
     }

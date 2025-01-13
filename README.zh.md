@@ -144,6 +144,8 @@ cd Examples
 | maxResolutionUid         | String    | 在 vertical 布局中，设定显示最大分辨率的用户 ID。                                                                                         |
 | recorderStreamType       | String    | 录制类型，支持 `audio_only`（只录音频），`video_only`（只录视频），`both`（音视频都录）。                                                 |
 | recorderPath             | String    | 录制文件路径。合流录制时为录制的文件名;单流录制时为录制的目录，以每一个用户 ID 为名的 mp4 文件。                                          |
+| maxDuration              | Integer   | 录制时长，单位秒。                                                                                                                        |
+| recoverFile              | Boolean   | 是否在录制时同时写 h264 和 aac 文件，程序 crash 后可以恢复出 mp4。                                                                        |
 | audio                    | Object    | 音频设置。                                                                                                                                |
 | audio.sampleRate         | Integer   | 音频采样率。                                                                                                                              |
 | audio.numOfChannels      | Integer   | 音频通道数量。                                                                                                                            |

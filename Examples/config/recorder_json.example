@@ -15,6 +15,8 @@
     "maxResolutionUid": "123",   // 在vertical布局中，设定显示最大分辨率的uid
     "recorderStreamType":"both",   // 录制类型， audio_only 只录音频，video_only 只录音频， both 音视频都录
     "recorderPath":"recorderTest.mp4",  // 合流录制时为录制的文件名，单流录制为录制的目录，以每一个uid为名的mp4文件
+    "maxDuration": 120,  // 录制时长，单位秒s
+    "recoverFile": false,   // 是否在录制时同时写h264和aac文件，程序crash后可以恢复出mp4
     "audio":{
         "sampleRate": 16000,
         "numOfChannels": 1
@@ -60,7 +62,7 @@
     "encryption":{              // 媒体流加密
         "mode": "AES_128_ECB",  // 加密类型 AES_128_XTS, AES_128_ECB, AES_256_XTS, SM4_128_ECB, AES_128_GCM, AES_256_GCM, AES_128_GCM2, AES_256_GCM2
         "key": "xxx",           
-        "salt": "xxx"
+        "salt": "xxx"           // 32位字符串
     },
     "rotation":[                    // 画面旋转
         {

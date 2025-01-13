@@ -28,6 +28,9 @@ public class RecordingApplication {
                     if ("1".equals(input)) {
                         leaveLatch.countDown();
                         break;
+                    } else if ("9".equals(input)) {
+                        SampleLogger.info("程序即将终止");
+                        System.exit(1);
                     }
                 }
                 scanner.close();
