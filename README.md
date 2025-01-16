@@ -65,7 +65,21 @@ The required bandwidth depends on the number of channels being recorded simultan
 
 ## SDK Download
 
-Contact to get the latest SDK.
+### Maven Dependency
+
+Add the following dependency to your project's `pom.xml` file:
+
+```xml
+<dependency>
+    <groupId>io.agora.rtc</groupId>
+    <artifactId>linux-recording-java-sdk</artifactId>
+    <version>4.4.150</version>
+</dependency>
+```
+
+### Download SDK
+
+[linux-recording-java-sdk-4.4.150](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150/linux-recording-java-sdk-4.4.150.jar)
 
 ## Quick Start
 
@@ -169,7 +183,7 @@ The following is a detailed explanation of each parameter based on the JSON file
 | encryption               | Object    | Media stream encryption settings.                                                                                                                                   |
 | encryption.mode          | String    | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                 |
 | encryption.key           | String    | Encryption key.                                                                                                                                                     |
-| encryption.salt          | String    | Encryption salt.                                                                                                                                                    |
+| encryption.salt          | String    | Encryption salt, a 32-character string, e.g., "ABC123".                                                                                                                                |
 | rotation                 | Object[]  | Video rotation settings.                                                                                                                                            |
 | rotation[].uid           | String    | User ID of the video to be rotated.                                                                                                                                 |
 | rotation[].degree        | Integer   | Rotation angle, supports 0, 90, 180, 270.                                                                                                                           |

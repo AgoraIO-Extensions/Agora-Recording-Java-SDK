@@ -1,4 +1,4 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -7,7 +7,9 @@ import io.agora.recording.AgoraMediaRtcRecorder;
 import io.agora.recording.MixerLayoutConfig;
 import io.agora.recording.UserMixerLayout;
 import io.agora.recording.VideoMixingLayout;
-import io.agora.recording.test.utils.SampleLogger;
+import io.agora.recording.example.ExampleConstants;
+import io.agora.recording.example.RecorderConfig;
+import io.agora.recording.example.utils.SampleLogger;
 
 public class VideoLayoutManager {
     private AgoraMediaRtcRecorder recorder;

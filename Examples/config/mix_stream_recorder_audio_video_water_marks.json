@@ -2,9 +2,9 @@
     "appId": "xxx",
     "token": "xxx",
     "channelName": "rtest",
-    "useStringUid": true,
+    "useStringUid": false,
     "useCloudProxy": false,
-    "userId": "123qwe",
+    "userId": "0",
     "subAllAudio": true,
     "subAudioUserList": [
         "123"

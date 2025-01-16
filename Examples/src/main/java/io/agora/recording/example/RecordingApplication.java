@@ -1,10 +1,10 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 
-import io.agora.recording.test.utils.SampleLogger;
-import io.agora.recording.test.utils.Utils;
+import io.agora.recording.example.utils.SampleLogger;
+import io.agora.recording.example.utils.Utils;
 
 public class RecordingApplication {
     private static final CountDownLatch leaveLatch = new CountDownLatch(1);
@@ -12,13 +12,13 @@ public class RecordingApplication {
 
     public static void main(String[] args) {
         try {
-            RecorderConfig config = RecorderConfigManager.parseArgs(args);
-            SampleLogger.info("Recording config: " + config);
+            RecorderConfigManager.parseArgs(args);
+            SampleLogger.info("Recording config: " + RecorderConfigManager.getConfig());
 
-            AgoraServiceInitializer.initService(config);
+            AgoraServiceInitializer.initService(RecorderConfigManager.getConfig());
 
             String taskId = Utils.getTaskId();
-            recordingManager.startRecording(taskId, config);
+            recordingManager.startRecording(taskId, RecorderConfigManager.getConfig());
 
             // Start a new thread to listen for console input
             new Thread(() -> {

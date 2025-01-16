@@ -1,4 +1,4 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 import io.agora.recording.AgoraMediaComponentFactory;
 import io.agora.recording.AgoraMediaRtcRecorder;
@@ -11,7 +11,7 @@ import io.agora.recording.MediaRecorderConfiguration;
 import io.agora.recording.VideoMixingLayout;
 import io.agora.recording.VideoSubscriptionOptions;
 import io.agora.recording.WatermarkConfig;
-import io.agora.recording.test.utils.SampleLogger;
+import io.agora.recording.example.utils.SampleLogger;
 
 public class APIExample implements IAgoraMediaRtcRecorderEventHandler {
     private static AgoraMediaRtcRecorder agoraMediaRtcRecorder;

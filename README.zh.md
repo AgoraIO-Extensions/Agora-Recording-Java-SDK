@@ -63,7 +63,21 @@
 
 ## SDK 下载
 
-联系获取最新 SDK
+### Maven 依赖
+
+在项目的 pom.xml 文件中添加以下依赖:
+
+```xml
+<dependency>
+    <groupId>io.agora.rtc</groupId>
+    <artifactId>linux-recording-java-sdk</artifactId>
+    <version>4.4.150</version>
+</dependency>
+```
+
+### 下载 SDK
+
+[linux-recording-java-sdk-4.4.150](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150/linux-recording-java-sdk-4.4.150.jar)
 
 ## 快速开始
 
@@ -167,7 +181,7 @@ cd Examples
 | encryption               | Object    | 媒体流加密设置。                                                                                                                          |
 | encryption.mode          | String    | 加密类型，支持 `AES_128_XTS`，`AES_128_ECB`，`AES_256_XTS`，`SM4_128_ECB`，`AES_128_GCM`，`AES_256_GCM`，`AES_128_GCM2`，`AES_256_GCM2`。 |
 | encryption.key           | String    | 加密密钥。                                                                                                                                |
-| encryption.salt          | String    | 加密盐值。                                                                                                                                |
+| encryption.salt          | String    | 加密盐，值为32位字符，例如串 "ABC123"。                                                                                                                                |
 | rotation                 | Object[]  | 画面旋转设置。                                                                                                                            |
 | rotation[].uid           | String    | 需要旋转画面的用户 ID。                                                                                                                   |
 | rotation[].degree        | Integer   | 旋转的角度，支持 0，90，180，270。                                                                                                        |

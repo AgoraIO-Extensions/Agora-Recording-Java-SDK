@@ -1,4 +1,4 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -6,14 +6,17 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-import io.agora.recording.test.utils.SampleLogger;
-import io.agora.recording.test.utils.Utils;
+import io.agora.recording.example.utils.SampleLogger;
+import io.agora.recording.example.utils.Utils;
 
 public class RecorderConfigManager {
-    public static RecorderConfig parseArgs(String[] args) {
+    private static RecorderConfig config;
+    private static int sleepTime;
+
+    public static void parseArgs(String[] args) {
         SampleLogger.info("parseArgs args:" + Arrays.toString(args));
         if (args == null || args.length == 0) {
-            return null;
+            return;
         }
 
         Map<String, String> params = new HashMap<>();
@@ -31,8 +34,17 @@ public class RecorderConfigManager {
         }
 
         Gson gson = new Gson();
-        RecorderConfig config = gson.fromJson(io.agora.recording.utils.Utils.readFile(params.get("config")),
-                RecorderConfig.class);
+
+        if (params.containsKey("config")) {
+            config = gson.fromJson(io.agora.recording.utils.Utils.readFile(params.get("config")),
+                    RecorderConfig.class);
+        } else {
+            config = new RecorderConfig();
+        }
+
+        if (params.containsKey("sleepTime")) {
+            sleepTime = Integer.parseInt(params.get("sleepTime"));
+        }
 
         String[] keys = Utils.readAppIdAndToken(".keys");
         if (keys != null && keys.length == 2 && !io.agora.recording.utils.Utils.isNullOrEmpty(keys[0])
@@ -40,6 +52,13 @@ public class RecorderConfigManager {
             config.setAppId(keys[0]);
             config.setToken(keys[1]);
         }
+    }
+
+    public static RecorderConfig getConfig() {
         return config;
+    }
+
+    public static int getSleepTime() {
+        return sleepTime;
     }
 }

@@ -1,10 +1,10 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.agora.recording.AgoraMediaComponentFactory;
 import io.agora.recording.AgoraMediaRtcRecorder;
@@ -15,7 +15,6 @@ import io.agora.recording.EncryptionConfig;
 import io.agora.recording.IAgoraMediaRtcRecorderEventHandler;
 import io.agora.recording.MediaRecorderConfiguration;
 import io.agora.recording.RecorderInfo;
-import io.agora.recording.Rectangle;
 import io.agora.recording.RemoteAudioStatistics;
 import io.agora.recording.RemoteVideoStatistics;
 import io.agora.recording.VideoSubscriptionOptions;
@@ -23,8 +22,8 @@ import io.agora.recording.WatermarkConfig;
 import io.agora.recording.WatermarkLitera;
 import io.agora.recording.WatermarkOptions;
 import io.agora.recording.WatermarkTimestamp;
-import io.agora.recording.test.utils.SampleLogger;
-import java.util.concurrent.atomic.AtomicBoolean;
+import io.agora.recording.example.utils.SampleLogger;
+import io.agora.recording.example.utils.Utils;
 
 public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     private final String taskId;
@@ -39,7 +38,6 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     private Constants.RecorderState recorderState = io.agora.recording.Constants.RecorderState.RECORDER_STATE_ERROR;
     private AtomicBoolean startRecordingDone = new AtomicBoolean(false);
     private List<String> waitForUpdateUIUserIds = new CopyOnWriteArrayList<>();
-
 
     public RecordingSession(String taskId, RecorderConfig recorderConfig, ThreadPoolExecutor taskExecutorService) {
         this.taskId = taskId;
@@ -72,12 +70,12 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
 
         if (enableEncryption) {
             EncryptionConfig encryptionConfig = new EncryptionConfig();
-            encryptionConfig.setEncryptionMode(io.agora.recording.test.utils.Utils
+            encryptionConfig.setEncryptionMode(Utils
                     .convertToEncryptionMode(recorderConfig.getEncryption().getMode()));
             encryptionConfig.setEncryptionKey(recorderConfig.getEncryption().getKey());
             if (!io.agora.recording.utils.Utils.isNullOrEmpty(recorderConfig.getEncryption().getSalt())) {
                 encryptionConfig.setEncryptionKdfSalt(
-                        recorderConfig.getEncryption().getSalt().getBytes(StandardCharsets.UTF_8));
+                        io.agora.recording.utils.Utils.byteStringToByteArray(recorderConfig.getEncryption().getSalt()));
             }
             SampleLogger.info("[" + taskId + "]joinChannel enableEncryption encryptionConfig:" + encryptionConfig);
             int ret = agoraMediaRtcRecorder.enableEncryption(true, encryptionConfig);
@@ -94,7 +92,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         VideoSubscriptionOptions options = new VideoSubscriptionOptions();
         options.setEncodedFrameOnly(false);
         options.setType(
-                io.agora.recording.test.utils.Utils.convertToVideoStreamType(recorderConfig.getSubStreamType()));
+                Utils.convertToVideoStreamType(recorderConfig.getSubStreamType()));
         SampleLogger.info("[" + taskId + "]startRecording VideoSubscriptionOptions:" + options);
         if (recorderConfig.isSubAllVideo()) {
             agoraMediaRtcRecorder.subscribeAllVideo(options);
@@ -117,7 +115,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             for (int i = 0; i < recorderConfig.getWaterMark().size(); i++) {
                 watermarks[i] = new WatermarkConfig();
                 watermarks[i].setIndex(i + 1);
-                WatermarkSourceType watermarkSourceType = io.agora.recording.test.utils.Utils
+                WatermarkSourceType watermarkSourceType = Utils
                         .convertToWatermarkSourceType(recorderConfig.getWaterMark().get(i).getType());
                 watermarks[i].setType(watermarkSourceType);
                 if (watermarkSourceType == WatermarkSourceType.LITERA) {
@@ -139,13 +137,13 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                 watermarkOptions.setMode(Constants.WaterMaskFitMode.FIT_MODE_COVER_POSITION);
                 watermarkOptions.setZOrder(recorderConfig.getWaterMark().get(i).getZorder());
 
-                Rectangle positionInPortraitMode = new Rectangle();
+                io.agora.recording.Rectangle positionInPortraitMode = new io.agora.recording.Rectangle();
                 positionInPortraitMode.setX(recorderConfig.getWaterMark().get(i).getX());
                 positionInPortraitMode.setY(recorderConfig.getWaterMark().get(i).getY());
                 positionInPortraitMode.setWidth(recorderConfig.getWaterMark().get(i).getWidth());
                 positionInPortraitMode.setHeight(recorderConfig.getWaterMark().get(i).getHeight());
 
-                Rectangle positionInLandscapeMode = new Rectangle();
+                io.agora.recording.Rectangle positionInLandscapeMode = new io.agora.recording.Rectangle();
                 positionInLandscapeMode.setX(recorderConfig.getWaterMark().get(i).getX());
                 positionInLandscapeMode.setY(recorderConfig.getWaterMark().get(i).getY());
                 positionInLandscapeMode.setWidth(recorderConfig.getWaterMark().get(i).getWidth());
@@ -189,14 +187,20 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         mediaRecorderConfiguration.setFps(recorderConfig.getVideo().getFps());
         mediaRecorderConfiguration.setMaxDurationMs(recorderConfig.getMaxDuration() * 1000);
         if (io.agora.recording.utils.Utils.isNullOrEmpty(userId)) {
-            mediaRecorderConfiguration.setStoragePath(recorderConfig.getRecorderPath());
+            mediaRecorderConfiguration.setStoragePath(
+                    recorderConfig.getRecorderPath().substring(0, recorderConfig.getRecorderPath().lastIndexOf(".mp4"))
+                            + "_" + io.agora.recording.utils.Utils.formatTimestamp(System.currentTimeMillis(),
+                                    "yyyyMMdd-HHmmss")
+                            + ".mp4");
         } else {
-            mediaRecorderConfiguration.setStoragePath(recorderConfig.getRecorderPath() + userId + ".mp4");
+            mediaRecorderConfiguration
+                    .setStoragePath(recorderConfig.getRecorderPath() + userId + "_" + io.agora.recording.utils.Utils
+                            .formatTimestamp(System.currentTimeMillis(), "yyyyMMdd-HHmmss") + ".mp4");
         }
         mediaRecorderConfiguration.setSampleRate(recorderConfig.getAudio().getSampleRate());
         mediaRecorderConfiguration.setChannelNum(recorderConfig.getAudio().getNumOfChannels());
         mediaRecorderConfiguration
-                .setStreamType(io.agora.recording.test.utils.Utils
+                .setStreamType(Utils
                         .convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()));
         mediaRecorderConfiguration
                 .setVideoSourceType(io.agora.recording.Constants.VideoSourceType.VIDEO_SOURCE_CAMERA_SECONDARY);
@@ -333,9 +337,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         }
 
         if (recorderConfig.isMix()) {
-            if (io.agora.recording.test.utils.Utils
-                    .recorderIsVideo(io.agora.recording.test.utils.Utils
-                            .convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
+            if (Utils.recorderIsVideo(Utils.convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
                     && null != videoLayoutManager) {
                 if (startRecordingDone.get()) {
                     taskExecutorService.submit(() -> videoLayoutManager.addUser(userId));
@@ -357,9 +359,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             if (!recorderConfig.isSubAllVideo() && !recorderConfig.getSubVideoUserList().contains(userId)) {
                 return;
             }
-            if (io.agora.recording.test.utils.Utils
-                    .recorderIsVideo(io.agora.recording.test.utils.Utils
-                            .convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
+            if (Utils.recorderIsVideo(Utils.convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
                     && null != videoLayoutManager) {
                 taskExecutorService.submit(() -> videoLayoutManager.removeUser(userId));
             }
@@ -371,9 +371,8 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             int elapsed) {
         SampleLogger.info("onFirstRemoteVideoDecoded channelId:" + channelId + " userId:" + userId + " width:" + width
                 + " height:" + height + " elapsed:" + elapsed);
-        if (!recorderConfig.isMix() && io.agora.recording.test.utils.Utils
-                .recorderIsVideo(io.agora.recording.test.utils.Utils
-                        .convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))) {
+        if (!recorderConfig.isMix() && Utils
+                .recorderIsVideo(Utils.convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))) {
             if (recorderConfig.isSubAllVideo()
                     || (!recorderConfig.isSubAllVideo() && recorderConfig.getSubVideoUserList().contains(userId))) {
                 taskExecutorService.submit(() -> startRecording(userId, width, height));
@@ -385,7 +384,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     public void onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed) {
         SampleLogger.info("onFirstRemoteAudioDecoded channelId:" + channelId + " userId:" + userId + " elapsed:"
                 + elapsed);
-        if (!recorderConfig.isMix() && io.agora.recording.test.utils.Utils.convertToMediaRecorderStreamType(
+        if (!recorderConfig.isMix() && Utils.convertToMediaRecorderStreamType(
                 recorderConfig.getRecorderStreamType()) == Constants.MediaRecorderStreamType.STREAM_TYPE_AUDIO) {
             if (recorderConfig.isSubAllAudio()
                     || (!recorderConfig.isSubAllAudio() && recorderConfig.getSubAudioUserList().contains(userId))) {

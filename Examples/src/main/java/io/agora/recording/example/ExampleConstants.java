@@ -1,4 +1,4 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 public class ExampleConstants {
     public static final String BESTFIT_LAYOUT = "bestfit";

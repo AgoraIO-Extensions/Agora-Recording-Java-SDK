@@ -1,11 +1,11 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 import io.agora.recording.AgoraMediaComponentFactory;
 import io.agora.recording.AgoraParameter;
 import io.agora.recording.AgoraService;
 import io.agora.recording.AgoraServiceConfiguration;
 import io.agora.recording.LogConfig;
-import io.agora.recording.test.utils.SampleLogger;
+import io.agora.recording.example.utils.SampleLogger;
 
 public class AgoraServiceInitializer {
     private static AgoraService agoraService;

@@ -1,1 +1,1 @@
-sh run.zsh io.agora.recording.test.RecordingApplication -config config/mix_stream_recorder_audio.json
+sh run.zsh io.agora.recording.example.RecordingApplication -config config/mix_stream_recorder_audio.json

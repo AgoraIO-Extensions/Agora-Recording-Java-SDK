@@ -1,4 +1,4 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 import java.util.ArrayList;
 import java.util.List;

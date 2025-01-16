@@ -1,10 +1,12 @@
-package io.agora.recording.test;
+package io.agora.recording.example;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import io.agora.recording.example.RecorderConfig;
 
 public class RecordingManager {
     private final Map<String, RecordingSession> activeRecordings = new HashMap<>();

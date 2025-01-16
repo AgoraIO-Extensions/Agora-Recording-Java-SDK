@@ -1,4 +1,4 @@
-package io.agora.recording.test.utils;
+package io.agora.recording.example.utils;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
