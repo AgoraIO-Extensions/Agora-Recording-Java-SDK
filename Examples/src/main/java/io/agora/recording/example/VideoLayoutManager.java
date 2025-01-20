@@ -7,8 +7,6 @@ import io.agora.recording.AgoraMediaRtcRecorder;
 import io.agora.recording.MixerLayoutConfig;
 import io.agora.recording.UserMixerLayout;
 import io.agora.recording.VideoMixingLayout;
-import io.agora.recording.example.ExampleConstants;
-import io.agora.recording.example.RecorderConfig;
 import io.agora.recording.example.utils.SampleLogger;
 
 public class VideoLayoutManager {
@@ -177,7 +175,7 @@ public class VideoLayoutManager {
         config.setY(0);
         config.setWidth(recorderConfig.getVideo().getWidth());
         config.setHeight(recorderConfig.getVideo().getHeight());
-        config.setAlpha(1.0f);
+        config.setZOrder(0);
         regionList[0].setConfig(config);
 
         float canvasWidth = recorderConfig.getVideo().getWidth();
@@ -185,8 +183,8 @@ public class VideoLayoutManager {
 
         float viewWidth = 0.235f;
         float viewHEdge = 0.012f;
-        float viewHeight = viewWidth * (canvasWidth / canvasHeight);
-        float viewVEdge = viewHEdge * (canvasWidth / canvasHeight);
+        float viewHeight = 0.235f;
+        float viewVEdge = 0.012f;
 
         for (int i = 1; i < userIds.size(); i++) {
             regionList[i].setUserId(userIds.get(i));
@@ -197,7 +195,7 @@ public class VideoLayoutManager {
             layoutConfig.setY((int) ((1 - (yIndex + 1) * (viewHeight + viewVEdge)) * canvasHeight));
             layoutConfig.setWidth((int) (viewWidth * canvasWidth));
             layoutConfig.setHeight((int) (viewHeight * canvasHeight));
-            layoutConfig.setAlpha(i + 1);
+            layoutConfig.setZOrder(1);
             regionList[i].setConfig(layoutConfig);
         }
     }
