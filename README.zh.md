@@ -181,7 +181,7 @@ cd Examples
 | encryption               | Object    | 媒体流加密设置。                                                                                                                          |
 | encryption.mode          | String    | 加密类型，支持 `AES_128_XTS`，`AES_128_ECB`，`AES_256_XTS`，`SM4_128_ECB`，`AES_128_GCM`，`AES_256_GCM`，`AES_128_GCM2`，`AES_256_GCM2`。 |
 | encryption.key           | String    | 加密密钥。                                                                                                                                |
-| encryption.salt          | String    | 加密盐，值为32位字符，例如串 "ABC123"。                                                                                                                                |
+| encryption.salt          | String    | 加密盐，值为 32 位字符，例如串 "ABC123"。                                                                                                 |
 | rotation                 | Object[]  | 画面旋转设置。                                                                                                                            |
 | rotation[].uid           | String    | 需要旋转画面的用户 ID。                                                                                                                   |
 | rotation[].degree        | Integer   | 旋转的角度，支持 0，90，180，270。                                                                                                        |
@@ -770,7 +770,7 @@ agoraService.release();
     - `0`: 注册成功。
     - 负值: 注册失败。
 
-- **int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handle)**
+- **int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handler)**
 
   注销先前注册的事件处理程序。
 
@@ -1198,6 +1198,10 @@ agoraService.release();
   - 返回值：转换后的特定平台文件路径，转换失败时返回 null。
 
 ## 更新日志
+
+### v4.4.150（2025-01-21）
+
+- 发布 4.4.150 版本，包含基础功能和性能优化。
 
 ## 其他参考
 

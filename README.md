@@ -183,7 +183,7 @@ The following is a detailed explanation of each parameter based on the JSON file
 | encryption               | Object    | Media stream encryption settings.                                                                                                                                   |
 | encryption.mode          | String    | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                 |
 | encryption.key           | String    | Encryption key.                                                                                                                                                     |
-| encryption.salt          | String    | Encryption salt, a 32-character string, e.g., "ABC123".                                                                                                                                |
+| encryption.salt          | String    | Encryption salt, a 32-character string, e.g., "ABC123".                                                                                                             |
 | rotation                 | Object[]  | Video rotation settings.                                                                                                                                            |
 | rotation[].uid           | String    | User ID of the video to be rotated.                                                                                                                                 |
 | rotation[].degree        | Integer   | Rotation angle, supports 0, 90, 180, 270.                                                                                                                           |
@@ -772,7 +772,7 @@ The `AgoraMediaRtcRecorder` class provides functionalities for recording Agora R
     - `0`: Registration successful.
     - Negative value: Registration failed.
 
-- **int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handle)**
+- **int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handler)**
 
   Unregisters a previously registered event handler.
 
@@ -1200,6 +1200,10 @@ The `AgoraParameter` class provides functionalities to get and set Agora SDK con
   - Returns: The platform-specific file path, or `null` if the conversion fails.
 
 ## Changelog
+
+### v4.4.150（2025-01-21）
+
+- Released version 4.4.150, including basic features and performance optimizations.
 
 ## Additional References
 
