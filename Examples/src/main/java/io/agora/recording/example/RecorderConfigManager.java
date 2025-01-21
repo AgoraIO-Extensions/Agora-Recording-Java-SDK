@@ -12,6 +12,9 @@ import io.agora.recording.example.utils.Utils;
 public class RecorderConfigManager {
     private static RecorderConfig config;
     private static int sleepTime;
+    private static int threadNum = 1;
+    private static int testTime = 0;
+    private static int oneTestTime = 0;
 
     public static void parseArgs(String[] args) {
         SampleLogger.info("parseArgs args:" + Arrays.toString(args));
@@ -46,6 +49,18 @@ public class RecorderConfigManager {
             sleepTime = Integer.parseInt(params.get("sleepTime"));
         }
 
+        if (params.containsKey("threadNum")) {
+            threadNum = Integer.parseInt(params.get("threadNum"));
+        }
+
+        if (params.containsKey("testTime")) {
+            testTime = Integer.parseInt(params.get("testTime"));
+        }
+
+        if (params.containsKey("oneTestTime")) {
+            oneTestTime = Integer.parseInt(params.get("oneTestTime"));
+        }
+
         String[] keys = Utils.readAppIdAndToken(".keys");
         if (keys != null && keys.length == 2 && !io.agora.recording.utils.Utils.isNullOrEmpty(keys[0])
                 && !io.agora.recording.utils.Utils.isNullOrEmpty(keys[1])) {
@@ -60,5 +75,17 @@ public class RecorderConfigManager {
 
     public static int getSleepTime() {
         return sleepTime;
+    }
+
+    public static int getThreadNum() {
+        return threadNum;
+    }
+
+    public static int getTestTime() {
+        return testTime;
+    }
+
+    public static int getOneTestTime() {
+        return oneTestTime;
     }
 }

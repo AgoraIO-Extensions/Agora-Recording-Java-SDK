@@ -1,15 +1,13 @@
 package io.agora.recording.example;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import io.agora.recording.example.RecorderConfig;
-
 public class RecordingManager {
-    private final Map<String, RecordingSession> activeRecordings = new HashMap<>();
+    private final Map<String, RecordingSession> activeRecordings = new ConcurrentHashMap<>();
     private final ThreadPoolExecutor taskExecutorService;
 
     public RecordingManager() {
@@ -18,12 +16,16 @@ public class RecordingManager {
     }
 
     public void startRecording(String taskId, RecorderConfig config) {
-        RecordingSession session = new RecordingSession(taskId, config, taskExecutorService);
-        activeRecordings.put(taskId, session);
-        taskExecutorService.submit(() -> session.joinChannel());
+        startRecording(taskId, config, "");
     }
 
-    public void stopRecording(String taskId, boolean async) {
+    public synchronized void startRecording(String taskId, RecorderConfig config, String channelName) {
+        RecordingSession session = new RecordingSession(taskId, config, taskExecutorService);
+        activeRecordings.put(taskId, session);
+        taskExecutorService.submit(() -> session.joinChannel(channelName));
+    }
+
+    public synchronized void stopRecording(String taskId, boolean async) {
         RecordingSession session = activeRecordings.get(taskId);
         if (session != null) {
             if (async) {
