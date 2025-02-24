@@ -65,9 +65,9 @@ The required bandwidth depends on the number of channels being recorded simultan
 
 ## SDK Download
 
-### Maven Dependency
+### Maven Download
 
-Add the following dependency to your project's `pom.xml` file:
+#### x86_64 Platform
 
 ```xml
 <dependency>
@@ -77,9 +77,29 @@ Add the following dependency to your project's `pom.xml` file:
 </dependency>
 ```
 
-### Download SDK
-
 [linux-recording-java-sdk-4.4.150](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150/linux-recording-java-sdk-4.4.150.jar)
+
+#### arm64 Platform
+
+```xml
+<dependency>
+    <groupId>io.agora.rtc</groupId>
+    <artifactId>linux-recording-java-sdk</artifactId>
+    <version>4.4.150-aarch64</version>
+</dependency>
+```
+
+[linux-recording-java-sdk-4.4.150-aarch64](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150-aarch64/linux-recording-java-sdk-4.4.150-aarch64.jar)
+
+### CDN Download
+
+#### x86_64 Platform
+
+[Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348.jar)
+
+#### arm64 Platform
+
+[Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934.jar)
 
 ## Quick Start
 
@@ -1200,6 +1220,10 @@ The `AgoraParameter` class provides functionalities to get and set Agora SDK con
   - Returns: The platform-specific file path, or `null` if the conversion fails.
 
 ## Changelog
+
+### v4.4.150-aarch64（2025-02-24）
+
+- Released version 4.4.150-aarch64, including basic features and performance optimizations.
 
 ### v4.4.150（2025-01-21）
 

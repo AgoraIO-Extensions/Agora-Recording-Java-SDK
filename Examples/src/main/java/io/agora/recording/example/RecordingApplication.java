@@ -41,7 +41,7 @@ public class RecordingApplication {
             recordingManager.stopRecording(taskId, false);
 
         } catch (Exception e) {
-            SampleLogger.error("Recording failed");
+            SampleLogger.error("Recording failed e:" + e);
         } finally {
             recordingManager.destroy();
             AgoraServiceInitializer.destroy();

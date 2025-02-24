@@ -63,9 +63,9 @@
 
 ## SDK 下载
 
-### Maven 依赖
+### Maven 下载
 
-在项目的 pom.xml 文件中添加以下依赖:
+#### x86_64 平台
 
 ```xml
 <dependency>
@@ -75,9 +75,29 @@
 </dependency>
 ```
 
-### 下载 SDK
-
 [linux-recording-java-sdk-4.4.150](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150/linux-recording-java-sdk-4.4.150.jar)
+
+#### arm64 平台
+
+```xml
+<dependency>
+    <groupId>io.agora.rtc</groupId>
+    <artifactId>linux-recording-java-sdk</artifactId>
+    <version>4.4.150-aarch64</version>
+</dependency>
+```
+
+[linux-recording-java-sdk-4.4.150-aarch64](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150-aarch64/linux-recording-java-sdk-4.4.150-aarch64.jar)
+
+### CDN 下载
+
+#### x86_64 平台
+
+[Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348.jar)
+
+#### arm64 平台
+
+[Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934.jar)
 
 ## 快速开始
 
@@ -1198,6 +1218,10 @@ agoraService.release();
   - 返回值：转换后的特定平台文件路径，转换失败时返回 null。
 
 ## 更新日志
+
+### v4.4.150-aarch64（2025-02-24）
+
+- 发布 4.4.150-aarch64 版本，包含基础功能和性能优化。
 
 ### v4.4.150（2025-01-21）
 
