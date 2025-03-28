@@ -33,7 +33,7 @@
         {
             "type": "litera",
             "litera": "你好,recorder test,ABC1234",
-            "fontFilePath": "./watermarks_res/Noto_Sans_SC/static/NotoSansSC-SemiBold.ttf",
+            "fontFilePath": "./res/watermarks/Noto_Sans_SC/static/NotoSansSC-SemiBold.ttf",
             "fontSize": 10,
             "x": 0,
             "y": 0,
@@ -43,7 +43,7 @@
         },
         {
             "type": "time",
-            "fontFilePath": "./watermarks_res/Noto_Sans_SC/static/NotoSansSC-SemiBold.ttf",
+            "fontFilePath": "./res/watermarks/Noto_Sans_SC/static/NotoSansSC-SemiBold.ttf",
             "fontSize": 15,
             "x": 0,
             "y": 100,
@@ -53,7 +53,7 @@
         },
         {
             "type": "picture",
-            "imgUrl": "./watermarks_res/agora.png",
+            "imgUrl": "./res/watermarks/agora.png",
             "x": 0,
             "y": 200,
             "width": 200,
