@@ -11,6 +11,8 @@
     "subVideoUserList": ["123"],
     "subStreamType":"high",      // 订阅大小流， 大流为high, 小流为low
     "isMix":true,             // 是否合流录制
+    "backgroundColor": 0,     // 合流录制设置背景颜色，uint32_t变量中设置 RGB 颜色，通常使用 32 位颜色格式（0xRRGGBB）RR：红色（8 位，0-255）,GG：绿色（8 位，0-255）,BB：蓝色（8 位，0-255），需要转为long类型的值
+    "backgroundImage": "1.jpg",  // 合流录制设置背景图片，当同时设置了背景颜色和背景图片，背景图片生效。图片支持png和jpg
     "layoutMode":"bestfit",      // 合流录制布局，支持 default（默认布局）， bestfit（自适应布局）， vertical（垂直布局）
     "maxResolutionUid": "123",   // 在vertical布局中，设定显示最大分辨率的uid
     "recorderStreamType":"both",   // 录制类型， audio_only 只录音频，video_only 只录音频， both 音视频都录

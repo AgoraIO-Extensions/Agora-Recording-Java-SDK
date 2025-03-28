@@ -46,6 +46,8 @@ public class VideoLayoutManager {
             layout.setCanvasWidth(recorderConfig.getVideo().getWidth());
             layout.setCanvasHeight(recorderConfig.getVideo().getHeight());
             layout.setCanvasFps(recorderConfig.getVideo().getFps());
+            layout.setBackgroundColor(recorderConfig.getBackgroundColor());
+            layout.setBackgroundImage(recorderConfig.getBackgroundImage());
 
             UserMixerLayout[] useLayout = new UserMixerLayout[userIds.size()];
             for (int i = 0; i < useLayout.length; i++) {

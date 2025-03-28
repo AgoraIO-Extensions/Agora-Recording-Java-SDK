@@ -16,6 +16,8 @@ public class RecorderConfig {
     private List<String> subVideoUserList;
     private String subStreamType;
     private boolean isMix;
+    private long backgroundColor;
+    private String backgroundImage;
     private String layoutMode;
     private String maxResolutionUid;
     private String recorderStreamType;
@@ -383,6 +385,22 @@ public class RecorderConfig {
         this.isMix = isMix;
     }
 
+    public long getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(long backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public String getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(String backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
     public String getLayoutMode() {
         return layoutMode;
     }
@@ -486,6 +504,8 @@ public class RecorderConfig {
                 ", subVideoUserList=" + subVideoUserList +
                 ", subStreamType='" + subStreamType + '\'' +
                 ", isMix=" + isMix +
+                ", backgroundColor=" + backgroundColor +
+                ", backgroundImage='" + backgroundImage + '\'' +
                 ", layoutMode='" + layoutMode + '\'' +
                 ", maxResolutionUid='" + maxResolutionUid + '\'' +
                 ", recorderStreamType='" + recorderStreamType + '\'' +

@@ -41,7 +41,7 @@
 ### 硬件环境
 
 - **操作系统**：Ubuntu 14.04+ 或 CentOS 6.5+（推荐 7.0）
-- **CPU 架构**：x86-64
+- **CPU 架构**：x86-64，arm64
 
 ### 网络要求
 
@@ -71,11 +71,11 @@
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150</version>
+    <version>4.4.150.1</version>
 </dependency>
 ```
 
-[linux-recording-java-sdk-4.4.150](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150/linux-recording-java-sdk-4.4.150.jar)
+[linux-recording-java-sdk-4.4.150.1](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150.1/linux-recording-java-sdk-4.4.150.1.jar)
 
 #### arm64 平台
 
@@ -93,7 +93,7 @@
 
 #### x86_64 平台
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348.jar)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-c0773dd379-20250328_114630](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-c0773dd379-20250328_114630.jar)
 
 #### arm64 平台
 
@@ -174,6 +174,8 @@ cd Examples
 | subVideoUserList         | String [] | 订阅视频的用户 ID 列表，仅在 subAllVideo 为 false 时生效。                                                                                |
 | subStreamType            | String    | 订阅的流类型，支持 `high`（大流）和 `low`（小流）。                                                                                       |
 | isMix                    | Boolean   | 是否合流录制。                                                                                                                            |
+| backgroundColor          | Long      | 合流录制的背景颜色。使用 RGB 颜色格式（0xRRGGBB），需要转为 long 类型的值。例如：红色为 0xFF0000，绿色为 0x00FF00，蓝色为 0x0000FF。      |
+| backgroundImage          | String    | 合流录制的背景图片路径，支持 PNG 和 JPG 格式。当同时设置了背景颜色和背景图片时，背景图片优先生效。                                        |
 | layoutMode               | String    | 合流录制布局模式，支持 `default`（默认布局），`bestfit`（自适应布局），`vertical`（垂直布局）。                                           |
 | maxResolutionUid         | String    | 在 vertical 布局中，设定显示最大分辨率的用户 ID。                                                                                         |
 | recorderStreamType       | String    | 录制类型，支持 `audio_only`（只录音频），`video_only`（只录视频），`both`（音视频都录）。                                                 |
@@ -713,6 +715,13 @@ agoraService.release();
     - `-2`: userId 无效。
     - 其他负值: 方法调用失败。
 
+- **int setAudioVolumeIndicationParameters(int intervalInMs)**
+
+  设置音频音量指示回调间隔。
+
+  - 参数:
+    - `intervalInMs`: 音频音量指示回调的间隔（毫秒）。
+
 - **int setVideoMixingLayout(VideoMixingLayout layout)**
 
   设置混合视频流的布局。
@@ -927,15 +936,14 @@ agoraService.release();
     - `userId`：远端用户 ID。
     - `elapsed`：从用户连接到 Agora 频道到解码出第一帧音频的时间（毫秒）。
 
-- `onAudioVolumeIndication(String channelId, String userId, int speakerNumber, int totalVolume)`
+- `onAudioVolumeIndication(String channelId, SpeakVolumeInfo[] speakers, int speakerNumber)`
 
   报告正在说话的用户、说话者的音量以及本地用户是否在说话。
 
   - 参数：
     - `channelId`：频道 ID。
-    - `userId`：远端用户 ID。
+    - `speakers`：说话者的信息。
     - `speakerNumber`：说话者的总数。
-    - `totalVolume`：音频混音后的总音量，范围为 0（最低音量）到 255（最高音量）。
 
 - `onActiveSpeaker(String channelId, String userId)`
 
@@ -1004,6 +1012,14 @@ agoraService.release();
     - `channelId`：频道名称。
     - `userId`：用户 ID。
     - `info`：录制文件的信息。参见 `RecorderInfo`。
+
+- `onEncryptionError(String channelId, Constants.EncryptionErrorType errorType)`
+
+  当录制发生加密错误时触发。
+
+  - 参数：
+    - `channelId`：频道名称。
+    - `errorType`：错误类型。参见 `Constants.EncryptionErrorType`。
 
 ### `MediaRecorderConfiguration` 类
 
@@ -1207,7 +1223,7 @@ agoraService.release();
 
   - 参数：
     - `parameters`：包含多个参数键值对的 JSON 字符串。
-  - 返回值：成功时返回 0，失败时返回负值。
+  - 返回值：成功时返回 0,失败时返回负值。
 
 - `String convertPath(String filePath)`
 
@@ -1218,6 +1234,13 @@ agoraService.release();
   - 返回值：转换后的特定平台文件路径，转换失败时返回 null。
 
 ## 更新日志
+
+### v4.4.150.1（2025-03-28）
+
+- 新增：`IAgoraMediaRtcRecorderEventHandler` 类中添加 `onEncryptionError` 回调函数，支持加密错误通知
+- 新增：`AgoraMediaRtcRecorder` 类中添加 `setAudioVolumeIndicationParameters` 方法，用于配置远端用户音量回调间隔
+- 优化：重构 `IAgoraMediaRtcRecorderEventHandler` 类中 `onAudioVolumeIndication` 回调函数的参数结构
+- 增强：改进 `VideoMixingLayout` 类，修复 `backgroundColor` 属性并新增 `backgroundImage` 属性支持设置背景图片
 
 ### v4.4.150-aarch64（2025-02-24）
 

@@ -1,5 +1,6 @@
 package io.agora.recording.example;
 
+import io.agora.recording.SpeakVolumeInfo;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -64,6 +65,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         agoraMediaRtcRecorder = factory.createMediaRtcRecorder();
         agoraMediaRtcRecorder.initialize(agoraService, recorderConfig.isMix());
         agoraMediaRtcRecorder.registerRecorderEventHandler(this);
+        agoraMediaRtcRecorder.setAudioVolumeIndicationParameters(500);
 
         this.videoLayoutManager = new VideoLayoutManager(agoraMediaRtcRecorder, recorderConfig);
 
@@ -406,10 +408,15 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     }
 
     @Override
-    public void onAudioVolumeIndication(String channelId, String userId, int speakerNumber, int totalVolume) {
-        SampleLogger.info("[" + taskId + "]onAudioVolumeIndication channelId:" + channelId + " userId:" + userId
-                + " speakerNumber:"
-                + speakerNumber + " totalVolume:" + totalVolume);
+    public void onAudioVolumeIndication(String channelId, SpeakVolumeInfo[] speakers, int speakerNumber) {
+        SampleLogger.info("[" + taskId + "]onAudioVolumeIndication channelId:" + channelId + " speakerNumber:"
+                + speakerNumber);
+        if (speakers != null && speakers.length > 0) {
+            for (SpeakVolumeInfo speaker : speakers) {
+                SampleLogger.info("[" + taskId + "]onAudioVolumeIndication speaker:" + speaker.getUserId()
+                        + " volume:" + speaker.getVolume());
+            }
+        }
     }
 
     @Override
@@ -458,5 +465,10 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     public void onRecorderInfoUpdated(String channelId, String userId, RecorderInfo info) {
         SampleLogger.info(
                 "[" + taskId + "]onRecorderInfoUpdated channelId:" + channelId + " userId:" + userId + " info:" + info);
+    }
+
+    @Override
+    public void onEncryptionError(String channelId, Constants.EncryptionErrorType errorType) {
+        SampleLogger.info("[" + taskId + "]onEncryptionError channelId:" + channelId + " errorType:" + errorType);
     }
 }

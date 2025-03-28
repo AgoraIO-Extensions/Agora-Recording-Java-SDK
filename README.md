@@ -43,7 +43,7 @@
 ### Hardware Environment
 
 - **Operating System**: Ubuntu 14.04+ or CentOS 6.5+ (recommended 7.0)
-- **CPU Architecture**: x86-64
+- **CPU Architecture**: x86-64, arm64
 
 ### Network Requirements
 
@@ -73,11 +73,11 @@ The required bandwidth depends on the number of channels being recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150</version>
+    <version>4.4.150.1</version>
 </dependency>
 ```
 
-[linux-recording-java-sdk-4.4.150](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150/linux-recording-java-sdk-4.4.150.jar)
+[linux-recording-java-sdk-4.4.150.1](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150.1/linux-recording-java-sdk-4.4.150.1.jar)
 
 #### arm64 Platform
 
@@ -95,7 +95,7 @@ The required bandwidth depends on the number of channels being recorded simultan
 
 #### x86_64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-x86_64-534965-4423b3dcaf-20250121_110348.jar)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-c0773dd379-20250328_114630](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-c0773dd379-20250328_114630.jar)
 
 #### arm64 Platform
 
@@ -162,51 +162,53 @@ Refer to `Examples/config/recorder_json.example` for the meaning of each paramet
 
 The following is a detailed explanation of each parameter based on the JSON file:
 
-| Parameter Name           | Type      | Description                                                                                                                                                         |
-| ------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| appId                    | String    | The App ID of the project, which needs to be consistent with the App ID in the RTC SDK.                                                                             |
-| token                    | String    | The token of the channel. If the channel is set to secure mode, a token is required.                                                                                |
-| channelName              | String    | The channel name, which needs to be consistent with the channel name in the RTC SDK.                                                                                |
-| useStringUid             | Boolean   | Whether to use string type user ID.                                                                                                                                 |
-| useCloudProxy            | Boolean   | Whether to use cloud proxy service.                                                                                                                                 |
-| userId                   | String    | User ID.                                                                                                                                                            |
-| subAllAudio              | Boolean   | Whether to subscribe to all audio. If false, fill in the user IDs to subscribe to in subAudioUserList.                                                              |
-| subAudioUserList         | String [] | List of user IDs to subscribe to audio, only effective when subAllAudio is false.                                                                                   |
-| subAllVideo              | Boolean   | Whether to subscribe to all video. If false, fill in the user IDs to subscribe to in subVideoUserList.                                                              |
-| subVideoUserList         | String [] | List of user IDs to subscribe to video, only effective when subAllVideo is false.                                                                                   |
-| subStreamType            | String    | Stream type to subscribe to, supports `high` (high stream) and `low` (low stream).                                                                                  |
-| isMix                    | Boolean   | Whether to record in mixed mode.                                                                                                                                    |
-| layoutMode               | String    | Layout mode for mixed recording, supports `default` (default layout), `bestfit` (adaptive layout), `vertical` (vertical layout).                                    |
-| maxResolutionUid         | String    | In vertical layout, set the user ID to display the maximum resolution.                                                                                              |
-| recorderStreamType       | String    | Recording type, supports `audio_only` (audio only), `video_only` (video only), `both` (both audio and video).                                                       |
-| recorderPath             | String    | Recording file path. For mixed recording, it is the recording file name; for single stream recording, it is the directory, with mp4 files named after each user ID. |
-| maxDuration              | Integer   | Recording duration, in seconds.                                                                                                                                     |
-| recoverFile              | Boolean   | Whether to write h264 and aac files simultaneously during recording, allowing recovery of mp4 files after program crash.                                            |
-| audio                    | Object    | Audio settings.                                                                                                                                                     |
-| audio.sampleRate         | Integer   | Audio sample rate.                                                                                                                                                  |
-| audio.numOfChannels      | Integer   | Number of audio channels.                                                                                                                                           |
-| video                    | Object    | Video settings.                                                                                                                                                     |
-| video.width              | Integer   | Video width.                                                                                                                                                        |
-| video.height             | Integer   | Video height.                                                                                                                                                       |
-| video.fps                | Integer   | Video frame rate.                                                                                                                                                   |
-| waterMark                | Object[]  | Watermark settings.                                                                                                                                                 |
-| waterMark[].type         | String    | Watermark type, supports `litera` (subtitle watermark), `time` (timestamp watermark), `picture` (image watermark).                                                  |
-| waterMark[].litera       | String    | Subtitle content, only effective when type is `litera`.                                                                                                             |
-| waterMark[].fontFilePath | String    | Font file path.                                                                                                                                                     |
-| waterMark[].fontSize     | Integer   | Font size.                                                                                                                                                          |
-| waterMark[].x            | Integer   | X coordinate of the watermark.                                                                                                                                      |
-| waterMark[].y            | Integer   | Y coordinate of the watermark.                                                                                                                                      |
-| waterMark[].width        | Integer   | Width of the watermark.                                                                                                                                             |
-| waterMark[].height       | Integer   | Height of the watermark.                                                                                                                                            |
-| waterMark[].zorder       | Integer   | Layer order of the watermark.                                                                                                                                       |
-| waterMark[].imgUrl       | String    | URL of the image watermark, only effective when type is `picture`.                                                                                                  |
-| encryption               | Object    | Media stream encryption settings.                                                                                                                                   |
-| encryption.mode          | String    | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                 |
-| encryption.key           | String    | Encryption key.                                                                                                                                                     |
-| encryption.salt          | String    | Encryption salt, a 32-character string, e.g., "ABC123".                                                                                                             |
-| rotation                 | Object[]  | Video rotation settings.                                                                                                                                            |
-| rotation[].uid           | String    | User ID of the video to be rotated.                                                                                                                                 |
-| rotation[].degree        | Integer   | Rotation angle, supports 0, 90, 180, 270.                                                                                                                           |
+| Parameter                | Type      | Description                                                                                                                                                                            |
+| ------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| appId                    | String    | The App ID of your project, which must be consistent with the App ID used in the RTC SDK.                                                                                              |
+| token                    | String    | The token for the channel. If the channel is set to security mode, a token is required.                                                                                                |
+| channelName              | String    | The channel name, which must be consistent with the channel name used in the RTC SDK.                                                                                                  |
+| useStringUid             | Boolean   | Whether to use string user IDs.                                                                                                                                                        |
+| useCloudProxy            | Boolean   | Whether to use cloud proxy service.                                                                                                                                                    |
+| userId                   | String    | The user ID.                                                                                                                                                                           |
+| subAllAudio              | Boolean   | Whether to subscribe to all audio streams. If false, you need to specify the user IDs to subscribe to in subAudioUserList.                                                             |
+| subAudioUserList         | String [] | The list of user IDs to subscribe to for audio, only effective when subAllAudio is false.                                                                                              |
+| subAllVideo              | Boolean   | Whether to subscribe to all video streams. If false, you need to specify the user IDs to subscribe to in subVideoUserList.                                                             |
+| subVideoUserList         | String [] | The list of user IDs to subscribe to for video, only effective when subAllVideo is false.                                                                                              |
+| subStreamType            | String    | The type of stream to subscribe to, supports `high` (high stream) and `low` (low stream).                                                                                              |
+| isMix                    | Boolean   | Whether to use composite recording.                                                                                                                                                    |
+| backgroundColor          | Long      | The background color for composite recording. Uses RGB color format (0xRRGGBB), needs to be converted to long type. For example: red is 0xFF0000, green is 0x00FF00, blue is 0x0000FF. |
+| backgroundImage          | String    | The background image path for composite recording, supports PNG and JPG formats. When both background color and image are set, the background image takes precedence.                  |
+| layoutMode               | String    | The layout mode for composite recording, supports `default` (default layout), `bestfit` (adaptive layout), `vertical` (vertical layout).                                               |
+| maxResolutionUid         | String    | In vertical layout, specifies the user ID to display with maximum resolution.                                                                                                          |
+| recorderStreamType       | String    | The recording type, supports `audio_only` (audio only), `video_only` (video only), `both` (both audio and video).                                                                      |
+| recorderPath             | String    | The recording file path. For composite recording, this is the file name; for individual recording, this is the directory where mp4 files named after each user ID are stored.          |
+| maxDuration              | Integer   | The recording duration in seconds.                                                                                                                                                     |
+| recoverFile              | Boolean   | Whether to simultaneously write h264 and aac files during recording, which can be used to recover mp4 files if the program crashes.                                                    |
+| audio                    | Object    | Audio settings.                                                                                                                                                                        |
+| audio.sampleRate         | Integer   | Audio sample rate.                                                                                                                                                                     |
+| audio.numOfChannels      | Integer   | Number of audio channels.                                                                                                                                                              |
+| video                    | Object    | Video settings.                                                                                                                                                                        |
+| video.width              | Integer   | Video width.                                                                                                                                                                           |
+| video.height             | Integer   | Video height.                                                                                                                                                                          |
+| video.fps                | Integer   | Video frame rate.                                                                                                                                                                      |
+| waterMark                | Object[]  | Watermark settings.                                                                                                                                                                    |
+| waterMark[].type         | String    | Watermark type, supports `litera` (text watermark), `time` (timestamp watermark), `picture` (image watermark).                                                                         |
+| waterMark[].litera       | String    | Text content, only effective when type is `litera`.                                                                                                                                    |
+| waterMark[].fontFilePath | String    | Font file path.                                                                                                                                                                        |
+| waterMark[].fontSize     | Integer   | Font size.                                                                                                                                                                             |
+| waterMark[].x            | Integer   | X coordinate of the watermark.                                                                                                                                                         |
+| waterMark[].y            | Integer   | Y coordinate of the watermark.                                                                                                                                                         |
+| waterMark[].width        | Integer   | Width of the watermark.                                                                                                                                                                |
+| waterMark[].height       | Integer   | Height of the watermark.                                                                                                                                                               |
+| waterMark[].zorder       | Integer   | Layer order of the watermark.                                                                                                                                                          |
+| waterMark[].imgUrl       | String    | URL of the image watermark, only effective when type is `picture`.                                                                                                                     |
+| encryption               | Object    | Media stream encryption settings.                                                                                                                                                      |
+| encryption.mode          | String    | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                                    |
+| encryption.key           | String    | Encryption key.                                                                                                                                                                        |
+| encryption.salt          | String    | Encryption salt, a 32-character string, e.g., "ABC123".                                                                                                                                |
+| rotation                 | Object[]  | Video rotation settings.                                                                                                                                                               |
+| rotation[].uid           | String    | User ID of the video to be rotated.                                                                                                                                                    |
+| rotation[].degree        | Integer   | Rotation angle, supports 0, 90, 180, 270.                                                                                                                                              |
 
 Note:
 
@@ -216,14 +218,14 @@ Note:
 
 #### Start Recording
 
-Navigate to the example directory and manually create the folder for single stream configuration:
+Navigate to the example directory and manually create a folder for individual stream configuration:
 
 ```sh
 cd Examples
 mkdir recorder_result
 ```
 
-Run the test script according to the test scenario:
+Run the test script according to your test scenario:
 
 ```sh
 ./script/TestCaseName.sh
@@ -231,7 +233,7 @@ Run the test script according to the test scenario:
 
 Note:
 
-- **The pre-configured scripts are just simple scenarios. You can modify any one of the script's corresponding json config files according to the specific situation.**
+- **The pre-made execution scripts are just for a few simple scenarios. In practice, you can modify the json config file corresponding to any script according to your specific requirements.**
 
 #### Stop Recording
 
@@ -715,6 +717,13 @@ The `AgoraMediaRtcRecorder` class provides functionalities for recording Agora R
     - `-2`: Invalid userId.
     - Other negative values: Method call failed.
 
+- **int setAudioVolumeIndicationParameters(int intervalInMs)**
+
+  Sets the audio volume indication parameters.
+
+  - Parameters:
+    - `intervalInMs`: The interval (in milliseconds) between volume indications.
+
 - **int setVideoMixingLayout(VideoMixingLayout layout)**
 
   Sets the layout for mixed video streams.
@@ -929,15 +938,14 @@ The `IAgoraMediaRtcRecorderEventHandler` interface defines callback methods for 
     - `userId`: The remote user ID.
     - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the first audio frame being decoded.
 
-- **onAudioVolumeIndication(String channelId, String userId, int speakerNumber, int totalVolume)**
+- **onAudioVolumeIndication(String channelId, SpeakVolumeInfo[] speakers, int speakerNumber)**
 
   Reports the users who are speaking, the volume of the speaker, and whether the local user is speaking.
 
   - Parameters:
     - `channelId`: The channel ID.
-    - `userId`: The remote user ID.
+    - `speakers`: The array of speaker information.
     - `speakerNumber`: The total number of speakers.
-    - `totalVolume`: The total volume after audio mixing, ranging from 0 (lowest volume) to 255 (highest volume).
 
 - **onActiveSpeaker(String channelId, String userId)**
 
@@ -1006,6 +1014,14 @@ The `IAgoraMediaRtcRecorderEventHandler` interface defines callback methods for 
     - `channelId`: The channel name.
     - `userId`: The user ID.
     - `info`: The information of the recorded file. See `RecorderInfo`.
+
+- **onEncryptionError(String channelId, Constants.EncryptionErrorType errorType)**
+
+  Triggered when the recording fails to decrypt the encrypted file.
+
+  - Parameters:
+    - `channelId`: The channel name.
+    - `errorType`: The error type. See `Constants.EncryptionErrorType`.
 
 ### `MediaRecorderConfiguration` Class
 
@@ -1220,6 +1236,13 @@ The `AgoraParameter` class provides functionalities to get and set Agora SDK con
   - Returns: The platform-specific file path, or `null` if the conversion fails.
 
 ## Changelog
+
+### v4.4.150.1（2025-03-28）
+
+- Added: `onEncryptionError` callback function in the `IAgoraMediaRtcRecorderEventHandler` class to support encryption error notifications
+- Added: `setAudioVolumeIndicationParameters` method in the `AgoraMediaRtcRecorder` class to configure the interval for remote user volume callbacks
+- Optimized: Restructured the parameters of the `onAudioVolumeIndication` callback function in the `IAgoraMediaRtcRecorderEventHandler` class
+- Enhanced: Improved the `VideoMixingLayout` class, fixed the `backgroundColor` property and added the `backgroundImage` property to support setting background images
 
 ### v4.4.150-aarch64（2025-02-24）
 

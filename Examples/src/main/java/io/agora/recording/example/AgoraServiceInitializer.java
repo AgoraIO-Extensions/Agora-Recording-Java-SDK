@@ -28,7 +28,7 @@ public class AgoraServiceInitializer {
             config.setUseStringUid(recorderConfig.isUseStringUid());
             LogConfig logConfig = new LogConfig();
             logConfig.setFileSizeInKB(1024 * 1024 * 5);
-            logConfig.setFilePath("agora_logs/agorasdk.log");
+            logConfig.setFilePath("logs/agora_logs/agorasdk.log");
             config.setLogConfig(logConfig);
             int ret = agoraService.initialize(config);
             if (ret != 0) {
