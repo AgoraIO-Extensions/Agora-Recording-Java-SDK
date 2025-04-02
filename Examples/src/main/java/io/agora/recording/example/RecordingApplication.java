@@ -51,6 +51,7 @@ public class RecordingApplication {
             } catch (Exception e) {
                 SampleLogger.error("exit failed");
             }
+            SampleLogger.release();
             System.exit(0);
         }
     }

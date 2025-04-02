@@ -77,8 +77,6 @@ The required bandwidth depends on the number of channels being recorded simultan
 </dependency>
 ```
 
-[linux-recording-java-sdk-4.4.150.1](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150.1/linux-recording-java-sdk-4.4.150.1.jar)
-
 #### arm64 Platform
 
 ```xml
@@ -89,13 +87,11 @@ The required bandwidth depends on the number of channels being recorded simultan
 </dependency>
 ```
 
-[linux-recording-java-sdk-4.4.150-aarch64](https://repo1.maven.org/maven2/io/agora/rtc/linux-recording-java-sdk/4.4.150-aarch64/linux-recording-java-sdk-4.4.150-aarch64.jar)
-
 ### CDN Download
 
 #### x86_64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-c0773dd379-20250328_114630](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-c0773dd379-20250328_114630.jar)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-3a6fa4362f-20250402_161914](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-3a6fa4362f-20250402_161914.zip)
 
 #### arm64 Platform
 

@@ -12,7 +12,7 @@ public class AgoraServiceInitializer {
     private static AgoraMediaComponentFactory factory;
 
     public static void initService(RecorderConfig recorderConfig) {
-        SampleLogger.info("AgoraService initService");
+        SampleLogger.info("AgoraService initService SDK Version: " + AgoraService.getSdkVersion());
         if (recorderConfig == null) {
             SampleLogger.info("recorderConfig is null");
             return;

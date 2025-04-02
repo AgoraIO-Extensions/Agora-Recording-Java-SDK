@@ -57,6 +57,9 @@ fi
 
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
+# Ensure Java library path includes all necessary directories
+JAVA_LIBRARY_PATH="-Djava.library.path=libs:$LIB_PATH"
+
 # Execute Java command
-java -cp $CLASSPATH $JAVA_OPTS -Dlog.filename=app-$TIMESTAMP -Dlog4j.configurationFile=file:./log4j2.xml -Djava.library.path=$LIB_PATH $CLASS $* |
+java -cp $CLASSPATH $JAVA_OPTS -Dlog.filename=app-$TIMESTAMP -Dlog4j.configurationFile=file:./log4j2.xml $JAVA_LIBRARY_PATH $CLASS $* |
     grep -v "WARNING in native method: JNI call made without checking exceptions"
