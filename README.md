@@ -1,66 +1,68 @@
 # Agora Recording Java SDK
 
-[中文](README.zh.md) | English
+[中文](./README.zh.md) | English
 
 ## Table of Contents
 
-1. [Development Environment Requirements](#development-environment-requirements)
-   - [Hardware Environment](#hardware-environment)
-   - [Network Requirements](#network-requirements)
-   - [Bandwidth Requirements](#bandwidth-requirements)
-   - [Software Environment](#software-environment)
-2. [SDK Download](#sdk-download)
-3. [Quick Start](#quick-start)
-   - [Enable Service](#enable-service)
-   - [Integrate Recording SDK](#integrate-recording-sdk)
-   - [Recording via Command Line](#recording-via-command-line)
-     - [Prerequisites](#prerequisites)
-     - [Integrate SDK](#integrate-sdk)
-     - [Compile](#compile)
-     - [Set Recording Options](#set-recording-options)
-     - [Start Recording](#start-recording)
-     - [Stop Recording](#stop-recording)
-   - [Recording via API](#recording-via-api)
-     - [Prerequisites](#prerequisites-1)
-     - [Implement Recording via API](#implement-recording-via-api)
-       - [Initialize Service](#initialize-service)
-       - [Join Channel](#join-channel)
-       - [Start Recording](#start-recording-1)
-       - [Stop Recording](#stop-recording)
-4. [API Reference](#api-reference)
-   - [AgoraService Class](#agoraservice-class)
-   - [AgoraServiceConfiguration Class](#agoraserviceconfiguration-class)
-   - [AgoraMediaComponentFactory Class](#agoramediacomponentfactory-class)
-   - [AgoraMediaRtcRecorder Class](#agoramediartcrecorder-class)
-   - [IAgoraMediaRtcRecorderEventHandler Class](#iagoramediartcrecordereventhandler-class)
-   - [MediaRecorderConfiguration Class](#mediarecorderconfiguration-class)
-   - [AgoraParameter Class](#agoraparameter-class)
-5. [Changelog](#changelog)
-6. [Other References](#other-references)
+1.  [Introduction](#introduction)
+2.  [Development Environment Requirements](#development-environment-requirements)
+    - [Hardware Environment](#hardware-environment)
+    - [Network Requirements](#network-requirements)
+    - [Bandwidth Requirements](#bandwidth-requirements)
+    - [Software Environment](#software-environment)
+3.  [SDK Download](#sdk-download)
+4.  [Integrating the SDK](#integrating-the-sdk)
+    - [1. Maven Integration](#1-maven-integration)
+    - [2. Local SDK Integration](#2-local-sdk-integration)
+    - [3. Loading Native Libraries (.so files)](#3-loading-native-libraries-so-files)
+      - [3.1 Extracting .so Files](#31-extracting-so-files)
+      - [3.2 Configuring Load Paths](#32-configuring-load-paths)
+5.  [Quick Start](#quick-start)
+    - [Enable Service](#enable-service)
+    - [Recording via Command Line](#recording-via-command-line)
+      - [Prerequisites](#prerequisites)
+      - [Compile Example Project](#compile-example-project)
+      - [Configure Recording Parameters](#configure-recording-parameters)
+      - [Start Recording](#start-recording)
+      - [Stop Recording](#stop-recording)
+    - [Recording via API Call](#recording-via-api-call)
+      - [Prerequisites](#prerequisites-1)
+      - [Implementing Recording via API Call](#implementing-recording-via-api-call)
+        - [Initialize Service](#initialize-service)
+        - [Join Channel](#join-channel)
+        - [Configure and Start Recording](#configure-and-start-recording)
+        - [Stop Recording](#stop-recording-1)
+6.  [API Reference](#api-reference)
+7.  [Changelog](#changelog)
+8.  [Other References](#other-references)
+
+## Introduction
+
+The Agora Recording Java SDK (v4.4.150.1) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
 
 ## Development Environment Requirements
 
 ### Hardware Environment
 
-- **Operating System**: Ubuntu 14.04+ or CentOS 6.5+ (recommended 7.0)
+- **Operating System**: Ubuntu 14.04+ or CentOS 6.5+ (7.0 recommended)
 - **CPU Architecture**: x86-64, arm64
 
 ### Network Requirements
 
-- **Public IP**
+- **Public IP Address**
 - **Domain Access**: Allow access to `.agora.io` and `.agoralab.co`
 
 ### Bandwidth Requirements
 
-The required bandwidth depends on the number of channels being recorded simultaneously and the situation within the channel. The following data can be used as a reference:
+The required bandwidth depends on the number of channels to be recorded simultaneously and the conditions within those channels. The following data serves as a reference:
 
-- Recording a 640 × 480 resolution video requires approximately 500 Kbps of bandwidth.
-- Recording a channel with two people requires 1 Mbps.
-- Simultaneously recording 100 such channels requires 100 Mbps of bandwidth.
+- Recording a 640 × 480 resolution stream requires approximately 500 Kbps.
+- Recording a channel with two participants requires approximately 1 Mbps.
+- Recording 100 such channels simultaneously requires approximately 100 Mbps.
 
 ### Software Environment
 
-- **Build Tools**: Apache Maven or other build tools
+- **Build Tool**: Apache Maven or other build tools
 - **JDK**: JDK 8+
 
 ## SDK Download
@@ -97,1157 +99,747 @@ The required bandwidth depends on the number of channels being recorded simultan
 
 [Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934.jar)
 
+## Integrating the SDK
+
+There are two ways to integrate the SDK: via Maven integration or local SDK integration.
+
+### 1. Maven Integration
+
+Maven integration is the simplest way, automatically managing Java dependencies.
+
+#### 1.1 Add Maven Dependency
+
+Add the following dependency to your project's `pom.xml` file:
+
+```xml
+<!-- x86_64 Platform -->
+<dependency>
+    <groupId>io.agora.rtc</groupId>
+    <artifactId>linux-recording-java-sdk</artifactId>
+    <version>4.4.150.1</version>
+</dependency>
+
+<!-- arm64 Platform -->
+<dependency>
+    <groupId>io.agora.rtc</groupId>
+    <artifactId>linux-recording-java-sdk</artifactId>
+    <version>4.4.150-aarch64</version>
+</dependency>
+```
+
+#### 1.2 Integrate .so Library Files
+
+The Maven dependency includes the required JAR file, but you still need to manually handle the `.so` library files to run the application. Please refer to the **Loading Native Libraries (.so files)** section below.
+
+### 2. Local SDK Integration
+
+The local SDK is a complete package containing all necessary files, suitable for scenarios requiring more flexible control.
+
+#### 2.1 SDK Package Structure
+
+The SDK package (zip format) downloaded from the official website contains the following:
+
+- **doc/** - JavaDoc documentation, detailed API descriptions
+- **examples/** - Example code and projects
+- **sdk/** - Core SDK files
+  - `agora-recording-sdk.jar` - Java library
+  - `agora-recording-sdk-javadoc.jar` - JavaDoc documentation
+
+#### 2.2 Integrate JAR File
+
+You can integrate the JAR file in two ways:
+
+###### Local Maven Repository Method
+
+Method 1: Install only the SDK JAR
+
+```sh
+mvn install:install-file \
+  -Dfile=sdk/agora-recording-sdk.jar \
+  -DgroupId=io.agora.rtc \
+  -DartifactId=linux-recording-java-sdk \
+  -Dversion=4.4.150.1 \
+  -Dpackaging=jar \
+  -DgeneratePom=true
+```
+
+Method 2: Install both SDK JAR and JavaDoc JAR
+
+```sh
+mvn install:install-file \
+  -Dfile=sdk/agora-recording-sdk.jar \
+  -DgroupId=io.agora.rtc \
+  -DartifactId=linux-recording-java-sdk \
+  -Dversion=4.4.150.1 \
+  -Dpackaging=jar \
+  -DgeneratePom=true \
+  -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
+```
+
+After installation, add the dependency in `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>io.agora.rtc</groupId>
+    <artifactId>linux-recording-java-sdk</artifactId>
+    <version>4.4.150.1</version>
+</dependency>
+```
+
+###### Direct Reference Method
+
+1.  Copy the JAR files to your project's `libs` directory:
+
+    ```sh
+    mkdir -p libs
+    cp sdk/agora-recording-sdk.jar libs/
+    cp sdk/agora-recording-sdk-javadoc.jar libs/  # Optional, for IDE support
+    ```
+
+2.  Add the classpath reference in your Java project:
+
+    ```sh
+    # Use the SDK JAR
+    java -cp .:libs/agora-recording-sdk.jar YourMainClass
+
+    # Configure JavaDoc in your IDE (common IDEs like IntelliJ IDEA or Eclipse support direct association of JavaDoc JARs)
+    ```
+
+#### 2.3 Integrate .so Library Files
+
+The downloaded SDK package already includes the `.so` files. You need to ensure that the Java program can find these files at runtime. Please refer to the **Loading Native Libraries (.so files)** section below.
+
+### 3. Loading Native Libraries (.so files)
+
+The Agora Linux Recording Java SDK depends on underlying C++ native libraries (`.so` files). Whether integrating via Maven or locally, you need to ensure the Java Virtual Machine (JVM) can find and load these libraries at runtime.
+
+#### 3.1 Extracting .so Files
+
+The `.so` files are contained within the `agora-recording-sdk.jar` or `linux-recording-java-sdk-x.x.x.x.jar` file. You need to extract them first:
+
+1.  Create a directory in your project or deployment location to store the library files, for example, `libs`:
+
+    ```sh
+    mkdir -p libs
+    cd libs
+    ```
+
+2.  Use the `jar` command to extract the contents from the SDK's JAR file (assuming the JAR file is in the `libs` directory or Maven cache):
+
+    ```sh
+    # If using local integration, the JAR file is usually in the libs directory
+    jar xvf agora-recording-sdk.jar
+
+    # If using Maven integration, the JAR file is in the Maven cache, e.g.:
+    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.1/linux-recording-java-sdk-4.4.150.1.jar
+    ```
+
+3.  After extraction, a `native/linux/x86_64` subdirectory (or `aarch64` for ARM) will be generated in the `libs` directory, containing the required `.so` files:
+
+    ```
+    libs/
+    ├── agora-recording-sdk.jar (or empty, if only used for extraction)
+    ├── io/          # Java class files location, no need to worry about
+    ├── META-INF/    # JAR file and application-related metadata, no need to worry about
+    └── native/      # Native library files for the corresponding platform
+        └── linux/
+            └── x86_64/   # x86_64 platform .so libraries
+                ├── libagora_rtc_sdk.so
+                ├── libagora-fdkaac.so
+                ├── libaosl.so
+                └── librecording.so
+            └── aarch64/  # arm64 platform .so libraries (if available)
+    ```
+
+#### 3.2 Configuring Load Paths
+
+There are two main methods to let the JVM find the `.so` files:
+
+**Method 1: Setting the `LD_LIBRARY_PATH` Environment Variable (Recommended)**
+
+This is the most reliable way, especially when there are dependencies between `.so` files.
+
+```sh
+# Determine the directory containing your .so files, assuming ./libs/native/linux/x86_64
+LIB_DIR=$(pwd)/libs/native/linux/x86_64
+
+# Set the LD_LIBRARY_PATH environment variable, adding the library directory to the front of the existing path
+export LD_LIBRARY_PATH=$LIB_DIR:$LD_LIBRARY_PATH
+
+# Run your Java application
+java -jar YourApp.jar
+# Or using classpath
+# java -cp "YourClasspath" YourMainClass
+```
+
+**Method 2: Using the JVM Parameter `-Djava.library.path`**
+
+This method directly tells the JVM where to look for library files.
+
+```sh
+# Determine the directory containing your .so files, assuming ./libs/native/linux/x86_64
+LIB_DIR=$(pwd)/libs/native/linux/x86_64
+
+# Run the Java application, specifying the library path via the -D parameter
+java -Djava.library.path=$LIB_DIR -jar YourApp.jar
+# Or using classpath
+# java -Djava.library.path=$LIB_DIR -cp "YourClasspath" YourMainClass
+```
+
+> **Note**:
+>
+> - Method 1 (`LD_LIBRARY_PATH`) is recommended because it handles dependencies between libraries better. If you only use `-Djava.library.path`, loading might fail sometimes because a library cannot find other libraries it depends on.
+> - Ensure `$LIB_DIR` points to the **exact directory** containing files like `libagora_rtc_sdk.so`.
+> - You can place the command to set the environment variable in a startup script so it's configured automatically each time the application runs.
+
+Refer to the following script example, which combines both methods and sets the classpath:
+
+```sh
+#!/bin/bash
+# Get the absolute path of the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Determine the .so library file path (assuming in libs/native/linux/x86_64 relative to the script)
+# Adjust x86_64 to your target architecture (e.g., aarch64) if needed
+LIB_PATH="$SCRIPT_DIR/libs/native/linux/x86_64"
+# SDK JAR path (assuming in libs relative to the script)
+SDK_JAR="$SCRIPT_DIR/libs/agora-recording-sdk.jar"
+# Your application's main class
+MAIN_CLASS="YourMainClass"
+# Your application's other dependency classpath (if any)
+APP_CP="YourOtherClasspath"
+
+# Check if the library directory exists
+if [ ! -d "$LIB_PATH" ]; then
+  echo "Error: Library directory not found: $LIB_PATH" >&2
+  exit 1
+fi
+
+# Set the library path environment variable
+export LD_LIBRARY_PATH=$LIB_PATH:$LD_LIBRARY_PATH
+
+# Combine the classpath
+CLASSPATH=".:$SDK_JAR:$APP_CP" # '.' represents the current directory
+
+# Execute the Java program
+# Use both LD_LIBRARY_PATH and -Djava.library.path for compatibility
+java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
+```
+
 ## Quick Start
 
 ### Enable Service
 
-Refer to [Enable Service on Official Website](https://doc.shengwang.cn/doc/recording/java/get-started/enable-service)
-
-### Integrate Recording SDK
-
-The downloaded SDK is a standalone JAR file, which needs to be manually extracted to obtain the `so` files:
-
-```sh
-jar xvf agora-recording-sdk.jar
-```
-
-The extracted directory structure is as follows:
-
-```
-io          # Java class files, no need to pay attention
-META-INF    # Metadata related to JAR files and applications, no need to pay attention
-native      # Corresponding platform's so library files, need to configure into the running environment
-```
+Refer to [Enable Service on the official website](https://docs.agora.io/en/recording/java/get-started/enable-service) (Link might need update based on documentation structure).
 
 ### Recording via Command Line
 
 #### Prerequisites
 
-Before starting, ensure that you have completed the environment preparation and integration of the recording SDK.
+Before starting, ensure you have completed the environment preparation and SDK integration steps.
 
-Note: When the recording SDK joins a channel, it is equivalent to a mute client joining the channel, so it needs to join the same channel as the Agora RTC SDK and use the same App ID and channel scenario.
+> **Note**: When the recording SDK joins a channel, it acts as a dummy client. Therefore, it needs to join the same channel using the same App ID and channel profile as the Agora RTC SDK clients.
 
-#### Integrate SDK
+#### Compile Example Project
 
-1. Create a `libs` folder in the `Examples` directory (if not already present).
-2. Rename the downloaded JAR to `agora-recording-sdk.jar` and place it in the `libs` directory.
-3. Place the `native` files extracted from the JAR into the `libs` directory.
-
-Ensure the directory structure is as follows:
-
-```
-libs/
-├── agora-recording-sdk.jar
-└── native/
-```
-
-#### Compile
-
-Navigate to the `Examples` folder and run the build script:
+Execute the build script in the `Examples` directory:
 
 ```sh
 cd Examples
 ./build.sh
 ```
 
-#### Set Recording Options
+#### Configure Recording Parameters
 
-Refer to the different parameters in the `Examples/config` folder. Note that the parameters are in JSON format, so ensure that any modifications are valid JSON.
+Recording parameters are configured using JSON format, located in the `Examples/config` directory.
 
-Refer to `Examples/config/recorder_json.example` for the meaning of each parameter:
+1.  View the configuration example:
 
-The following is a detailed explanation of each parameter based on the JSON file:
+    ```sh
+    cat config/recorder_json.example
+    ```
 
-| Parameter                | Type      | Description                                                                                                                                                                            |
-| ------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| appId                    | String    | The App ID of your project, which must be consistent with the App ID used in the RTC SDK.                                                                                              |
-| token                    | String    | The token for the channel. If the channel is set to security mode, a token is required.                                                                                                |
-| channelName              | String    | The channel name, which must be consistent with the channel name used in the RTC SDK.                                                                                                  |
-| useStringUid             | Boolean   | Whether to use string user IDs.                                                                                                                                                        |
-| useCloudProxy            | Boolean   | Whether to use cloud proxy service.                                                                                                                                                    |
-| userId                   | String    | The user ID.                                                                                                                                                                           |
-| subAllAudio              | Boolean   | Whether to subscribe to all audio streams. If false, you need to specify the user IDs to subscribe to in subAudioUserList.                                                             |
-| subAudioUserList         | String [] | The list of user IDs to subscribe to for audio, only effective when subAllAudio is false.                                                                                              |
-| subAllVideo              | Boolean   | Whether to subscribe to all video streams. If false, you need to specify the user IDs to subscribe to in subVideoUserList.                                                             |
-| subVideoUserList         | String [] | The list of user IDs to subscribe to for video, only effective when subAllVideo is false.                                                                                              |
-| subStreamType            | String    | The type of stream to subscribe to, supports `high` (high stream) and `low` (low stream).                                                                                              |
-| isMix                    | Boolean   | Whether to use composite recording.                                                                                                                                                    |
-| backgroundColor          | Long      | The background color for composite recording. Uses RGB color format (0xRRGGBB), needs to be converted to long type. For example: red is 0xFF0000, green is 0x00FF00, blue is 0x0000FF. |
-| backgroundImage          | String    | The background image path for composite recording, supports PNG and JPG formats. When both background color and image are set, the background image takes precedence.                  |
-| layoutMode               | String    | The layout mode for composite recording, supports `default` (default layout), `bestfit` (adaptive layout), `vertical` (vertical layout).                                               |
-| maxResolutionUid         | String    | In vertical layout, specifies the user ID to display with maximum resolution.                                                                                                          |
-| recorderStreamType       | String    | The recording type, supports `audio_only` (audio only), `video_only` (video only), `both` (both audio and video).                                                                      |
-| recorderPath             | String    | The recording file path. For composite recording, this is the file name; for individual recording, this is the directory where mp4 files named after each user ID are stored.          |
-| maxDuration              | Integer   | The recording duration in seconds.                                                                                                                                                     |
-| recoverFile              | Boolean   | Whether to simultaneously write h264 and aac files during recording, which can be used to recover mp4 files if the program crashes.                                                    |
-| audio                    | Object    | Audio settings.                                                                                                                                                                        |
-| audio.sampleRate         | Integer   | Audio sample rate.                                                                                                                                                                     |
-| audio.numOfChannels      | Integer   | Number of audio channels.                                                                                                                                                              |
-| video                    | Object    | Video settings.                                                                                                                                                                        |
-| video.width              | Integer   | Video width.                                                                                                                                                                           |
-| video.height             | Integer   | Video height.                                                                                                                                                                          |
-| video.fps                | Integer   | Video frame rate.                                                                                                                                                                      |
-| waterMark                | Object[]  | Watermark settings.                                                                                                                                                                    |
-| waterMark[].type         | String    | Watermark type, supports `litera` (text watermark), `time` (timestamp watermark), `picture` (image watermark).                                                                         |
-| waterMark[].litera       | String    | Text content, only effective when type is `litera`.                                                                                                                                    |
-| waterMark[].fontFilePath | String    | Font file path.                                                                                                                                                                        |
-| waterMark[].fontSize     | Integer   | Font size.                                                                                                                                                                             |
-| waterMark[].x            | Integer   | X coordinate of the watermark.                                                                                                                                                         |
-| waterMark[].y            | Integer   | Y coordinate of the watermark.                                                                                                                                                         |
-| waterMark[].width        | Integer   | Width of the watermark.                                                                                                                                                                |
-| waterMark[].height       | Integer   | Height of the watermark.                                                                                                                                                               |
-| waterMark[].zorder       | Integer   | Layer order of the watermark.                                                                                                                                                          |
-| waterMark[].imgUrl       | String    | URL of the image watermark, only effective when type is `picture`.                                                                                                                     |
-| encryption               | Object    | Media stream encryption settings.                                                                                                                                                      |
-| encryption.mode          | String    | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                                    |
-| encryption.key           | String    | Encryption key.                                                                                                                                                                        |
-| encryption.salt          | String    | Encryption salt, a 32-character string, e.g., "ABC123".                                                                                                                                |
-| rotation                 | Object[]  | Video rotation settings.                                                                                                                                                               |
-| rotation[].uid           | String    | User ID of the video to be rotated.                                                                                                                                                    |
-| rotation[].degree        | Integer   | Rotation angle, supports 0, 90, 180, 270.                                                                                                                                              |
+2.  Create or modify your own configuration file, e.g., `config/my_recorder.json`, ensuring the JSON format is correct.
 
-Note:
+3.  Full Parameter Description:
 
-- **Before executing the recording, be sure to fill in the appId and token parameters in the JSON.**
-- **The appId and channelName settings must be consistent with those in the Agora RTC SDK.**
-- **In single stream mode, the recorderPath folder name needs to be manually created in the Examples folder, for example, "recorderPath": "recorder_result/", ensure that the Examples/recorder_result/ directory exists.**
+    | Parameter                | Type     | Description                                                                                                                                             |
+    | ------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | appId                    | String   | The App ID of the project, must be consistent with the App ID in the RTC SDK.                                                                           |
+    | token                    | String   | The channel Token. Required if the channel has security mode enabled.                                                                                   |
+    | channelName              | String   | The channel name, must be consistent with the channel name in the RTC SDK.                                                                              |
+    | useStringUid             | Boolean  | Whether to use string user IDs.                                                                                                                         |
+    | useCloudProxy            | Boolean  | Whether to use the cloud proxy service.                                                                                                                 |
+    | userId                   | String   | The user ID for the recorder client.                                                                                                                    |
+    | subAllAudio              | Boolean  | Whether to subscribe to all audio streams. If false, specify user IDs in `subAudioUserList`.                                                            |
+    | subAudioUserList         | String[] | List of user IDs to subscribe to audio from, effective only when `subAllAudio` is false.                                                                |
+    | subAllVideo              | Boolean  | Whether to subscribe to all video streams. If false, specify user IDs in `subVideoUserList`.                                                            |
+    | subVideoUserList         | String[] | List of user IDs to subscribe to video from, effective only when `subAllVideo` is false.                                                                |
+    | subStreamType            | String   | The type of stream to subscribe to, supports `high` (high-resolution) and `low` (low-resolution).                                                       |
+    | isMix                    | Boolean  | Whether to perform mixed-stream recording.                                                                                                              |
+    | backgroundColor          | Long     | Background color for mixed-stream recording. Use RGB format (0xRRGGBB), converted to a long value. E.g., Red=0xFF0000, Green=0x00FF00, Blue=0x0000FF.   |
+    | backgroundImage          | String   | Path to the background image for mixed-stream recording, supports PNG and JPG. Takes precedence over `backgroundColor` if both are set.                 |
+    | layoutMode               | String   | Layout mode for mixed-stream recording, supports `default`, `bestfit`, `vertical`.                                                                      |
+    | maxResolutionUid         | String   | In `vertical` layout, sets the user ID whose video is displayed at the maximum resolution.                                                              |
+    | recorderStreamType       | String   | Recording type, supports `audio_only`, `video_only`, `both`.                                                                                            |
+    | recorderPath             | String   | Recording file path. For mixed-stream, it's the filename; for single-stream, it's the directory where MP4 files named after each user ID will be saved. |
+    | maxDuration              | Integer  | Recording duration in seconds.                                                                                                                          |
+    | recoverFile              | Boolean  | Whether to write separate h264 and aac files during recording, allowing MP4 recovery if the program crashes.                                            |
+    | audio                    | Object   | Audio settings.                                                                                                                                         |
+    | audio.sampleRate         | Integer  | Audio sample rate (Hz).                                                                                                                                 |
+    | audio.numOfChannels      | Integer  | Number of audio channels.                                                                                                                               |
+    | video                    | Object   | Video settings.                                                                                                                                         |
+    | video.width              | Integer  | Video width (pixels).                                                                                                                                   |
+    | video.height             | Integer  | Video height (pixels).                                                                                                                                  |
+    | video.fps                | Integer  | Video frame rate (fps).                                                                                                                                 |
+    | waterMark                | Object[] | Watermark settings.                                                                                                                                     |
+    | waterMark[].type         | String   | Watermark type, supports `litera` (text), `time` (timestamp), `picture`.                                                                                |
+    | waterMark[].litera       | String   | Text content, effective only when type is `litera`.                                                                                                     |
+    | waterMark[].fontFilePath | String   | Font file path.                                                                                                                                         |
+    | waterMark[].fontSize     | Integer  | Font size.                                                                                                                                              |
+    | waterMark[].x            | Integer  | Watermark X coordinate.                                                                                                                                 |
+    | waterMark[].y            | Integer  | Watermark Y coordinate.                                                                                                                                 |
+    | waterMark[].width        | Integer  | Watermark width.                                                                                                                                        |
+    | waterMark[].height       | Integer  | Watermark height.                                                                                                                                       |
+    | waterMark[].zorder       | Integer  | Watermark layer order (z-index).                                                                                                                        |
+    | waterMark[].imgUrl       | String   | Image watermark URL, effective only when type is `picture`.                                                                                             |
+    | encryption               | Object   | Media stream encryption settings.                                                                                                                       |
+    | encryption.mode          | String   | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.     |
+    | encryption.key           | String   | Encryption key.                                                                                                                                         |
+    | encryption.salt          | String   | Encryption salt, a 32-byte value (often represented as a string).                                                                                       |
+    | rotation                 | Object[] | Video rotation settings.                                                                                                                                |
+    | rotation[].uid           | String   | User ID whose video needs rotation.                                                                                                                     |
+    | rotation[].degree        | Integer  | Rotation angle, supports 0, 90, 180, 270.                                                                                                               |
+
+    > **Important Notes**:
+    >
+    > - Before executing recording, ensure `appId` and `token` (if applicable) are correctly filled in the JSON.
+    > - `appId` and `channelName` must exactly match those used by the RTC SDK clients.
+    > - In single-stream recording mode, `recorderPath` specifies a directory path. You must manually ensure this directory exists before starting the recording (e.g., if `"recorderPath": "recorder_result/"`, ensure `Examples/recorder_result/` exists).
+    > - Ensure the JSON format is correct; do not miss commas, quotes, etc.
 
 #### Start Recording
 
-Navigate to the example directory and manually create a folder for individual stream configuration:
+1.  Create the output directory for single-stream recording (if using):
 
-```sh
-cd Examples
-mkdir recorder_result
-```
+    ```sh
+    mkdir -p Examples/recorder_result
+    ```
 
-Run the test script according to your test scenario:
+2.  Choose and run the corresponding test script:
 
-```sh
-./script/TestCaseName.sh
-```
+    ```sh
+    cd Examples
+    ./script/TestCaseName.sh
+    ```
 
-Note:
+    You can modify the scripts or their corresponding JSON configuration files to customize the recording behavior.
 
-- **The pre-made execution scripts are just for a few simple scenarios. In practice, you can modify the json config file corresponding to any script according to your specific requirements.**
+#### Common Test Scripts
+
+The `Examples/script` directory provides several preset test scripts:
+
+| Script Name                                      | Description                                                                 |
+| ------------------------------------------------ | --------------------------------------------------------------------------- |
+| MixStreamRecordingAudioVideo.sh                  | Mixed-stream recording of audio and video.                                  |
+| MixStreamRecordingAudio.sh                       | Mixed-stream recording of audio only.                                       |
+| MixStreamRecordingVideo.sh                       | Mixed-stream recording of video only.                                       |
+| MixStreamRecordingAudioVideoWatermarks.sh        | Mixed-stream recording of audio/video with watermarks.                      |
+| MixStreamRecordingAudioVideoWatermarksBg.sh      | Mixed-stream recording of audio/video with watermarks and background.       |
+| MixStreamRecordingAudioVideoWatermarksRecover.sh | Mixed-stream recording of audio/video with watermarks and recovery enabled. |
+| MixStreamRecordingAudioVideoEncryption.sh        | Mixed-stream recording of audio/video with encryption enabled.              |
+| MixStreamRecordingAudioVideoStringUid.sh         | Mixed-stream recording of audio/video using string UIDs.                    |
+| SingleStreamRecordingAudioVideo.sh               | Single-stream recording of audio and video.                                 |
+| SingleStreamRecordingAudio.sh                    | Single-stream recording of audio only.                                      |
+| SingleStreamRecordingVideo.sh                    | Single-stream recording of video only.                                      |
+| SingleStreamRecordingAudioVideoWatermarks.sh     | Single-stream recording of audio/video with watermarks.                     |
+
+Choose a suitable script or create custom recording configurations based on these examples. Each script corresponds to a configuration file with the same name in the `config` directory.
 
 #### Stop Recording
 
-Enter `1` in the terminal console to stop recording.
+- **Start Recording**: Recording starts automatically when the script is executed.
+- **Stop Recording**: Enter `1` in the command line and press Enter. The program will stop recording and exit.
 
-#### Recording File Path
+#### Recording Output Files
 
-For single stream, mp4 files are generated in the specified folder under the `Examples` directory, with the file name starting with the UID.
-For mixed stream, the mp4 file is generated in the `Examples` directory with the file name specified in the JSON configuration.
+- **Single-Stream Recording**: Generates multiple MP4 files in the `Examples/recorder_result/` directory (or as specified by `recorderPath`), named after the UIDs of each user (e.g., `uid_123456_timestamp.mp4`).
+- **Mixed-Stream Recording**: Generates a single MP4 file in the `Examples` directory (or as specified by `recorderPath`), with the filename specified in the JSON configuration.
 
-### Recording via API
+#### Troubleshooting Common Issues
+
+- If no recording file is output, check if the AppID, Token, and channel name are correct.
+- Ensure there are active users sending media streams in the channel.
+- Check the log files for detailed error messages. Logs are typically located in the `Examples/logs/` directory.
+
+> **Tip**: For more advanced configuration options and detailed parameter descriptions, refer to the comments in the `Examples/config/recorder_json.example` file.
+
+### Recording via API Call
 
 #### Prerequisites
 
-Before starting, ensure that you have completed the environment preparation and integration of the recording SDK, including configuring the jar and corresponding platform's so files.
+Before starting, ensure you have completed the environment preparation and SDK integration steps, including configuring the JAR and corresponding platform's `.so` files.
 
-#### Implement Recording via API
+#### Implementing Recording via API Call
+
+The following example code, based on the actual example project in the `Examples` directory, demonstrates how to use the Recording SDK API for recording.
 
 ##### Initialize Service
 
 ```java
+import io.agora.recording.AgoraMediaRtcRecorder;
+import io.agora.recording.AgoraMediaComponentFactory;
+import io.agora.recording.AgoraParameter;
+import io.agora.recording.AgoraService;
+import io.agora.recording.AgoraServiceConfiguration;
+import io.agora.recording.Constants;
+import io.agora.recording.EncryptionConfig;
+import io.agora.recording.IAgoraMediaRtcRecorderEventHandler;
+import io.agora.recording.MediaRecorderConfiguration;
+import io.agora.recording.RecorderInfo;
+import io.agora.recording.RemoteAudioStatistics;
+import io.agora.recording.RemoteVideoStatistics;
+import io.agora.recording.SpeakVolumeInfo;
+import io.agora.recording.VideoMixingLayout;
+import io.agora.recording.VideoSubscriptionOptions;
+import io.agora.recording.WatermarkConfig;
+
+// Create AgoraService instance
+AgoraService agoraService = new AgoraService();
+
+// Create and configure the service configuration object
 AgoraServiceConfiguration config = new AgoraServiceConfiguration();
-config.setEnableAudioDevice(false);
-config.setEnableAudioProcessor(true);
-config.setEnableVideo(true);
-config.setAppId("APPID");
-config.setUseStringUid(false);
-agoraService.initialize(config);
+config.setEnableAudioDevice(false);    // Whether to enable audio device (usually set to false for recording)
+config.setEnableAudioProcessor(true);  // Enable audio processing
+config.setEnableVideo(true);           // Enable video functionality
+config.setAppId("YOUR_APPID");         // Set your App ID
+config.setUseStringUid(false);         // Whether to use string UID
+agoraService.initialize(config);       // Initialize the service
+
+// Optional: Set cloud proxy
+AgoraParameter parameter = agoraService.getAgoraParameter();
+if (parameter != null) {
+    // Example: Enable cloud proxy (check AgoraParameter documentation for specific keys)
+    // parameter.setBool("rtc.enable_proxy", true);
+    // parameter.setString("rtc.proxy_server", "your.proxy.server:port");
+}
 ```
-
-Note:
-
-- **appId: The App ID of the project, which needs to be consistent with the App ID in the RTC SDK.**
 
 ##### Join Channel
 
 ```java
+// Create media component factory
 AgoraMediaComponentFactory factory = agoraService.createAgoraMediaComponentFactory();
 
+// Create and initialize the recorder
 AgoraMediaRtcRecorder agoraMediaRtcRecorder = factory.createMediaRtcRecorder();
-agoraMediaRtcRecorder.initialize(agoraService, false);
-AgoraMediaRtcRecorderEventHandler handler = new AgoraMediaRtcRecorderEventHandler();
+// The second parameter indicates whether to enable mixed-stream recording: true=mixed, false=single
+boolean enableMix = false; // Example: Single-stream recording
+agoraMediaRtcRecorder.initialize(agoraService, enableMix);
+
+// Create and register the event handler
+// Replace AgoraMediaRtcRecorderEventHandler with your actual implementation
+IAgoraMediaRtcRecorderEventHandler handler = new AgoraMediaRtcRecorderEventHandler();
 agoraMediaRtcRecorder.registerRecorderEventHandler(handler);
 
-agoraMediaRtcRecorder.joinChannel("token", "channelName", "0");
+// Join the channel
+int joinResult = agoraMediaRtcRecorder.joinChannel(
+    "YOUR_TOKEN",        // Channel Token, can be null if token validation is not enabled
+    "YOUR_CHANNEL_NAME", // Channel name
+    "0"                  // User ID, if set to "0", the system will automatically assign one
+);
+if (joinResult != 0) {
+    System.err.println("Failed to join channel, error code: " + joinResult);
+    // Handle error appropriately
+}
 ```
 
-Note:
-
-- **channelName: Must be consistent with the channel name joined by the RTC SDK.**
-
-##### Start Recording
+##### Configure and Start Recording
 
 ```java
-agoraMediaRtcRecorder.subscribeAllAudio();
+// Subscribe to audio streams
+boolean subscribeAllAudio = true; // Example: Subscribe to all audio
+if (subscribeAllAudio) {
+    agoraMediaRtcRecorder.subscribeAllAudio();
+} else {
+    // Only subscribe to specific users' audio
+    agoraMediaRtcRecorder.subscribeAudio("USER_ID_TO_SUBSCRIBE");
+}
+
+// Subscribe to video streams
+boolean subscribeAllVideo = true; // Example: Subscribe to all video
 VideoSubscriptionOptions options = new VideoSubscriptionOptions();
 options.setEncodedFrameOnly(false);
-options.setType(VideoStreamType.VIDEO_STREAM_HIGH);
-agoraMediaRtcRecorder.subscribeAllVideo(options);
+options.setType(Constants.VideoStreamType.VIDEO_STREAM_HIGH); // Optional: VIDEO_STREAM_LOW
+if (subscribeAllVideo) {
+    agoraMediaRtcRecorder.subscribeAllVideo(options);
+} else {
+    // Only subscribe to specific users' video
+    agoraMediaRtcRecorder.subscribeVideo("USER_ID_TO_SUBSCRIBE", options);
+}
 
-// set watermark
-WatermarkConfig[] watermarks = new WatermarkConfig[1];
-agoraMediaRtcRecorder.enableAndUpdateVideoWatermarks(watermarks);
-```
+// Configure mixed-stream layout (only needed in mixed-stream mode)
+if (enableMix) {
+    VideoMixingLayout layout = new VideoMixingLayout();
+    layout.setCanvasWidth(1280);
+    layout.setCanvasHeight(720);
+    layout.setBackgroundColor(0x000000); // Black background
+    // Add user layouts... (See VideoMixingLayout and UserMixerLayout in API reference)
+    agoraMediaRtcRecorder.setVideoMixingLayout(layout);
+}
 
-- **The watermark position cannot exceed the width and height of the video.**
-
-1. Mixed Recording:
-
-```java
-// set recorder config
+// Configure recording parameters
 MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
-agoraMediaRtcRecorder.setRecorderConfig(mediaRecorderConfiguration);
+mediaRecorderConfiguration.setWidth(640);       // Set recording video width
+mediaRecorderConfiguration.setHeight(480);      // Set recording video height
+mediaRecorderConfiguration.setFps(15);          // Set recording frame rate
+mediaRecorderConfiguration.setMaxDurationMs(60 * 60 * 1000); // Max recording duration (e.g., 1 hour) in milliseconds
+// IMPORTANT: Ensure the directory exists and is writable
+mediaRecorderConfiguration.setStoragePath(enableMix ? "/path/to/save/mixed_recording.mp4" : "/path/to/save/single_stream_dir/"); // Recording file save path/directory
 
-agoraMediaRtcRecorder.startRecording();
+int configResult = 0;
+if (enableMix) {
+    // Configure mixed-stream recording
+    configResult = agoraMediaRtcRecorder.setRecorderConfig(mediaRecorderConfiguration);
+} else {
+    // Configure single-stream recording (can be called multiple times for different users)
+    // Typically called within event handlers like onUserJoined or onFirstRemoteVideoDecoded
+    // configResult = agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, "USER_ID");
+    // NOTE: For single-stream, setRecorderConfigByUid should be called before startSingleRecordingByUid for each user.
+}
+if (configResult != 0) {
+     System.err.println("Failed to set recorder config, error code: " + configResult);
+     // Handle error
+}
+
+// Add watermark (Optional)
+// WatermarkConfig[] watermarks = new WatermarkConfig[1];
+// watermarks[0] = new WatermarkConfig();
+// // Configure watermark parameters... (See WatermarkConfig in API reference)
+// if (enableMix) {
+//     agoraMediaRtcRecorder.enableAndUpdateVideoWatermarks(watermarks);
+// } else {
+//     agoraMediaRtcRecorder.enableAndUpdateVideoWatermarksByUid(watermarks, "USER_ID");
+// }
+
+// Enable encryption (Optional)
+boolean enableEncryption = false; // Example: Encryption disabled
+if (enableEncryption) {
+    EncryptionConfig encryptionConfig = new EncryptionConfig();
+    encryptionConfig.setEncryptionMode(Constants.EncryptionMode.AES_128_GCM); // Set encryption mode
+    encryptionConfig.setEncryptionKey("YOUR_ENCRYPTION_KEY");
+    // encryptionConfig.setEncryptionKdfSalt(...); // Set salt if using GCM2 modes
+    agoraMediaRtcRecorder.enableEncryption(true, encryptionConfig);
+}
+
+// Start recording
+int startResult = 0;
+if (enableMix) {
+    startResult = agoraMediaRtcRecorder.startRecording();
+} else {
+    // Start single-stream recording (typically called within event handlers)
+    // startResult = agoraMediaRtcRecorder.startSingleRecordingByUid("USER_ID");
+}
+ if (startResult != 0) {
+     System.err.println("Failed to start recording, error code: " + startResult);
+     // Handle error
+ }
 ```
 
-2. Single Stream Recording
-
-Listen for audio and video callbacks, and call the single stream recording interface.
+##### Handling Recording Events
 
 ```java
+// Example Implementation of the EventHandler
 public static class AgoraMediaRtcRecorderEventHandler implements IAgoraMediaRtcRecorderEventHandler {
-    @Override
-    public void onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed) {
-        new Thread() {
-            @Override
-            public void run() {
-                MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
-                agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
 
-                agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
-            }
-        }.start();
+    private AgoraMediaRtcRecorder recorder; // Keep a reference if needed
+    private boolean isMixMode;
+
+    // Constructor or setter to pass the recorder instance and mode
+    public AgoraMediaRtcRecorderEventHandler(AgoraMediaRtcRecorder recorder, boolean isMixMode) {
+        this.recorder = recorder;
+        this.isMixMode = isMixMode;
+    }
+     public AgoraMediaRtcRecorderEventHandler() {
+        // Default constructor if reference is not needed or set later
+    }
+
+
+    @Override
+    public void onConnected(String channelId, String userId) {
+         System.out.println("Recorder connected to channel: " + channelId + " with user ID: " + userId);
+         // Connection successful, ready for operations
+    }
+
+     @Override
+    public void onDisconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason) {
+         System.out.println("Recorder disconnected. Reason: " + reason);
+    }
+
+    @Override
+    public void onUserJoined(String channelId, String userId) {
+        System.out.println("Remote user joined: " + userId);
+        if (!isMixMode) {
+            // In single-stream mode, configure and potentially start recording for the new user
+             new Thread(() -> {
+                MediaRecorderConfiguration config = new MediaRecorderConfiguration();
+                // Configure parameters specific to this user if needed
+                config.setWidth(640);
+                config.setHeight(480);
+                config.setFps(15);
+                 // Ensure the directory exists!
+                config.setStoragePath("/path/to/save/single_stream_dir/"); // Directory for single stream files
+                 // ... other configurations ...
+
+                int configUidResult = recorder.setRecorderConfigByUid(config, userId);
+                 if (configUidResult == 0) {
+                     // Optionally wait for first frame decoded, or start immediately if configured
+                     // int startUidResult = recorder.startSingleRecordingByUid(userId);
+                     // System.out.println("Attempted to start single recording for " + userId + ", result: " + startUidResult);
+                 } else {
+                     System.err.println("Failed to set recorder config for user " + userId + ", error: " + configUidResult);
+                 }
+             }).start();
+        } else {
+             // In mixed-stream mode, maybe update the layout
+            // updateMixingLayout();
+        }
+    }
+
+     @Override
+     public void onUserLeft(String channelId, String userId, Constants.UserOfflineReasonType reason) {
+         System.out.println("Remote user left: " + userId + ", reason: " + reason);
+         if (!isMixMode) {
+             // Stop single-stream recording for the user who left
+             int stopUidResult = recorder.stopSingleRecordingByUid(userId);
+             System.out.println("Stopped single recording for user " + userId + ", result: " + stopUidResult);
+         } else {
+             // In mixed-stream mode, maybe update the layout
+             // updateMixingLayout();
+         }
+     }
+
+    @Override
+    public void onFirstRemoteAudioFrame(String channelId, String userId, int elapsed) {
+         System.out.println("First remote audio frame received from user: " + userId);
+         // If auto-start wasn't used, can start single audio recording here
     }
 
     @Override
     public void onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed) {
-        new Thread() {
-            @Override
-            public void run() {
-                if (isMix) {
-                    VideoMixingLayout layout = new VideoMixingLayout();
-                    agoraMediaRtcRecorder.setVideoMixingLayout(layout);
-                } else {
-                    MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
-                    agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
-
-                    agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
-                }
-            }
-        }.start();
+        System.out.println("First remote video decoded from user: " + userId + " [" + width + "x" + height + "]");
+        if (!isMixMode) {
+            // Good place to start single-stream recording if setRecorderConfigByUid was successful
+             new Thread(() -> {
+                 int startUidResult = recorder.startSingleRecordingByUid(userId);
+                 System.out.println("Started single recording for user " + userId + " after first video frame, result: " + startUidResult);
+             }).start();
+        }
     }
+
+    @Override
+    public void onRecorderStateChanged(String channelId, String userId, Constants.RecorderState state,
+            Constants.RecorderReasonCode reason, String fileName) {
+        System.out.println("Recorder state changed for user " + (userId != null ? userId : "N/A (Mixed)") +
+                           ": State=" + state + ", Reason=" + reason + ", File=" + fileName);
+        // Handle state changes, e.g., RECORDER_STATE_ERROR might require action
+    }
+
+     @Override
+     public void onRecorderInfoUpdated(String channelId, String userId, RecorderInfo info) {
+         System.out.println("Recorder info updated for user " + (userId != null ? userId : "N/A (Mixed)") +
+                            ": FileName=" + info.getFileName() + ", Duration=" + info.getDurationMs() + "ms, Size=" + info.getFileSize() + " bytes");
+     }
+
+     @Override
+     public void onEncryptionError(String channelId, Constants.EncryptionErrorType errorType) {
+         System.err.println("Encryption error occurred: " + errorType);
+     }
+
+    // Implement other necessary event handling methods...
+    // e.g., onConnectionLost, onReconnected, onUserVideoStateChanged, etc.
 }
 ```
 
 ##### Stop Recording
 
 ```java
+// Unsubscribe from streams (optional but good practice)
 agoraMediaRtcRecorder.unsubscribeAllAudio();
 agoraMediaRtcRecorder.unsubscribeAllVideo();
 
-if (isMix) {
+// Stop recording
+if (enableMix) {
     agoraMediaRtcRecorder.stopRecording();
 } else {
-    agoraMediaRtcRecorder.stopSingleRecordingByUid("userId");
+    // Stop single-stream recording for all users being recorded
+    // You'll need to keep track of which users are being recorded
+    // Example: Assuming you have a list of user IDs called 'recordingUserIds'
+    // for (String userId : recordingUserIds) {
+    //     agoraMediaRtcRecorder.stopSingleRecordingByUid(userId);
+    // }
 }
 
+// Unregister the event handler
 agoraMediaRtcRecorder.unregisterRecorderEventHandle(handler);
 
+// Leave the channel and release recorder resources
 agoraMediaRtcRecorder.leaveChannel();
 agoraMediaRtcRecorder.release();
 
+// Release the service
 agoraService.release();
 ```
 
-##### Get Recording File Path
+##### Getting Recorded Files
 
-For single stream, mp4 files are generated in the specified folder under the `Examples` directory, with the file name starting with the UID.
-For mixed stream, the mp4 file is generated in the `Examples` directory with the file name specified in the MediaRecorderConfiguration object.
+Recorded files will be saved in different locations based on the recording type:
+
+- **Single-Stream Recording**: Generates MP4 files in the directory specified by `storagePath` in `MediaRecorderConfiguration` (when calling `setRecorderConfigByUid`). Filenames typically start with the UID, e.g., `uid_123456_timestamp.mp4`.
+- **Mixed-Stream Recording**: Generates a single MP4 file at the path specified by `storagePath` in `MediaRecorderConfiguration` (when calling `setRecorderConfig`).
+
+In practical applications, it is recommended to set a unique file path for each recording session, possibly using the channel name, timestamp, etc., as part of the filename to avoid overwriting files.
+
+For more recording options and advanced features, please refer to the API documentation for the `MediaRecorderConfiguration` class.
 
 ## API Reference
 
-### `AgoraService` Class
-
-#### Overview
-
-The `AgoraService` class provides core functionalities for initializing and managing Agora services. It is the primary entry point for using Agora's recording features.
-
-#### Methods
-
-##### `AgoraService()`
-
-Constructs an `AgoraService` instance and initializes local components. Only one `AgoraService` instance can be initialized at a time.
-
-##### `long getNativeHandle()`
-
-Retrieves the native handle associated with this `AgoraService` instance.
-
-**Returns**:
-
-- The native handle value used for local method calls.
-
-##### `int release()`
-
-Releases the `AgoraService` object and its associated resources. After calling this method, the instance becomes invalid.
-
-**Returns**:
-
-- `0`: Success
-- `< 0`: Failure
-
-##### `int initialize(AgoraServiceConfiguration config)`
-
-Initializes the `AgoraService` object with the specified configuration.
-
-**Parameters**:
-
-- `config`: The configuration object containing initialization parameters.
-
-**Returns**:
-
-- `0`: Success
-- `< 0`: Failure
-
-##### `AgoraMediaComponentFactory createAgoraMediaComponentFactory()`
-
-Creates and returns an `AgoraMediaComponentFactory` object for creating media components.
-
-**Returns**:
-
-- An `AgoraMediaComponentFactory` instance.
-
-##### `AgoraParameter getAgoraParameter()`
-
-Creates and returns an `AgoraParameter` object for parameter management.
-
-**Returns**:
-
-- On success, returns an `AgoraParameter` instance.
-- On failure, returns `null`.
-
-##### `static String getSdkVersion()`
-
-Retrieves the SDK version.
-
-**Returns**:
-
-- The SDK version.
-
-##### `int setLogFile(String filePath, int fileSize)`
-
-Sets the path and size of the SDK log file.
-
-**Parameters**:
-
-- `filePath`: The path to the log file. Ensure the directory exists and is writable.
-- `fileSize`: The size of the SDK log file (in bytes), i.e., the size of each log file.
-
-**Returns**:
-
-- `0`: Success
-- `< 0`: Failure
-
-##### `int setLogLevel(Constants.LogLevel level)`
-
-Sets the log level for the SDK log file.
-
-**Parameters**:
-
-- `level`: The log level.
-
-**Returns**:
-
-- `0`: Success
-- `< 0`: Failure
-
-### `AgoraServiceConfiguration` Class
-
-#### Overview
-
-The `AgoraServiceConfiguration` class is used to configure and initialize an Agora service instance. This class contains all the settings needed to initialize and configure the Agora service instance.
-
-#### Properties
-
-- **enableAudioProcessor**
-
-  Indicates whether to enable the audio processing module.
-
-  - `true`: Enables the audio processing module (default).
-  - `false`: Disables the audio processing module. If the audio processing module is disabled, audio tracks cannot be created.
-
-- **enableAudioDevice**
-
-  Indicates whether to enable the audio device module. The audio device module manages audio devices such as recording and playback.
-
-  - `true`: Enables the audio device module (default). Audio recording and playback are available.
-  - `false`: Disables the audio device module. Audio recording and playback are unavailable.
-
-  Note: If `enableAudioDevice` is set to `false` and `enableAudioProcessor` is set to `true`, audio devices cannot be used, but PCM audio data can be pushed.
-
-- **enableVideo**
-
-  Indicates whether to enable video.
-
-  - `true`: Enables video.
-  - `false`: Disables video (default).
-
-- **context**
-
-  The user context object. For Android, it is the context of the activity.
-
-- **appId**
-
-  The App ID of the project.
-
-- **areaCode**
-
-  The supported area code. The default value is `AREA_CODE_GLOB`.
-
-- **channelProfile**
-
-  The channel profile. The default channel profile is `CHANNEL_PROFILE_LIVE_BROADCASTING`.
-
-- **license**
-
-  The authentication license used when connecting to a channel. Charges are based on the license.
-
-- **audioScenario**
-
-  The audio scenario. The default value is `AUDIO_SCENARIO_DEFAULT`.
-
-- **logConfig**
-
-  Configuration for custom log path, log size, and log level.
-
-- **useStringUid**
-
-  Indicates whether to enable string user IDs.
-
-- **useExternalEglContext**
-
-  Indicates whether to use the EGL context in the current thread as the root EGL context for the SDK. This context is shared by all EGL-related modules, such as camera capture and video rendering.
-  Note: This property is only applicable to Android.
-
-- **domainLimit**
-
-  Indicates whether to enable domain limitation.
-
-  - `true`: Only connects to servers resolved via DNS.
-  - `false`: Connects to servers without limitations (default).
-
-### `AgoraMediaComponentFactory` Class
-
-#### Overview
-
-The `AgoraMediaComponentFactory` class is a factory class for creating Agora media components. It provides functionalities to create instances of media recording components.
-
-#### Methods
-
-- **AgoraMediaComponentFactory(long handle)**
-
-  Constructs an `AgoraMediaComponentFactory` instance.
-
-  - Parameters:
-    - `handle`: The native handle for the factory instance.
-
-- **AgoraMediaRtcRecorder createMediaRtcRecorder()**
-
-  Creates a new `AgoraMediaRtcRecorder` instance.
-
-  - Returns:
-    - A new `AgoraMediaRtcRecorder` instance.
-  - Exceptions:
-    - `RuntimeException`: If the local recorder creation fails.
-
-- **int release()**
-
-  Releases the local resources associated with the factory.
-
-  - Returns:
-    - The result of the release operation.
-      - `0`: Success.
-      - `< 0`: Failure.
-
-### `AgoraMediaRtcRecorder` Class
-
-#### Overview
-
-The `AgoraMediaRtcRecorder` class provides functionalities for recording Agora RTC media streams. This class allows recording audio and video streams from an Agora RTC channel, with options for stream mixing, encryption, and selective subscription.
-
-#### Methods
-
-- **AgoraMediaRtcRecorder(long handle)**
-
-  Constructs an `AgoraMediaRtcRecorder` instance.
-
-  - Parameters:
-    - `handle`: The native handle for the recorder instance.
-
-- **int initialize(AgoraService service, boolean enableMix)**
-
-  Initializes the recorder with the specified service and mixing settings.
-
-  - Parameters:
-    - `service`: The Agora service instance that must be initialized before calling this method.
-    - `enableMix`: Whether to enable stream mixing.
-  - Returns:
-    - `0`: Initialization successful.
-    - Negative value: Initialization failed.
-
-- **int joinChannel(String token, String channelName, String userId)**
-
-  Joins an Agora RTC channel.
-
-  - Parameters:
-    - `token`: The token for authentication.
-    - `channelName`: The name of the channel to join. The name cannot exceed 64 bytes and can include lowercase letters, uppercase letters, numbers, spaces, and special characters.
-    - `userId`: The user ID of the local user. If `null`, the system will automatically assign one.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int leaveChannel()**
-
-  Leaves the current channel.
-
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int enableEncryption(boolean enabled, EncryptionConfig config)**
-
-  Enables or disables built-in encryption.
-
-  - Parameters:
-    - `enabled`: Whether to enable built-in encryption.
-    - `config`: The encryption configuration parameters.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-  Note: If encryption is enabled, the RTMP stream feature will be disabled.
-
-- **int subscribeAllAudio()**
-
-  Subscribes to the audio streams of all remote users in the channel.
-
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int subscribeAllVideo(VideoSubscriptionOptions options)**
-
-  Subscribes to the video streams of all remote users in the channel.
-
-  - Parameters:
-    - `options`: Video subscription options, including stream type and other parameters.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int unsubscribeAllAudio()**
-
-  Stops subscribing to the audio streams of all remote users in the channel.
-
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int unsubscribeAllVideo()**
-
-  Stops subscribing to the video streams of all remote users in the channel.
-
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int subscribeAudio(String userId)**
-
-  Subscribes to the audio stream of a specified remote user.
-
-  - Parameters:
-    - `userId`: The ID of the remote user whose audio is to be subscribed to.
-  - Returns:
-    - `0`: Method call successful.
-    - `-2`: Invalid userId.
-    - Other negative values: Method call failed.
-
-- **int unsubscribeAudio(String userId)**
-
-  Stops subscribing to the audio stream of a specified remote user.
-
-  - Parameters:
-    - `userId`: The ID of the remote user whose audio subscription is to be stopped.
-  - Returns:
-    - `0`: Method call successful.
-    - `-2`: Invalid userId.
-    - Other negative values: Method call failed.
-
-- **int subscribeVideo(String userId, VideoSubscriptionOptions options)**
-
-  Subscribes to the video stream of a specified remote user.
-
-  - Parameters:
-    - `userId`: The ID of the remote user whose video is to be subscribed to.
-    - `options`: Video subscription options, including stream type and other parameters.
-  - Returns:
-    - `0`: Method call successful.
-    - `-2`: Invalid userId.
-    - Other negative values: Method call failed.
-
-- **int unsubscribeVideo(String userId)**
-
-  Stops subscribing to the video stream of a specified remote user.
-
-  - Parameters:
-    - `userId`: The ID of the remote user whose video subscription is to be stopped.
-  - Returns:
-    - `0`: Method call successful.
-    - `-2`: Invalid userId.
-    - Other negative values: Method call failed.
-
-- **int setAudioVolumeIndicationParameters(int intervalInMs)**
-
-  Sets the audio volume indication parameters.
-
-  - Parameters:
-    - `intervalInMs`: The interval (in milliseconds) between volume indications.
-
-- **int setVideoMixingLayout(VideoMixingLayout layout)**
-
-  Sets the layout for mixed video streams.
-
-  - Parameters:
-    - `layout`: The layout configuration for mixed video streams.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int setRecorderConfig(MediaRecorderConfiguration config)**
-
-  Configures the recorder settings. This method must be called before starting the recording.
-
-  - Parameters:
-    - `config`: The recorder configuration parameters.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int setRecorderConfigByUid(MediaRecorderConfiguration config, String userId)**
-
-  Configures the recorder settings for a specified user.
-
-  - Parameters:
-    - `config`: The recorder configuration parameters.
-    - `userId`: The user ID of the user whose recorder settings are to be configured.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int startRecording()**
-
-  Starts the recording process. Ensure to configure the recorder using `setRecorderConfig` before calling this method.
-
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int stopRecording()**
-
-  Stops the recording process. This method stops all ongoing recordings and saves the recorded files.
-
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int startSingleRecordingByUid(String userId)**
-
-  Starts the recording process for a specified user.
-
-  - Parameters:
-    - `userId`: The user ID of the user whose recording is to be started.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int stopSingleRecordingByUid(String userId)**
-
-  Stops the recording process for a specified user.
-
-  - Parameters:
-    - `userId`: The user ID of the user whose recording is to be stopped.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int registerRecorderEventHandler(IAgoraMediaRtcRecorderEventHandler handler)**
-
-  Registers an event handler for recording events. The handler receives callbacks for various recording events, such as state changes, errors, and recording progress updates.
-
-  - Parameters:
-    - `handler`: The event handler implementing the `IAgoraMediaRtcRecorderEventHandler` interface.
-  - Returns:
-    - `0`: Registration successful.
-    - Negative value: Registration failed.
-
-- **int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handler)**
-
-  Unregisters a previously registered event handler.
-
-  - Parameters:
-    - `handle`: The event handler to be unregistered.
-  - Returns:
-    - `0`: Unregistration successful.
-    - Negative value: Unregistration failed.
-
-- **int enableAndUpdateVideoWatermarks(WatermarkConfig[] watermarkConfigs)**
-
-  Adds watermarks to the stream.
-
-  - Parameters:
-    - `watermarkConfigs`: The watermark configurations.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int disableVideoWatermarks()**
-
-  Disables watermarks on the stream.
-
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int enableAndUpdateVideoWatermarksByUid(WatermarkConfig[] watermarkConfigs, String userId)**
-
-  Adds watermarks to the stream of a specified user.
-
-  - Parameters:
-    - `watermarkConfigs`: The watermark configurations.
-    - `userId`: The user ID of the user whose stream watermarks are to be added.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int disableVideoWatermarksByUid(String userId)**
-
-  Disables watermarks on the stream of a specified user.
-
-  - Parameters:
-    - `userId`: The user ID of the user whose stream watermarks are to be disabled.
-  - Returns:
-    - `0`: Method call successful.
-    - Negative value: Method call failed.
-
-- **int release()**
-
-  Releases the local resources associated with the recorder.
-
-  - Returns:
-    - The result of the release operation.
-      - `0`: Success.
-      - `< 0`: Failure.
-
-### `IAgoraMediaRtcRecorderEventHandler` Interface
-
-#### Overview
-
-The `IAgoraMediaRtcRecorderEventHandler` interface defines callback methods for changes in connection state between the SDK and the Agora channel, as well as other recording-related events.
-
-#### Methods
-
-- **onConnected(String channelId, String userId)**
-
-  Triggered when the connection state between the SDK and the Agora channel becomes `CONNECTION_STATE_CONNECTED(3)`.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The user ID.
-
-- **onDisconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason)**
-
-  Triggered when the connection state between the SDK and the Agora channel becomes `CONNECTION_STATE_DISCONNECTED(1)`.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The user ID.
-    - `reason`: The reason for the connection state change. See `Constants.ConnectionChangedReasonType`.
-
-- **onReconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason)**
-
-  Triggered when the connection state between the SDK and the Agora channel becomes `CONNECTION_STATE_CONNECTED(3)` again.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The user ID.
-    - `reason`: The reason for the connection state change. See `Constants.ConnectionChangedReasonType`.
-
-- **onConnectionLost(String channelId, String userId)**
-
-  Triggered when the SDK loses connection with the Agora channel.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The user ID.
-
-- **onUserJoined(String channelId, String userId)**
-
-  Triggered when a remote user joins the channel.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The user ID.
-
-- **onUserLeft(String channelId, String userId, Constants.UserOfflineReasonType reason)**
-
-  Triggered when a remote user leaves the channel.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The user ID.
-    - `reason`: The reason the remote user left the channel. See `Constants.UserOfflineReasonType`.
-
-- **onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed)**
-
-  Triggered when the SDK decodes the first frame of remote video.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The remote user ID.
-    - `width`: The width of the video stream (pixels).
-    - `height`: The height of the video stream (pixels).
-    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the first video frame being decoded.
-
-- **onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed)**
-
-  Triggered when the SDK decodes the first frame of remote audio.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The remote user ID.
-    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the first audio frame being decoded.
-
-- **onAudioVolumeIndication(String channelId, SpeakVolumeInfo[] speakers, int speakerNumber)**
-
-  Reports the users who are speaking, the volume of the speaker, and whether the local user is speaking.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `speakers`: The array of speaker information.
-    - `speakerNumber`: The total number of speakers.
-
-- **onActiveSpeaker(String channelId, String userId)**
-
-  Triggered when an active speaker is detected.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The user ID of the active speaker. A `userId` of `0` indicates the local user.
-
-- **onUserVideoStateChanged(String channelId, String userId, Constants.RemoteVideoState state, Constants.RemoteVideoStateReason reason, int elapsed)**
-
-  Triggered when the video state of a remote user changes.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The remote user ID.
-    - `state`: The current video state. See `Constants.RemoteVideoState`.
-    - `reason`: The reason for the state change. See `Constants.RemoteVideoStateReason`.
-    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the state change.
-
-- **onUserAudioStateChanged(String channelId, String userId, Constants.RemoteAudioState state, Constants.RemoteAudioStateReason reason, int elapsed)**
-
-  Triggered when the audio state of a remote user changes.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The remote user ID.
-    - `state`: The current audio state. See `Constants.RemoteAudioState`.
-    - `reason`: The reason for the state change. See `Constants.RemoteAudioStateReason`.
-    - `elapsed`: The time elapsed (in milliseconds) from the user joining the Agora channel to the state change.
-
-- **onRemoteVideoStats(String channelId, String userId, RemoteVideoStatistics stats)**
-
-  Reports the statistics of the remote video.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The remote user ID.
-    - `stats`: The statistics of the current video.
-
-- **onRemoteAudioStats(String channelId, String userId, RemoteAudioStatistics stats)**
-
-  Reports the statistics of the remote audio.
-
-  - Parameters:
-    - `channelId`: The channel ID.
-    - `userId`: The remote user ID.
-    - `stats`: The statistics of the current audio.
-
-- **onRecorderStateChanged(String channelId, String userId, Constants.RecorderState state, Constants.RecorderReasonCode reason, String fileName)**
-
-  Triggered when the recording state changes.
-
-  - Parameters:
-    - `channelId`: The channel name.
-    - `userId`: The user ID.
-    - `state`: The current recording state. See `Constants.RecorderState`.
-    - `reason`: The reason for the state change. See `Constants.RecorderReasonCode`.
-    - `fileName`: The name of the recorded file.
-
-- **onRecorderInfoUpdated(String channelId, String userId, RecorderInfo info)**
-
-  Triggered when the recording information is updated.
-
-  - Parameters:
-    - `channelId`: The channel name.
-    - `userId`: The user ID.
-    - `info`: The information of the recorded file. See `RecorderInfo`.
-
-- **onEncryptionError(String channelId, Constants.EncryptionErrorType errorType)**
-
-  Triggered when the recording fails to decrypt the encrypted file.
-
-  - Parameters:
-    - `channelId`: The channel name.
-    - `errorType`: The error type. See `Constants.EncryptionErrorType`.
-
-### `MediaRecorderConfiguration` Class
-
-#### Overview
-
-The `MediaRecorderConfiguration` class is used to configure parameters related to the recording file.
-
-#### Properties
-
-- **`storagePath`**
-
-  The absolute path of the recording file (including the file name and extension). For example:
-
-  - Windows: `C:\Users\<user_name>\AppData\Local\Agora\<process_name>\example.mp4`
-  - iOS: `/App Sandbox/Library/Caches/example.mp4`
-  - macOS: `/Library/Logs/example.mp4`
-  - Android: `/storage/emulated/0/Android/data/<package name>/files/example.mp4`
-  - Linux: `result/example.mp4`
-
-  **Note**: Ensure that the specified path exists and is writable.
-
-- **`containerFormat`**
-
-  The format of the recording file. Refer to `Constants.MediaRecorderContainerFormat`.
-
-- **`streamType`**
-
-  The type of content to be recorded. Refer to `Constants.MediaRecorderStreamType`.
-
-- **`maxDurationMs`**
-
-  The maximum recording duration in milliseconds. The default value is 120,000 milliseconds (2 minutes).
-
-- **`recorderInfoUpdateInterval`**
-
-  The interval for updating recording information, in milliseconds. The value range is [1000, 10000]. Based on the set value, the SDK triggers the `IMediaRecorderObserver#onRecorderInfoUpdated` callback to report updated recording information.
-
-- **`width`**
-
-  The width of the recording video in pixels. The default value is 1280.
-
-- **`height`**
-
-  The height of the recording video in pixels. The default value is 720.
-
-- **`fps`**
-
-  The frame rate of the recording video, in frames per second. The default value is 30.
-
-- **`sampleRate`**
-
-  The sample rate of the recording audio, in Hz. The default value is 48,000 Hz.
-
-- **`channelNum`**
-
-  The number of audio channels for recording. The default value is 1 (mono).
-
-- **`videoSourceType`**
-
-  The type of external video source. Refer to `Constants.VideoSourceType`.
-
-### `AgoraParameter` Class
-
-#### Overview
-
-The `AgoraParameter` class provides functionalities to get and set Agora SDK configuration parameters, supporting various data types including boolean, integer, unsigned integer, floating-point, string, object, and array.
-
-#### Methods
-
-- **`void release()`**
-
-  Releases all resources associated with this parameter instance. After calling this method, the instance becomes invalid.
-
-- **`int setBool(String key, boolean value)`**
-
-  Sets a boolean parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `value`: The boolean value to set.
-  - Returns: `0` on success, negative value on failure.
-
-- **`int setInt(String key, int value)`**
-
-  Sets an integer parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `value`: The integer value to set.
-  - Returns: `0` on success, negative value on failure.
-
-- **`int setUInt(String key, int value)`**
-
-  Sets an unsigned integer parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `value`: The unsigned integer value to set.
-  - Returns: `0` on success, negative value on failure.
-
-- **`int setNumber(String key, double value)`**
-
-  Sets a floating-point parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `value`: The floating-point value to set.
-  - Returns: `0` on success, negative value on failure.
-
-- **`int setString(String key, String value)`**
-
-  Sets a string parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `value`: The string value to set.
-  - Returns: `0` on success, negative value on failure.
-
-- **`int setObject(String key, String value)`**
-
-  Sets an object parameter value in JSON format.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `value`: The JSON string representing the object.
-  - Returns: `0` on success, negative value on failure.
-
-- **`int setArray(String key, String value)`**
-
-  Sets an array parameter value in JSON format.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `value`: The JSON string representing the array.
-  - Returns: `0` on success, negative value on failure.
-
-- **`boolean getBool(String key)`**
-
-  Gets a boolean parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-  - Returns: The boolean value associated with the key.
-  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
-
-- **`int getInt(String key)`**
-
-  Gets an integer parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-  - Returns: The integer value associated with the key.
-  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
-
-- **`int getUInt(String key)`**
-
-  Gets an unsigned integer parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-  - Returns: The unsigned integer value associated with the key.
-  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
-
-- **`double getNumber(String key)`**
-
-  Gets a floating-point parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-  - Returns: The floating-point value associated with the key.
-  - Exceptions: Throws `IllegalStateException` if the parameter cannot be retrieved.
-
-- **`String getString(String key)`**
-
-  Gets a string parameter value.
-
-  - Parameters:
-    - `key`: The parameter key.
-  - Returns: The string value associated with the key, or `null` if not found.
-
-- **`String getObject(String key)`**
-
-  Gets an object parameter value in JSON format.
-
-  - Parameters:
-    - `key`: The parameter key.
-  - Returns: The JSON string representing the object, or `null` if not found.
-
-- **`String getArray(String key, String args)`**
-
-  Gets an array parameter value in JSON format.
-
-  - Parameters:
-    - `key`: The parameter key.
-    - `args`: Additional parameters for array retrieval.
-  - Returns: The JSON string representing the array, or `null` if not found.
-
-- **`int setParameters(String parameters)`**
-
-  Sets multiple parameters at once using a JSON string.
-
-  - Parameters:
-    - `parameters`: A JSON string containing multiple parameter key-value pairs.
-  - Returns: `0` on success, negative value on failure.
-
-- **`String convertPath(String filePath)`**
-
-  Converts a file path to a platform-specific format.
-
-  - Parameters:
-    - `filePath`: The original file path to convert.
-  - Returns: The platform-specific file path, or `null` if the conversion fails.
+For detailed descriptions of the SDK APIs, please refer to the [API-reference.md](API-reference.md) document, each class and method provides detailed parameter descriptions and return value explanations.
 
 ## Changelog
 
-### v4.4.150.1（2025-03-28）
+### v4.4.150.1 (2025-03-28)
 
-- Added: `onEncryptionError` callback function in the `IAgoraMediaRtcRecorderEventHandler` class to support encryption error notifications
-- Added: `setAudioVolumeIndicationParameters` method in the `AgoraMediaRtcRecorder` class to configure the interval for remote user volume callbacks
-- Optimized: Restructured the parameters of the `onAudioVolumeIndication` callback function in the `IAgoraMediaRtcRecorderEventHandler` class
-- Enhanced: Improved the `VideoMixingLayout` class, fixed the `backgroundColor` property and added the `backgroundImage` property to support setting background images
+#### API Changes
 
-### v4.4.150-aarch64（2025-02-24）
+- **Added**: `onEncryptionError` callback in `IAgoraMediaRtcRecorderEventHandler` for encryption error notifications.
+- **Added**: `setAudioVolumeIndicationParameters` method in `AgoraMediaRtcRecorder` to configure the interval for remote user volume callbacks.
+- **Refactored**: Optimized the parameter structure of the `onAudioVolumeIndication` callback in `IAgoraMediaRtcRecorderEventHandler`.
 
-- Released version 4.4.150-aarch64, including basic features and performance optimizations.
+#### Improvements & Optimizations
 
-### v4.4.150（2025-01-21）
+- **Enhanced**: Improved `VideoMixingLayout`, fixed `backgroundColor` property.
+- **New Feature**: Added `backgroundImage` property to `VideoMixingLayout` to support setting background images.
 
-- Released version 4.4.150, including basic features and performance optimizations.
+### v4.4.150-aarch64 (2025-02-24)
 
-## Additional References
+#### API Changes
 
-For detailed references, please visit the official website: [Agora Documentation](https://doc.shengwang.cn/doc/recording/java/landing-page)
+- **Compatibility**: API compatible with v4.4.150.
+
+#### Improvements & Optimizations
+
+- **Platform**: Initial support for ARM64 architecture.
+
+### v4.4.150 (2025-01-21)
+
+#### API Changes
+
+- **Initial Release**: Basic API structure published.
+
+#### Improvements & Optimizations
+
+- **Performance**: Basic functionality and performance optimizations.
+
+## Other References
+
+Refer to the official documentation website for details: (e.g., <https://docs.agora.io/en/recording/java/landing-page>) (Update link as necessary)
