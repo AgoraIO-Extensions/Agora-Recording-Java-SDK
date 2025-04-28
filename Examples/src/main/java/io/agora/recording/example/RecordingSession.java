@@ -25,6 +25,7 @@ import io.agora.recording.WatermarkOptions;
 import io.agora.recording.WatermarkTimestamp;
 import io.agora.recording.example.utils.SampleLogger;
 import io.agora.recording.example.utils.Utils;
+import io.agora.recording.example.model.RecordingUserInfo;
 
 public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     private final String taskId;
@@ -34,11 +35,11 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     private AgoraMediaRtcRecorder agoraMediaRtcRecorder;
     private AgoraService agoraService = null;
     private AgoraMediaComponentFactory factory = null;
-    private List<String> singleRecordingUserList = new CopyOnWriteArrayList<>();
+    private final List<String> singleRecordingUserList = new CopyOnWriteArrayList<>();
     private VideoLayoutManager videoLayoutManager;
     private Constants.RecorderState recorderState = io.agora.recording.Constants.RecorderState.RECORDER_STATE_ERROR;
-    private AtomicBoolean startRecordingDone = new AtomicBoolean(false);
-    private List<String> waitForUpdateUIUserIds = new CopyOnWriteArrayList<>();
+    private final AtomicBoolean startRecordingDone = new AtomicBoolean(false);
+    private final List<RecordingUserInfo> waitForUpdateUiUserInfos = new CopyOnWriteArrayList<>();
 
     private String channelNameInternal;
 
@@ -236,11 +237,12 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         }
         startRecordingDone.set(true);
 
-        if (!waitForUpdateUIUserIds.isEmpty()) {
-            for (String waitUserId : waitForUpdateUIUserIds) {
-                taskExecutorService.submit(() -> videoLayoutManager.addUser(waitUserId));
+        if (!waitForUpdateUiUserInfos.isEmpty()) {
+            for (RecordingUserInfo waitUserId : waitForUpdateUiUserInfos) {
+                taskExecutorService.submit(() -> videoLayoutManager.addRecordingUserInfo(waitUserId.getUserId(), waitUserId.getVideoWidth(),
+                        waitUserId.getVideoHeight()));
             }
-            waitForUpdateUIUserIds.clear();
+            waitForUpdateUiUserInfos.clear();
         }
 
     }
@@ -295,7 +297,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         }
 
         startRecordingDone.set(false);
-        waitForUpdateUIUserIds.clear();
+        waitForUpdateUiUserInfos.clear();
     }
 
     public void stopRecordingByUserId(String userId) {
@@ -347,16 +349,6 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             return;
         }
 
-        if (recorderConfig.isMix()) {
-            if (Utils.recorderIsVideo(Utils.convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
-                    && null != videoLayoutManager) {
-                if (startRecordingDone.get()) {
-                    taskExecutorService.submit(() -> videoLayoutManager.addUser(userId));
-                } else {
-                    waitForUpdateUIUserIds.add(userId);
-                }
-            }
-        }
     }
 
     @Override
@@ -373,7 +365,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             }
             if (Utils.recorderIsVideo(Utils.convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
                     && null != videoLayoutManager) {
-                taskExecutorService.submit(() -> videoLayoutManager.removeUser(userId));
+                taskExecutorService.submit(() -> videoLayoutManager.removeRecordingUserInfo(userId));
             }
         }
     }
@@ -389,6 +381,20 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             if (recorderConfig.isSubAllVideo()
                     || (!recorderConfig.isSubAllVideo() && recorderConfig.getSubVideoUserList().contains(userId))) {
                 taskExecutorService.submit(() -> startRecording(userId, width, height));
+            }
+        }
+        if (recorderConfig.isMix()) {
+            if (Utils.recorderIsVideo(Utils.convertToMediaRecorderStreamType(recorderConfig.getRecorderStreamType()))
+                    && null != videoLayoutManager) {
+                if (startRecordingDone.get()) {
+                    taskExecutorService.submit(() -> videoLayoutManager.addRecordingUserInfo(userId, width, height));
+                } else {
+                    RecordingUserInfo recordingUserInfo = new RecordingUserInfo();
+                    recordingUserInfo.setUserId(userId);
+                    recordingUserInfo.setVideoWidth(width);
+                    recordingUserInfo.setVideoHeight(height);
+                    waitForUpdateUiUserInfos.add(recordingUserInfo);
+                }
             }
         }
     }

@@ -1,47 +1,60 @@
 package io.agora.recording.example;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import io.agora.recording.AgoraMediaRtcRecorder;
 import io.agora.recording.MixerLayoutConfig;
 import io.agora.recording.UserMixerLayout;
 import io.agora.recording.VideoMixingLayout;
 import io.agora.recording.example.utils.SampleLogger;
+import io.agora.recording.example.model.RecordingUserInfo;
+import io.agora.recording.example.model.LayoutCoordinates;
 
 public class VideoLayoutManager {
-    private AgoraMediaRtcRecorder recorder;
-    private RecorderConfig recorderConfig;
-    private List<String> userIds;
+    private final AgoraMediaRtcRecorder recorder;
+    private final RecorderConfig recorderConfig;
+    private final List<RecordingUserInfo> recordingUserInfos;
 
     public VideoLayoutManager(AgoraMediaRtcRecorder recorder, RecorderConfig recorderConfig) {
         this.recorder = recorder;
         this.recorderConfig = recorderConfig;
-        this.userIds = new CopyOnWriteArrayList<>();
+        this.recordingUserInfos = new CopyOnWriteArrayList<>();
     }
 
     public void release() {
-        userIds.clear();
+        recordingUserInfos.clear();
     }
 
-    public synchronized void addUser(String userId) {
-        SampleLogger.info("VideoLayoutManager addUser userId: " + userId);
-        if (!userIds.contains(userId)) {
-            userIds.add(userId);
+    public synchronized void addRecordingUserInfo(String userId, int videoWidth, int videoHeight) {
+        SampleLogger.info("VideoLayoutManager addRecordingUserInfo userId: " + userId + " videoWidth: " + videoWidth
+                + " videoHeight: " + videoHeight);
+        for (RecordingUserInfo recordingUserInfo : recordingUserInfos) {
+            if (recordingUserInfo.getUserId().equals(userId)) {
+                return;
+            }
         }
+        RecordingUserInfo recordingUserInfo = new RecordingUserInfo();
+        recordingUserInfo.setUserId(userId);
+        recordingUserInfo.setVideoHeight(videoHeight);
+        recordingUserInfo.setVideoWidth(videoWidth);
+        recordingUserInfos.add(recordingUserInfo);
         updateVideoMixLayout();
     }
 
-    public synchronized void removeUser(String userId) {
-        SampleLogger.info("removeUser userId: " + userId);
-        if (userIds.contains(userId)) {
-            userIds.remove(userId);
+    public synchronized void removeRecordingUserInfo(String userId) {
+        SampleLogger.info("removeRecordingUserInfo userId: " + userId);
+        for (RecordingUserInfo recordingUserInfo : recordingUserInfos) {
+            if (recordingUserInfo.getUserId().equals(userId)) {
+                recordingUserInfos.remove(recordingUserInfo);
+                break;
+            }
         }
         updateVideoMixLayout();
     }
 
     private void updateVideoMixLayout() {
-        if (userIds.size() > 0 && userIds.size() <= 17) {
+        if (!recordingUserInfos.isEmpty() && recordingUserInfos.size() <= 17) {
             VideoMixingLayout layout = new VideoMixingLayout();
             layout.setCanvasWidth(recorderConfig.getVideo().getWidth());
             layout.setCanvasHeight(recorderConfig.getVideo().getHeight());
@@ -49,7 +62,8 @@ public class VideoLayoutManager {
             layout.setBackgroundColor(recorderConfig.getBackgroundColor());
             layout.setBackgroundImage(recorderConfig.getBackgroundImage());
 
-            UserMixerLayout[] useLayout = new UserMixerLayout[userIds.size()];
+            UserMixerLayout[] useLayout = new UserMixerLayout[recordingUserInfos
+                    .size()];
             for (int i = 0; i < useLayout.length; i++) {
                 useLayout[i] = new UserMixerLayout();
             }
@@ -65,7 +79,7 @@ public class VideoLayoutManager {
                     adjustVerticalLayout(useLayout, recorderConfig.getMaxResolutionUid());
                     break;
             }
-            for (int i = 0; i < userIds.size(); i++) {
+            for (int i = 0; i < recordingUserInfos.size(); i++) {
                 String userId = useLayout[i].getUserId();
                 for (RecorderConfig.Rotation rotation : recorderConfig.getRotation()) {
                     if (rotation.getUid().equals(userId)) {
@@ -80,148 +94,633 @@ public class VideoLayoutManager {
         }
     }
 
+    /**
+     * Calculates the layout coordinates for a video within a target region,
+     * preserving aspect ratio and centering.
+     *
+     * @param videoWidth   The original width of the video.
+     * @param videoHeight  The original height of the video.
+     * @param targetX      The X coordinate of the target region's top-left corner.
+     * @param targetY      The Y coordinate of the target region's top-left corner.
+     * @param targetWidth  The width of the target region.
+     * @param targetHeight The height of the target region.
+     * @return LayoutCoordinates containing the calculated centered position and
+     *         size.
+     */
+    private LayoutCoordinates calculateLayoutInRegion(int videoWidth, int videoHeight, int targetX, int targetY,
+            int targetWidth, int targetHeight) {
+        LayoutCoordinates coords = new LayoutCoordinates(targetX, targetY, 0, 0); // Default to zero size at target
+                                                                                  // origin
+
+        if (targetWidth <= 0 || targetHeight <= 0 || videoWidth <= 0 || videoHeight <= 0) {
+            SampleLogger.warn("calculateLayoutInRegion: Invalid dimensions (video: " + videoWidth + "x" + videoHeight
+                    + ", target: " + targetWidth + "x" + targetHeight + "). Setting zero size.");
+            return coords; // Return zero size
+        }
+
+        int scaledWidth;
+        int scaledHeight;
+
+        // Compare aspect ratios using cross-multiplication to avoid division by zero
+        // and precision issues
+        // Use long to prevent potential overflow during multiplication
+        if ((long) targetWidth * videoHeight > (long) videoWidth * targetHeight) {
+            // Target area is relatively wider than the video (letterbox)
+            // Fit to height, calculate width proportionally
+            scaledHeight = targetHeight;
+            // Use double for intermediate calculation for better precision before casting
+            // to int
+            scaledWidth = (int) Math.round((double) videoWidth * targetHeight / videoHeight);
+        } else {
+            // Target area is relatively narrower than or same aspect ratio as the video
+            // (pillarbox)
+            // Fit to width, calculate height proportionally
+            scaledWidth = targetWidth;
+            // Use double for intermediate calculation for better precision before casting
+            // to int
+            scaledHeight = (int) Math.round((double) videoHeight * targetWidth / videoWidth);
+        }
+
+        // Center the scaled video within the target area
+        coords.setWidth(scaledWidth);
+        coords.setHeight(scaledHeight);
+        coords.setX(targetX + (targetWidth - scaledWidth) / 2);
+        coords.setY(targetY + (targetHeight - scaledHeight) / 2);
+
+        return coords;
+    }
+
     private void adjustBestFitVideoLayout(UserMixerLayout[] regionList) {
         if (regionList.length == 0) {
             return;
         }
 
-        if (userIds.size() == 1) {
-            adjustBestFitLayouSquare(regionList, 1);
-        } else if (userIds.size() == 2) {
+        if (recordingUserInfos.size() == 1) {
+            adjustBestFitLayout1(regionList, 1);
+        } else if (recordingUserInfos.size() == 2) {
             adjustBestFitLayout2(regionList);
-        } else if (userIds.size() <= 4) {
+        } else if (recordingUserInfos.size() <= 4) {
             adjustBestFitLayouSquare(regionList, 2);
-        } else if (userIds.size() <= 9) {
+        } else if (recordingUserInfos.size() <= 9) {
             adjustBestFitLayouSquare(regionList, 3);
-        } else if (userIds.size() <= 16) {
+        } else if (recordingUserInfos.size() <= 16) {
             adjustBestFitLayouSquare(regionList, 4);
-        } else if (userIds.size() == 17) {
+        } else if (recordingUserInfos.size() == 17) {
             adjustBestFitLayout17(regionList);
         } else {
             SampleLogger.error("adjustBestFitVideoLayout is more than 17 users");
         }
     }
 
-    private void adjustBestFitLayouSquare(UserMixerLayout[] regionList, int square) {
+    private void adjustBestFitLayout1(UserMixerLayout[] regionList, int square) {
         if (regionList.length == 0) {
             return;
         }
+        MixerLayoutConfig config = new MixerLayoutConfig();
+        int canvasWidth = recorderConfig.getVideo().getWidth();
+        int canvasHeight = recorderConfig.getVideo().getHeight();
 
-        float viewWidth = 1.0f / square;
-        float viewHEdge = 1.0f / square;
-        int i = 0;
+        // Default to zero size layout
+        int layoutX = 0;
+        int layoutY = 0;
+        int layoutWidth = 0;
+        int layoutHeight = 0;
 
-        for (String userId : userIds) {
-            float xIndex = i % square;
-            float yIndex = i / square;
-            regionList[i].setUserId(userId);
-            MixerLayoutConfig config = new MixerLayoutConfig();
-            config.setX((int) (viewWidth * xIndex * recorderConfig.getVideo().getWidth()));
-            config.setY((int) (viewHEdge * yIndex * recorderConfig.getVideo().getHeight()));
-            config.setWidth((int) (viewWidth * recorderConfig.getVideo().getWidth()));
-            config.setHeight((int) (viewHEdge * recorderConfig.getVideo().getHeight()));
-            regionList[i].setConfig(config);
+        if (recordingUserInfos != null && !recordingUserInfos.isEmpty()) {
+            RecordingUserInfo firstUser = recordingUserInfos.get(0);
+            int videoWidth = firstUser.getVideoWidth();
+            int videoHeight = firstUser.getVideoHeight();
 
-            i++;
+            // Only calculate layout if all dimensions are positive
+            if (canvasWidth > 0 && canvasHeight > 0 && videoWidth > 0 && videoHeight > 0) {
+                // Compare aspect ratios using cross-multiplication to avoid division
+                // Use long to prevent potential overflow during multiplication
+                if ((long) canvasWidth * videoHeight > (long) videoWidth * canvasHeight) {
+                    // Canvas is relatively wider than the video (letterbox)
+                    // Fit to height, calculate width proportionally, center horizontally
+                    layoutHeight = canvasHeight;
+                    // Use double for intermediate calculation for better precision before casting
+                    // to int
+                    layoutWidth = (int) Math.round((double) videoWidth * canvasHeight / videoHeight);
+                    layoutX = (canvasWidth - layoutWidth) / 2;
+                    layoutY = 0;
+                } else {
+                    // Canvas is relatively narrower than or same aspect ratio as the video
+                    // (pillarbox)
+                    // Fit to width, calculate height proportionally, center vertically
+                    layoutWidth = canvasWidth;
+                    // Use double for intermediate calculation for better precision before casting
+                    // to int
+                    layoutHeight = (int) Math.round((double) videoHeight * canvasWidth / videoWidth);
+                    layoutX = 0;
+                    layoutY = (canvasHeight - layoutHeight) / 2;
+                }
+            }
         }
+        // else: Keep the default zero size layout if no users or invalid dimensions
+
+        config.setX(layoutX);
+        config.setY(layoutY);
+        config.setWidth(layoutWidth);
+        config.setHeight(layoutHeight);
+
+        regionList[0].setConfig(config);
+        regionList[0].setUserId(recordingUserInfos.get(0).getUserId());
     }
 
     private void adjustBestFitLayout2(UserMixerLayout[] regionList) {
-        int i = 0;
+        if (regionList == null || regionList.length < 2 || recordingUserInfos == null
+                || recordingUserInfos.size() < 2) {
+            SampleLogger.warn("adjustBestFitLayout2: Invalid input for layout calculation.");
+            return;
+        }
 
-        for (String userId : userIds) {
-            regionList[i].setUserId(userId);
+        int canvasWidth = recorderConfig.getVideo().getWidth();
+        int canvasHeight = recorderConfig.getVideo().getHeight();
+
+        // Calculate the target area width for each user (half the canvas)
+        int targetWidth = canvasWidth / 2;
+        int targetHeight = canvasHeight;
+
+        for (int i = 0; i < 2; i++) {
+            RecordingUserInfo recordingUserInfo = recordingUserInfos.get(i);
+            regionList[i].setUserId(recordingUserInfo.getUserId());
             MixerLayoutConfig config = new MixerLayoutConfig();
-            config.setX((int) (((i % 2 == 0) ? 0 : 0.5f) * recorderConfig.getVideo().getWidth()));
-            config.setY(0);
-            config.setWidth((int) (0.5f * recorderConfig.getVideo().getWidth()));
-            config.setHeight(recorderConfig.getVideo().getHeight());
+
+            int videoWidth = recordingUserInfo.getVideoWidth();
+            int videoHeight = recordingUserInfo.getVideoHeight();
+
+            // Calculate the target X position for this user's area
+            int targetX = i * targetWidth; // 0 for first, targetWidth for second
+            int targetY = 0;
+
+            // Default to zero size layout
+            int layoutX = targetX;
+            int layoutY = targetY;
+            int layoutWidth = 0;
+            int layoutHeight = 0;
+
+            // Only calculate layout if all dimensions are positive
+            if (targetWidth > 0 && targetHeight > 0 && videoWidth > 0 && videoHeight > 0) {
+                int scaledWidth = 0;
+                int scaledHeight = 0;
+
+                // Compare aspect ratios using cross-multiplication
+                if ((long) targetWidth * videoHeight > (long) videoWidth * targetHeight) {
+                    // Target area is relatively wider (letterbox for video)
+                    scaledHeight = targetHeight;
+                    scaledWidth = (int) Math.round((double) videoWidth * targetHeight / videoHeight);
+                } else {
+                    // Target area is relatively narrower or same aspect ratio (pillarbox for video)
+                    scaledWidth = targetWidth;
+                    scaledHeight = (int) Math.round((double) videoHeight * targetWidth / videoWidth);
+                }
+
+                // Center the scaled video within the target area
+                layoutWidth = scaledWidth;
+                layoutHeight = scaledHeight;
+                layoutX = targetX + (targetWidth - scaledWidth) / 2;
+                layoutY = targetY + (targetHeight - scaledHeight) / 2;
+            }
+            // else: Keep the default zero size layout if dimensions are invalid
+
+            config.setX(layoutX);
+            config.setY(layoutY);
+            config.setWidth(layoutWidth);
+            config.setHeight(layoutHeight);
             regionList[i].setConfig(config);
-            i++;
+        }
+    }
+
+    private void adjustBestFitLayouSquare(UserMixerLayout[] regionList, int square) {
+        // Input validation
+        if (regionList == null || regionList.length == 0 || recordingUserInfos == null || recordingUserInfos.isEmpty()
+                || square <= 0) {
+            SampleLogger
+                    .warn("adjustBestFitLayouSquare: Invalid input (regionList, recordingUserInfos, or square <= 0).");
+            return;
+        }
+
+        int canvasWidth = recorderConfig.getVideo().getWidth();
+        int canvasHeight = recorderConfig.getVideo().getHeight();
+
+        // Check for invalid canvas dimensions
+        if (canvasWidth <= 0 || canvasHeight <= 0) {
+            SampleLogger.warn(
+                    "adjustBestFitLayouSquare: Invalid canvas dimensions (" + canvasWidth + "x" + canvasHeight + ").");
+            // Set all regions to zero size as a fallback
+            for (int i = 0; i < regionList.length; ++i) {
+                MixerLayoutConfig config = new MixerLayoutConfig();
+                config.setWidth(0);
+                config.setHeight(0);
+                config.setX(0);
+                config.setY(0);
+                if (i < recordingUserInfos.size()) {
+                    regionList[i].setUserId(recordingUserInfos.get(i).getUserId());
+                } else {
+                    regionList[i].setUserId(""); // Or null
+                }
+                regionList[i].setConfig(config);
+            }
+            return;
+        }
+
+        // Calculate dimensions for each grid cell
+        int targetWidth = canvasWidth / square;
+        int targetHeight = canvasHeight / square;
+
+        int count = Math.min(regionList.length, recordingUserInfos.size());
+
+        for (int i = 0; i < count; i++) {
+            RecordingUserInfo recordingUserInfo = recordingUserInfos.get(i);
+            regionList[i].setUserId(recordingUserInfo.getUserId());
+            MixerLayoutConfig config = new MixerLayoutConfig();
+
+            int videoWidth = recordingUserInfo.getVideoWidth();
+            int videoHeight = recordingUserInfo.getVideoHeight();
+
+            // Calculate target position for the top-left corner of the cell
+            int targetX = (i % square) * targetWidth;
+            int targetY = (i / square) * targetHeight;
+
+            // Default to zero size layout within the cell
+            int layoutX = targetX;
+            int layoutY = targetY;
+            int layoutWidth = 0;
+            int layoutHeight = 0;
+
+            // Only calculate layout if all dimensions are positive
+            if (targetWidth > 0 && targetHeight > 0 && videoWidth > 0 && videoHeight > 0) {
+                int scaledWidth = 0;
+                int scaledHeight = 0;
+
+                // Compare aspect ratios using cross-multiplication
+                if ((long) targetWidth * videoHeight > (long) videoWidth * targetHeight) {
+                    // Target cell is relatively wider (letterbox for video)
+                    scaledHeight = targetHeight;
+                    scaledWidth = (int) Math.round((double) videoWidth * targetHeight / videoHeight);
+                } else {
+                    // Target cell is relatively narrower or same aspect ratio (pillarbox for video)
+                    scaledWidth = targetWidth;
+                    scaledHeight = (int) Math.round((double) videoHeight * targetWidth / videoWidth);
+                }
+
+                // Center the scaled video within the target cell
+                layoutWidth = scaledWidth;
+                layoutHeight = scaledHeight;
+                layoutX = targetX + (targetWidth - scaledWidth) / 2;
+                layoutY = targetY + (targetHeight - scaledHeight) / 2;
+            } else {
+                SampleLogger
+                        .warn("adjustBestFitLayouSquare: Invalid dimensions for user " + recordingUserInfo.getUserId() +
+                                " (video: " + videoWidth + "x" + videoHeight + ", target: " + targetWidth + "x"
+                                + targetHeight + "). Setting zero size.");
+                // Keep layoutWidth/Height as 0 if dimensions are invalid
+            }
+
+            config.setX(layoutX);
+            config.setY(layoutY);
+            config.setWidth(layoutWidth);
+            config.setHeight(layoutHeight);
+            regionList[i].setConfig(config);
+        }
+
+        // Handle remaining regionList elements if regionList.length >
+        // recordingUserInfos.size()
+        // Set them to zero size
+        for (int i = count; i < regionList.length; i++) {
+            MixerLayoutConfig config = new MixerLayoutConfig();
+            config.setWidth(0);
+            config.setHeight(0);
+            config.setX(0); // Explicitly set position too
+            config.setY(0);
+            regionList[i].setUserId(""); // Set empty user ID or null
+            regionList[i].setConfig(config);
         }
     }
 
     private void adjustBestFitLayout17(UserMixerLayout[] regionList) {
-        int n = 5;
-        float viewWidth = 1.0f / n;
-        float viewHEdge = 1.0f / n;
+        // Input validation
+        if (regionList == null || regionList.length < 17 || recordingUserInfos == null
+                || recordingUserInfos.size() < 17) {
+            SampleLogger.warn("adjustBestFitLayout17: Invalid input (requires at least 17 regions and users).");
+            // Fallback or simply return if strict 17 is required
+            // If fallback needed, maybe call adjustBestFitLayouSquare(regionList, 4) or
+            // similar?
+            return; // Assuming strict 17 users are required for this specific layout
+        }
 
-        int i = 0;
-        for (String userId : userIds) {
-            float xIndex = i % (n - 1);
-            float yIndex = i / (n - 1);
-            regionList[i].setUserId(userId);
-            MixerLayoutConfig config = new MixerLayoutConfig();
-            config.setWidth((int) (viewWidth * recorderConfig.getVideo().getWidth()));
-            config.setHeight((int) (viewHEdge * recorderConfig.getVideo().getHeight()));
+        int canvasWidth = recorderConfig.getVideo().getWidth();
+        int canvasHeight = recorderConfig.getVideo().getHeight();
 
-            if (i == 16) {
-                config.setX((int) ((1 - viewWidth) * 0.5f * recorderConfig.getVideo().getWidth()));
-
-            } else {
-                config.setX((int) ((0.5f * viewWidth + viewWidth * xIndex) * recorderConfig.getVideo().getWidth()));
+        // Check for invalid canvas dimensions
+        if (canvasWidth <= 0 || canvasHeight <= 0) {
+            SampleLogger.warn(
+                    "adjustBestFitLayout17: Invalid canvas dimensions (" + canvasWidth + "x" + canvasHeight + ").");
+            // Set all regions to zero size as a fallback
+            for (int i = 0; i < regionList.length; ++i) {
+                MixerLayoutConfig config = new MixerLayoutConfig();
+                config.setWidth(0);
+                config.setHeight(0);
+                config.setX(0);
+                config.setY(0);
+                if (i < recordingUserInfos.size()) {
+                    regionList[i].setUserId(recordingUserInfos.get(i).getUserId());
+                } else {
+                    regionList[i].setUserId(""); // Or null
+                }
+                regionList[i].setConfig(config);
             }
-            config.setY((int) ((1.0f / n) * yIndex * recorderConfig.getVideo().getHeight()));
+            return;
+        }
+
+        int n = 5;
+        // Calculate dimensions for each conceptual grid cell
+        int targetWidth = canvasWidth / n;
+        int targetHeight = canvasHeight / n;
+
+        int count = Math.min(regionList.length, recordingUserInfos.size()); // Should be at least 17 due to initial
+                                                                            // check
+        count = Math.min(count, 17); // Ensure we don't process more than 17 for this specific layout
+
+        for (int i = 0; i < count; i++) {
+            RecordingUserInfo recordingUserInfo = recordingUserInfos.get(i);
+            regionList[i].setUserId(recordingUserInfo.getUserId());
+            MixerLayoutConfig config = new MixerLayoutConfig();
+
+            int videoWidth = recordingUserInfo.getVideoWidth();
+            int videoHeight = recordingUserInfo.getVideoHeight();
+
+            // Calculate target top-left corner for the cell based on the 17-layout pattern
+            int targetX = 0;
+            int targetY = 0;
+            if (i == 16) { // Special case for the 17th user
+                targetX = (int) (0.4f * canvasWidth); // As per original calculation: (1 - 1/n) * 0.5 * canvasWidth
+                int yIndex = 4; // As per original calculation: i / (n - 1) => 16 / 4 = 4
+                targetY = (int) ((1.0f / n) * yIndex * canvasHeight); // 0.2 * 4 * canvasHeight = 0.8 * canvasHeight
+            } else { // For the first 16 users (i=0 to 15)
+                int xIndex = i % 4; // Column index within the 4x4 grid
+                int yIndex = i / 4; // Row index within the 4x4 grid
+                targetX = (int) ((0.5f / n + (1.0f / n) * xIndex) * canvasWidth); // (0.1 + 0.2 * xIndex) * canvasWidth
+                targetY = (int) ((1.0f / n) * yIndex * canvasHeight); // 0.2 * yIndex * canvasHeight
+            }
+
+            // Default to zero size layout within the cell
+            int layoutX = targetX;
+            int layoutY = targetY;
+            int layoutWidth = 0;
+            int layoutHeight = 0;
+
+            // Only calculate layout if all dimensions are positive
+            if (targetWidth > 0 && targetHeight > 0 && videoWidth > 0 && videoHeight > 0) {
+                int scaledWidth = 0;
+                int scaledHeight = 0;
+
+                // Compare aspect ratios using cross-multiplication
+                if ((long) targetWidth * videoHeight > (long) videoWidth * targetHeight) {
+                    // Target cell is relatively wider (letterbox for video)
+                    scaledHeight = targetHeight;
+                    scaledWidth = (int) Math.round((double) videoWidth * targetHeight / videoHeight);
+                } else {
+                    // Target cell is relatively narrower or same aspect ratio (pillarbox for video)
+                    scaledWidth = targetWidth;
+                    scaledHeight = (int) Math.round((double) videoHeight * targetWidth / videoWidth);
+                }
+
+                // Center the scaled video within the target cell
+                layoutWidth = scaledWidth;
+                layoutHeight = scaledHeight;
+                layoutX = targetX + (targetWidth - scaledWidth) / 2;
+                layoutY = targetY + (targetHeight - scaledHeight) / 2;
+            } else {
+                SampleLogger
+                        .warn("adjustBestFitLayout17: Invalid dimensions for user " + recordingUserInfo.getUserId() +
+                                " (video: " + videoWidth + "x" + videoHeight + ", target: " + targetWidth + "x"
+                                + targetHeight + "). Setting zero size.");
+                // Keep layoutWidth/Height as 0
+            }
+
+            config.setX(layoutX);
+            config.setY(layoutY);
+            config.setWidth(layoutWidth);
+            config.setHeight(layoutHeight);
             regionList[i].setConfig(config);
-            i++;
+        }
+
+        // Handle remaining regionList elements if regionList.length > 17
+        for (int i = count; i < regionList.length; i++) {
+            MixerLayoutConfig config = new MixerLayoutConfig();
+            config.setWidth(0);
+            config.setHeight(0);
+            config.setX(0);
+            config.setY(0);
+            regionList[i].setUserId(""); // Set empty user ID or null
+            regionList[i].setConfig(config);
         }
     }
 
     private void adjustDefaultVideoLayout(UserMixerLayout[] regionList) {
-        if (regionList.length == 0) {
+        if (regionList == null || regionList.length == 0 || recordingUserInfos == null
+                || recordingUserInfos.isEmpty()) {
+            SampleLogger.warn("adjustDefaultVideoLayout: Invalid input.");
             return;
         }
-        regionList[0].setUserId(userIds.get(0));
-        MixerLayoutConfig config = new MixerLayoutConfig();
-        config.setX(0);
-        config.setY(0);
-        config.setWidth(recorderConfig.getVideo().getWidth());
-        config.setHeight(recorderConfig.getVideo().getHeight());
-        config.setZOrder(0);
-        regionList[0].setConfig(config);
 
-        float canvasWidth = recorderConfig.getVideo().getWidth();
-        float canvasHeight = recorderConfig.getVideo().getHeight();
+        int canvasWidth = recorderConfig.getVideo().getWidth();
+        int canvasHeight = recorderConfig.getVideo().getHeight();
 
-        float viewWidth = 0.235f;
-        float viewHEdge = 0.012f;
-        float viewHeight = 0.235f;
-        float viewVEdge = 0.012f;
+        // Check for invalid canvas dimensions
+        if (canvasWidth <= 0 || canvasHeight <= 0) {
+            SampleLogger.warn(
+                    "adjustDefaultVideoLayout: Invalid canvas dimensions (" + canvasWidth + "x" + canvasHeight + ").");
+            // Set all regions to zero size as a fallback
+            for (int i = 0; i < regionList.length; ++i) {
+                MixerLayoutConfig config = new MixerLayoutConfig();
+                config.setWidth(0);
+                config.setHeight(0);
+                config.setX(0);
+                config.setY(0);
+                if (i < recordingUserInfos.size()) {
+                    regionList[i].setUserId(recordingUserInfos.get(i).getUserId());
+                } else {
+                    regionList[i].setUserId("");
+                }
+                regionList[i].setConfig(config);
+            }
+            return;
+        }
 
-        for (int i = 1; i < userIds.size(); i++) {
-            regionList[i].setUserId(userIds.get(i));
+        // --- Layout for the first user (main view) ---
+        RecordingUserInfo firstUser = recordingUserInfos.get(0);
+        regionList[0].setUserId(firstUser.getUserId());
+        MixerLayoutConfig mainConfig = new MixerLayoutConfig();
+
+        int mainLayoutX = 0;
+        int mainLayoutY = 0;
+        int mainLayoutWidth = 0;
+        int mainLayoutHeight = 0;
+        int mainVideoWidth = firstUser.getVideoWidth();
+        int mainVideoHeight = firstUser.getVideoHeight();
+
+        if (mainVideoWidth > 0 && mainVideoHeight > 0) {
+            if ((long) canvasWidth * mainVideoHeight > (long) mainVideoWidth * canvasHeight) {
+                // Canvas is wider (letterbox)
+                mainLayoutHeight = canvasHeight;
+                mainLayoutWidth = (int) Math.round((double) mainVideoWidth * canvasHeight / mainVideoHeight);
+                mainLayoutX = (canvasWidth - mainLayoutWidth) / 2;
+                mainLayoutY = 0;
+            } else {
+                // Canvas is narrower or same (pillarbox)
+                mainLayoutWidth = canvasWidth;
+                mainLayoutHeight = (int) Math.round((double) mainVideoHeight * canvasWidth / mainVideoWidth);
+                mainLayoutX = 0;
+                mainLayoutY = (canvasHeight - mainLayoutHeight) / 2;
+            }
+        } else {
+            SampleLogger.warn("adjustDefaultVideoLayout: Invalid dimensions for main user " + firstUser.getUserId() +
+                    " (video: " + mainVideoWidth + "x" + mainVideoHeight + "). Setting zero size.");
+            // Keep main layout dimensions as 0
+        }
+        mainConfig.setX(mainLayoutX);
+        mainConfig.setY(mainLayoutY);
+        mainConfig.setWidth(mainLayoutWidth);
+        mainConfig.setHeight(mainLayoutHeight);
+        mainConfig.setZOrder(0); // Main view is at the bottom
+        regionList[0].setConfig(mainConfig);
+
+        // --- Layout for subsequent users (small overlays) ---
+        float overlayTargetWidthRatio = 0.235f;
+        float overlayTargetHeightRatio = 0.235f;
+        float hEdgeRatio = 0.012f;
+        float vEdgeRatio = 0.012f;
+
+        int overlayTargetWidth = (int) (overlayTargetWidthRatio * canvasWidth);
+        int overlayTargetHeight = (int) (overlayTargetHeightRatio * canvasHeight);
+
+        int count = Math.min(regionList.length, recordingUserInfos.size());
+
+        for (int i = 1; i < count; i++) {
+            RecordingUserInfo overlayUser = recordingUserInfos.get(i);
+            regionList[i].setUserId(overlayUser.getUserId());
+            MixerLayoutConfig overlayConfig = new MixerLayoutConfig();
+
+            int overlayVideoWidth = overlayUser.getVideoWidth();
+            int overlayVideoHeight = overlayUser.getVideoHeight();
+
+            // Calculate target position for the top-left corner of the overlay cell
             float xIndex = (i - 1) % 4;
             float yIndex = (i - 1) / 4;
-            MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
-            layoutConfig.setX((int) ((xIndex * (viewWidth + viewHEdge) + viewHEdge) * canvasWidth));
-            layoutConfig.setY((int) ((1 - (yIndex + 1) * (viewHeight + viewVEdge)) * canvasHeight));
-            layoutConfig.setWidth((int) (viewWidth * canvasWidth));
-            layoutConfig.setHeight((int) (viewHeight * canvasHeight));
-            layoutConfig.setZOrder(1);
-            regionList[i].setConfig(layoutConfig);
+            int targetX = (int) ((xIndex * (overlayTargetWidthRatio + hEdgeRatio) + hEdgeRatio) * canvasWidth);
+            int targetY = (int) ((1 - (yIndex + 1) * (overlayTargetHeightRatio + vEdgeRatio)) * canvasHeight);
+
+            // Default to zero size layout within the cell
+            int layoutX = targetX;
+            int layoutY = targetY;
+            int layoutWidth = 0;
+            int layoutHeight = 0;
+
+            // Only calculate layout if all dimensions are positive
+            if (overlayTargetWidth > 0 && overlayTargetHeight > 0 && overlayVideoWidth > 0 && overlayVideoHeight > 0) {
+                int scaledWidth = 0;
+                int scaledHeight = 0;
+
+                // Compare aspect ratios of target overlay area and video
+                if ((long) overlayTargetWidth * overlayVideoHeight > (long) overlayVideoWidth * overlayTargetHeight) {
+                    // Target area is relatively wider (letterbox for video)
+                    scaledHeight = overlayTargetHeight;
+                    scaledWidth = (int) Math
+                            .round((double) overlayVideoWidth * overlayTargetHeight / overlayVideoHeight);
+                } else {
+                    // Target area is relatively narrower or same (pillarbox for video)
+                    scaledWidth = overlayTargetWidth;
+                    scaledHeight = (int) Math
+                            .round((double) overlayVideoHeight * overlayTargetWidth / overlayVideoWidth);
+                }
+
+                // Center the scaled video within the target overlay area
+                layoutWidth = scaledWidth;
+                layoutHeight = scaledHeight;
+                layoutX = targetX + (overlayTargetWidth - scaledWidth) / 2;
+                layoutY = targetY + (overlayTargetHeight - scaledHeight) / 2;
+            } else {
+                SampleLogger.warn(
+                        "adjustDefaultVideoLayout: Invalid dimensions for overlay user " + overlayUser.getUserId() +
+                                " (video: " + overlayVideoWidth + "x" + overlayVideoHeight + ", target: "
+                                + overlayTargetWidth + "x" + overlayTargetHeight + "). Setting zero size.");
+                // Keep layout dimensions as 0
+            }
+
+            overlayConfig.setX(layoutX);
+            overlayConfig.setY(layoutY);
+            overlayConfig.setWidth(layoutWidth);
+            overlayConfig.setHeight(layoutHeight);
+            overlayConfig.setZOrder(1); // Overlays are on top
+            regionList[i].setConfig(overlayConfig);
+        }
+
+        // Handle remaining regionList elements if regionList.length >
+        // recordingUserInfos.size()
+        for (int i = count; i < regionList.length; i++) {
+            MixerLayoutConfig config = new MixerLayoutConfig();
+            config.setWidth(0);
+            config.setHeight(0);
+            config.setX(0);
+            config.setY(0);
+            regionList[i].setUserId("");
+            regionList[i].setConfig(config);
         }
     }
 
     private void adjustVerticalLayout(UserMixerLayout[] regionList, String maxResolutionUid) {
-        if (userIds.size() <= 5) {
+        if (recordingUserInfos.size() <= 5) {
             adjustVideo5Layout(regionList, maxResolutionUid);
-        } else if (userIds.size() <= 7) {
+        } else if (recordingUserInfos.size() <= 7) {
             adjustVideo7Layout(regionList, maxResolutionUid);
-        } else if (userIds.size() <= 9) {
+        } else if (recordingUserInfos.size() <= 9) {
             adjustVideo9Layout(regionList, maxResolutionUid);
         } else {
             adjustVideo17Layout(regionList, maxResolutionUid);
         }
     }
 
-    private void setMaxResolutionUid(int number, String maxResolutionUid, UserMixerLayout[] regionList,
+    private void setMaxResolutionUid(int number, RecordingUserInfo maxUserInfo, UserMixerLayout[] regionList,
             double weightRatio) {
-        regionList[number].setUserId(maxResolutionUid);
+
+        if (maxUserInfo == null) {
+            SampleLogger.error("setMaxResolutionUid: maxUserInfo is null for index " + number);
+            // Set a default zero-size layout
+            regionList[number].setUserId("");
+            MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
+            layoutConfig.setX(0);
+            layoutConfig.setY(0);
+            layoutConfig.setWidth(0);
+            layoutConfig.setHeight(0);
+            regionList[number].setConfig(layoutConfig);
+            return;
+        }
+
+        regionList[number].setUserId(maxUserInfo.getUserId());
         MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
-        layoutConfig.setX(0);
-        layoutConfig.setY(0);
-        layoutConfig.setWidth((int) (weightRatio * recorderConfig.getVideo().getWidth()));
-        layoutConfig.setHeight(recorderConfig.getVideo().getHeight());
+
+        int canvasWidth = recorderConfig.getVideo().getWidth();
+        int canvasHeight = recorderConfig.getVideo().getHeight();
+        int videoWidth = maxUserInfo.getVideoWidth();
+        int videoHeight = maxUserInfo.getVideoHeight();
+
+        // Define target region for the main user
+        int targetX = 0;
+        int targetY = 0;
+        int targetWidth = (int) (weightRatio * canvasWidth);
+        int targetHeight = canvasHeight;
+
+        // Calculate layout using helper logic
+        LayoutCoordinates coords = calculateLayoutInRegion(videoWidth, videoHeight, targetX, targetY, targetWidth,
+                targetHeight);
+
+        layoutConfig.setX(coords.getX());
+        layoutConfig.setY(coords.getY());
+        layoutConfig.setWidth(coords.getWidth());
+        layoutConfig.setHeight(coords.getHeight());
         layoutConfig.setAlpha(1.0f);
         regionList[number].setConfig(layoutConfig);
     }
@@ -231,20 +730,52 @@ public class VideoLayoutManager {
         int number = 0;
         int i = 0;
 
-        for (String userId : userIds) {
-            if (maxResolutionUid.equals(userId)) {
+        for (RecordingUserInfo recordingUserInfo : recordingUserInfos) {
+            if (maxResolutionUid.equals(recordingUserInfo.getUserId())) {
                 flag = true;
-                setMaxResolutionUid(number, maxResolutionUid, regionList, 0.8);
+                setMaxResolutionUid(number, recordingUserInfo, regionList, 0.8);
                 number++;
                 continue;
             }
-            regionList[number].setUserId(userId);
+            regionList[number].setUserId(recordingUserInfo.getUserId());
             float yIndex = flag ? (number - 1) % 4 : number % 4;
             MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
-            layoutConfig.setX((int) (0.8f * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setY((int) (0.25f * yIndex * recorderConfig.getVideo().getHeight()));
-            layoutConfig.setWidth((int) (0.2f * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setHeight((int) (0.25f * recorderConfig.getVideo().getHeight()));
+            // Calculate the target area for the small window
+            int targetX = (int) (0.8f * recorderConfig.getVideo().getWidth());
+            int targetY = (int) (0.25f * yIndex * recorderConfig.getVideo().getHeight());
+            int targetWidth = (int) (0.2f * recorderConfig.getVideo().getWidth());
+            int targetHeight = (int) (0.25f * recorderConfig.getVideo().getHeight());
+
+            int videoWidth = recordingUserInfo.getVideoWidth();
+            int videoHeight = recordingUserInfo.getVideoHeight();
+
+            // Default to zero size layout within the cell
+            int layoutX = targetX;
+            int layoutY = targetY;
+            int layoutWidth = 0;
+            int layoutHeight = 0;
+
+            // Only calculate layout if all dimensions are positive
+            if (targetWidth > 0 && targetHeight > 0 && videoWidth > 0 && videoHeight > 0) {
+                LayoutCoordinates coords = calculateLayoutInRegion(videoWidth, videoHeight, targetX, targetY,
+                        targetWidth, targetHeight);
+                layoutX = coords.getX();
+                layoutY = coords.getY();
+                layoutWidth = coords.getWidth();
+                layoutHeight = coords.getHeight();
+            } else {
+                SampleLogger.warn(
+                        "adjustVideo5Layout: Invalid dimensions for small window user " + recordingUserInfo.getUserId()
+                                +
+                                " (video: " + videoWidth + "x" + videoHeight + ", target: "
+                                + targetWidth + "x" + targetHeight + "). Setting zero size.");
+                // Keep layout dimensions as 0
+            }
+
+            layoutConfig.setX(layoutX);
+            layoutConfig.setY(layoutY);
+            layoutConfig.setWidth(layoutWidth);
+            layoutConfig.setHeight(layoutHeight);
             layoutConfig.setAlpha(1.0f);
             regionList[number].setConfig(layoutConfig);
             number++;
@@ -260,20 +791,52 @@ public class VideoLayoutManager {
         int number = 0;
         int i = 0;
 
-        for (String userId : userIds) {
-            if (maxResolutionUid.equals(userId)) {
+        for (RecordingUserInfo recordingUserInfo : recordingUserInfos) {
+            if (maxResolutionUid.equals(recordingUserInfo.getUserId())) {
                 flag = true;
-                setMaxResolutionUid(number, maxResolutionUid, regionList, 6.f / 7);
+                setMaxResolutionUid(number, recordingUserInfo, regionList, 6.f / 7);
                 number++;
                 continue;
             }
-            regionList[number].setUserId(userId);
+            regionList[number].setUserId(recordingUserInfo.getUserId());
             float yIndex = flag ? (number - 1) % 6 : number % 6;
             MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
-            layoutConfig.setX((int) (6.f / 7 * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setY((int) (1.f / 6 * yIndex * recorderConfig.getVideo().getHeight()));
-            layoutConfig.setWidth((int) (1.f / 7 * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setHeight((int) (1.f / 6 * recorderConfig.getVideo().getHeight()));
+            // Calculate the target area for the small window
+            int targetX = (int) (6.f / 7 * recorderConfig.getVideo().getWidth());
+            int targetY = (int) (1.f / 6 * yIndex * recorderConfig.getVideo().getHeight());
+            int targetWidth = (int) (1.f / 7 * recorderConfig.getVideo().getWidth());
+            int targetHeight = (int) (1.f / 6 * recorderConfig.getVideo().getHeight());
+
+            int videoWidth = recordingUserInfo.getVideoWidth();
+            int videoHeight = recordingUserInfo.getVideoHeight();
+
+            // Default to zero size layout within the cell
+            int layoutX = targetX;
+            int layoutY = targetY;
+            int layoutWidth = 0;
+            int layoutHeight = 0;
+
+            // Only calculate layout if all dimensions are positive
+            if (targetWidth > 0 && targetHeight > 0 && videoWidth > 0 && videoHeight > 0) {
+                LayoutCoordinates coords = calculateLayoutInRegion(videoWidth, videoHeight, targetX, targetY,
+                        targetWidth, targetHeight);
+                layoutX = coords.getX();
+                layoutY = coords.getY();
+                layoutWidth = coords.getWidth();
+                layoutHeight = coords.getHeight();
+            } else {
+                SampleLogger.warn(
+                        "adjustVideo7Layout: Invalid dimensions for small window user " + recordingUserInfo.getUserId()
+                                +
+                                " (video: " + videoWidth + "x" + videoHeight + ", target: "
+                                + targetWidth + "x" + targetHeight + "). Setting zero size.");
+                // Keep layout dimensions as 0
+            }
+
+            layoutConfig.setX(layoutX);
+            layoutConfig.setY(layoutY);
+            layoutConfig.setWidth(layoutWidth);
+            layoutConfig.setHeight(layoutHeight);
             layoutConfig.setAlpha(1.0f);
             regionList[number].setConfig(layoutConfig);
             number++;
@@ -285,63 +848,233 @@ public class VideoLayoutManager {
     }
 
     private void adjustVideo9Layout(UserMixerLayout[] regionList, String maxResolutionUid) {
-        boolean flag = false;
-        int number = 0;
-        int i = 0;
+        if (regionList == null || regionList.length == 0 || recordingUserInfos == null
+                || recordingUserInfos.isEmpty()) {
+            SampleLogger.warn("adjustVideo9Layout: Invalid input.");
+            return;
+        }
 
-        for (String userId : userIds) {
-            if (maxResolutionUid.equals(userId)) {
-                flag = true;
-                setMaxResolutionUid(number, maxResolutionUid, regionList, 9.f / 5);
-                number++;
-                continue;
+        RecordingUserInfo maxUserInfo = null;
+        List<RecordingUserInfo> sideUserInfos = new ArrayList<>();
+
+        // Separate max user and side users
+        for (RecordingUserInfo info : recordingUserInfos) {
+            if (maxResolutionUid != null && !maxResolutionUid.isEmpty() && maxResolutionUid.equals(info.getUserId())) {
+                if (maxUserInfo == null) { // Found the max user
+                    maxUserInfo = info;
+                } else {
+                    // Duplicate max user ID found? Treat subsequent ones as side users.
+                    SampleLogger.warn("adjustVideo9Layout: Duplicate maxResolutionUid found: " + maxResolutionUid
+                            + ". Treating subsequent as side user.");
+                    sideUserInfos.add(info);
+                }
+            } else {
+                sideUserInfos.add(info);
+            }
+        }
+
+        if (maxUserInfo == null && maxResolutionUid != null && !maxResolutionUid.isEmpty()) {
+            SampleLogger.warn("adjustVideo9Layout: maxResolutionUid '" + maxResolutionUid
+                    + "' not found in user list. Treating all as side users.");
+        }
+
+        int regionIndex = 0;
+        final int maxSidePanels = 8;
+        final int totalCapacity = 9;
+
+        // 1. Set layout for the main user (if exists)
+        if (maxUserInfo != null) {
+            if (regionIndex < regionList.length) {
+                // Note: Original logic used 9.f / 5 = 1.8 ratio, seems incorrect (wider than
+                // canvas?). Using 8/9 like side panels.
+                setMaxResolutionUid(regionIndex, maxUserInfo, regionList, 8.f / 9);
+                regionIndex++;
+            } else {
+                SampleLogger.warn("adjustVideo9Layout: Not enough space in regionList for the main user.");
+            }
+        }
+
+        // 2. Set layout for side users
+        int sidePanelCount = 0;
+        for (RecordingUserInfo sideUserInfo : sideUserInfos) {
+            // Stop if we have filled the allocated regions or the total capacity (9) or the
+            // side panel limit (8 or 9)
+            if (regionIndex >= regionList.length || regionIndex >= totalCapacity) {
+                SampleLogger.warn(
+                        "adjustVideo9Layout: Reached regionList limit or total capacity. Stopping side user layout.");
+                break;
+            }
+            // Also check if we exceeded the max number of side panels allowed
+            int maxAllowedSidePanels = (maxUserInfo != null) ? maxSidePanels : totalCapacity;
+            if (sidePanelCount >= maxAllowedSidePanels) {
+                SampleLogger.warn("adjustVideo9Layout: Reached maximum allowed side panels (" + maxAllowedSidePanels
+                        + "). Stopping side user layout.");
+                break;
             }
 
-            regionList[number].setUserId(userId);
-            float yIndex = flag ? (number - 1) % 8 : number % 8;
+            regionList[regionIndex].setUserId(sideUserInfo.getUserId());
             MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
-            layoutConfig.setX((int) (8.f / 9 * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setY((int) (1.f / 8 * yIndex * recorderConfig.getVideo().getHeight()));
-            layoutConfig.setWidth((int) (1.f / 9 * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setHeight((int) (1.f / 8 * recorderConfig.getVideo().getHeight()));
+
+            // Calculate target area for the small side window
+            float yIndex = sidePanelCount % maxSidePanels; // Always use maxSidePanels (8) for vertical indexing
+            int targetX = (int) (8.f / 9 * recorderConfig.getVideo().getWidth());
+            int targetY = (int) (1.f / maxSidePanels * yIndex * recorderConfig.getVideo().getHeight());
+            int targetWidth = (int) (1.f / 9 * recorderConfig.getVideo().getWidth());
+            int targetHeight = (int) (1.f / maxSidePanels * recorderConfig.getVideo().getHeight());
+
+            int videoWidth = sideUserInfo.getVideoWidth();
+            int videoHeight = sideUserInfo.getVideoHeight();
+
+            SampleLogger.debug("adjustVideo9Layout [Side User: " + sideUserInfo.getUserId() + "] - Target Region: x="
+                    + targetX + ", y=" + targetY + ", w=" + targetWidth + ", h=" + targetHeight + " | Video: w="
+                    + videoWidth + ", h=" + videoHeight);
+            LayoutCoordinates coords = calculateLayoutInRegion(videoWidth, videoHeight, targetX, targetY, targetWidth,
+                    targetHeight);
+            SampleLogger
+                    .debug("adjustVideo9Layout [Side User: " + sideUserInfo.getUserId() + "] - Calculated Coords: x="
+                            + coords.getX() + ", y=" + coords.getY() + ", w=" + coords.getWidth() + ", h="
+                            + coords.getHeight());
+
+            layoutConfig.setX(coords.getX());
+            layoutConfig.setY(coords.getY());
+            layoutConfig.setWidth(coords.getWidth());
+            layoutConfig.setHeight(coords.getHeight());
             layoutConfig.setAlpha(1.0f);
-            regionList[number].setConfig(layoutConfig);
-            number++;
-            i++;
-            if (i == 8 && !flag) {
-                adjustVideo17Layout(regionList, maxResolutionUid);
-            }
+            regionList[regionIndex].setConfig(layoutConfig);
+
+            regionIndex++;
+            sidePanelCount++;
+        }
+
+        // 3. Clear remaining regions
+        for (int j = regionIndex; j < regionList.length; j++) {
+            MixerLayoutConfig config = new MixerLayoutConfig();
+            config.setWidth(0);
+            config.setHeight(0);
+            config.setX(0);
+            config.setY(0);
+            regionList[j].setUserId("");
+            regionList[j].setConfig(config);
         }
     }
 
+    // Updated adjustVideo17Layout using the helper method
     private void adjustVideo17Layout(UserMixerLayout[] regionList, String maxResolutionUid) {
-        boolean flag = false;
-        int number = 0;
-        int i = 0;
+        if (regionList == null || regionList.length == 0 || recordingUserInfos == null
+                || recordingUserInfos.isEmpty()) {
+            SampleLogger.warn("adjustVideo17Layout: Invalid input.");
+            return;
+        }
 
-        for (String userId : userIds) {
-            if (maxResolutionUid.equals(userId)) {
-                flag = true;
-                setMaxResolutionUid(number, maxResolutionUid, regionList, 0.8);
-                number++;
-                continue;
+        RecordingUserInfo maxUserInfo = null;
+        List<RecordingUserInfo> sideUserInfos = new ArrayList<>();
+
+        // Separate max user and side users
+        for (RecordingUserInfo info : recordingUserInfos) {
+            if (maxResolutionUid != null && !maxResolutionUid.isEmpty() && maxResolutionUid.equals(info.getUserId())) {
+                if (maxUserInfo == null) { // Found the max user
+                    maxUserInfo = info;
+                } else {
+                    // Duplicate max user ID found? Treat subsequent ones as side users.
+                    SampleLogger.warn("adjustVideo17Layout: Duplicate maxResolutionUid found: " + maxResolutionUid
+                            + ". Treating subsequent as side user.");
+                    sideUserInfos.add(info);
+                }
+            } else {
+                sideUserInfos.add(info);
             }
-            if (!flag && i == 16) {
+        }
+
+        if (maxUserInfo == null && maxResolutionUid != null && !maxResolutionUid.isEmpty()) {
+            SampleLogger.warn("adjustVideo17Layout: maxResolutionUid '" + maxResolutionUid
+                    + "' not found in user list. Treating all as side users.");
+        }
+
+        int regionIndex = 0;
+        final int maxSidePanels = 16; // Maximum number of side panels
+        final int totalCapacity = 17; // Total layout capacity
+        final int rowsPerColumn = 8;
+        final float mainUserWidthRatio = 0.8f; // 80% for main user
+        final float sidePanelWidthRatio = (1.0f - mainUserWidthRatio) / 2; // Width for each side column
+
+        // 1. Set layout for the main user (if exists)
+        if (maxUserInfo != null) {
+            if (regionIndex < regionList.length) {
+                setMaxResolutionUid(regionIndex, maxUserInfo, regionList, mainUserWidthRatio);
+                regionIndex++;
+            } else {
+                SampleLogger.warn("adjustVideo17Layout: Not enough space in regionList for the main user.");
+            }
+        }
+
+        // 2. Set layout for side users
+        int sidePanelCount = 0;
+        for (RecordingUserInfo sideUserInfo : sideUserInfos) {
+            // Stop if we have filled the allocated regions or the total capacity
+            if (regionIndex >= regionList.length || regionIndex >= totalCapacity) {
+                SampleLogger.warn(
+                        "adjustVideo17Layout: Reached regionList limit or total capacity. Stopping side user layout.");
                 break;
             }
-            regionList[number].setUserId(userId);
-            float yIndex = flag ? (number - 1) % 8 : number % 8;
-            MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
-            layoutConfig.setX((int) (((flag && i > 8) || (!flag && i >= 8) ? (9.f / 10) : (8.f / 10))
-                    * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setY((int) ((1.f / 8 * yIndex) * recorderConfig.getVideo().getHeight()));
-            layoutConfig.setWidth((int) (1.f / 10 * recorderConfig.getVideo().getWidth()));
-            layoutConfig.setHeight((int) (1.f / 8 * recorderConfig.getVideo().getHeight()));
-            layoutConfig.setAlpha(1.0f);
-            regionList[number].setConfig(layoutConfig);
+            // Also check if we exceeded the max number of side panels allowed
+            int maxAllowedSidePanels = (maxUserInfo != null) ? maxSidePanels : totalCapacity;
+            if (sidePanelCount >= maxAllowedSidePanels) {
+                SampleLogger.warn("adjustVideo17Layout: Reached maximum allowed side panels (" + maxAllowedSidePanels
+                        + "). Stopping side user layout.");
+                break;
+            }
 
-            number++;
-            i++;
+            regionList[regionIndex].setUserId(sideUserInfo.getUserId());
+            MixerLayoutConfig layoutConfig = new MixerLayoutConfig();
+
+            // Calculate target region for the side user based on the 17-layout pattern
+            int targetWidth = (int) (sidePanelWidthRatio * recorderConfig.getVideo().getWidth());
+            int targetHeight = (int) (1.f / rowsPerColumn * recorderConfig.getVideo().getHeight());
+            int targetX;
+            int targetY;
+
+            int currentPanelIndex = sidePanelCount; // Index of the current side panel (0 to 15)
+            int columnIndex = currentPanelIndex / rowsPerColumn; // 0 for first column, 1 for second
+            int rowIndex = currentPanelIndex % rowsPerColumn; // 0 to 7 within the column
+
+            // Determine column X coordinate
+            targetX = (int) ((mainUserWidthRatio + columnIndex * sidePanelWidthRatio)
+                    * recorderConfig.getVideo().getWidth());
+            targetY = (int) ((1.f / rowsPerColumn * rowIndex) * recorderConfig.getVideo().getHeight());
+
+            int videoWidth = sideUserInfo.getVideoWidth();
+            int videoHeight = sideUserInfo.getVideoHeight();
+
+            SampleLogger.debug("adjustVideo17Layout [Side User: " + sideUserInfo.getUserId() + ", PanelIdx: "
+                    + currentPanelIndex + "] - Target Region: x=" + targetX + ", y=" + targetY + ", w=" + targetWidth
+                    + ", h=" + targetHeight + " | Video: w=" + videoWidth + ", h=" + videoHeight);
+            LayoutCoordinates coords = calculateLayoutInRegion(videoWidth, videoHeight, targetX, targetY, targetWidth,
+                    targetHeight);
+            SampleLogger
+                    .debug("adjustVideo17Layout [Side User: " + sideUserInfo.getUserId() + "] - Calculated Coords: x="
+                            + coords.getX() + ", y=" + coords.getY() + ", w=" + coords.getWidth() + ", h="
+                            + coords.getHeight());
+
+            layoutConfig.setX(coords.getX());
+            layoutConfig.setY(coords.getY());
+            layoutConfig.setWidth(coords.getWidth());
+            layoutConfig.setHeight(coords.getHeight());
+            layoutConfig.setAlpha(1.0f);
+            regionList[regionIndex].setConfig(layoutConfig);
+
+            regionIndex++; // Increment region list index
+            sidePanelCount++; // Increment side panel counter
+        }
+
+        // 3. Clear remaining regions if any were not filled
+        for (int j = regionIndex; j < regionList.length; j++) {
+            MixerLayoutConfig config = new MixerLayoutConfig();
+            config.setWidth(0);
+            config.setHeight(0);
+            config.setX(0);
+            config.setY(0);
+            regionList[j].setUserId(""); // Set empty user ID or null
+            regionList[j].setConfig(config);
         }
     }
 
