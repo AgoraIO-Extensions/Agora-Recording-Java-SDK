@@ -32,13 +32,14 @@
        - [加入频道](#加入频道)
        - [开始录制](#开始录制-1)
        - [结束录制](#结束录制)
+   - [跑通 Maven 工程](#跑通-maven-工程)
 6. [API 参考](#api-参考)
 7. [更新日志](#更新日志)
 8. [其他参考](#其他参考)
 
 ## 简介
 
-Agora Recording Java SDK (v4.4.150.1) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
+Agora Recording Java SDK (v4.4.150.2) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
 
 ## 开发环境要求
 
@@ -75,7 +76,7 @@ Agora Recording Java SDK (v4.4.150.1) 为您提供了强大的实时音视频录
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.1</version>
+    <version>4.4.150.2</version>
 </dependency>
 ```
 
@@ -93,7 +94,7 @@ Agora Recording Java SDK (v4.4.150.1) 为您提供了强大的实时音视频录
 
 #### x86_64 平台
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-3a6fa4362f-20250402_161914](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-3a6fa4362f-20250402_161914.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.2-x86_64-693846-e8c947cbcd-20250508_163339](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.2-x86_64-693846-e8c947cbcd-20250508_163339.zip)
 
 #### arm64 平台
 
@@ -116,7 +117,7 @@ Maven 集成是最简单的方式，可以自动管理 Java 依赖关系。
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.1</version>
+    <version>4.4.150.2</version>
 </dependency>
 
 <!-- arm64 平台 -->
@@ -158,7 +159,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.1 \
+  -Dversion=4.4.150.2 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -170,7 +171,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.1 \
+  -Dversion=4.4.150.2 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -182,7 +183,7 @@ mvn install:install-file \
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.1</version>
+    <version>4.4.150.2</version>
 </dependency>
 ```
 
@@ -231,7 +232,7 @@ Agora Linux Recording Java SDK 依赖于底层的 C++ 原生库（`.so` 文件�
     jar xvf agora-recording-sdk.jar
 
     # 如果使用 Maven 集成方式，JAR 文件在 Maven 缓存中，例如：
-    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.1/linux-recording-java-sdk-4.4.150.1.jar
+    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.2/linux-recording-java-sdk-4.4.150.2.jar
     ```
 
 3.  提取后，`libs` 目录下会生成 `native/linux/x86_64` 子目录，其中包含所需的 `.so` 文件：
@@ -333,7 +334,7 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
 
 #### 编译示例项目
 
-在 `Examples` 目录下执行编译脚本：
+在 `Examples-Cmd` 目录下执行编译脚本：
 
 ```sh
 ./build.sh
@@ -341,7 +342,7 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
 
 #### 配置录制参数
 
-录制参数使用 JSON 格式配置，位于 `Examples/config` 目录下。
+录制参数使用 JSON 格式配置，位于 `Examples-Cmd/config` 目录下。
 
 1. 查看配置示例：
 
@@ -405,7 +406,7 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
    >
    > - 执行录制前务必正确填写 JSON 中的 `appId` 和 `token` 参数
    > - `appId` 和 `channelName` 的设置必须与声网 RTC SDK 中设置的完全一致
-   > - 单流录制模式下，`recorderPath` 指定的是文件夹路径，必须手动确保该目录存在，例如设置 `"recorderPath": "recorder_result/"`，则需确保 `Examples/recorder_result/` 目录已创建
+   > - 单流录制模式下，`recorderPath` 指定的是文件夹路径，必须手动确保该目录存在，例如设置 `"recorderPath": "recorder_result/"`，则需确保 `Examples-Cmd/recorder_result/` 目录已创建
    > - 确保 JSON 格式正确，不要漏掉逗号或引号等符号
 
 #### 执行录制
@@ -413,13 +414,13 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
 1. 为单流录制创建输出目录：
 
    ```sh
-   mkdir -p Examples/recorder_result
+   mkdir -p Examples-Cmd/recorder_result
    ```
 
 2. 选择并运行对应的测试脚本：
 
    ```sh
-   cd Examples
+   cd Examples-Cmd
    ./script/TestCaseName.sh
    ```
 
@@ -427,7 +428,7 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
 
 #### 常用测试脚本
 
-`Examples/script` 目录下提供了多种预设的测试脚本：
+`Examples-Cmd/script` 目录下提供了多种预设的测试脚本：
 
 | 脚本名称                                         | 功能描述                                   |
 | ------------------------------------------------ | ------------------------------------------ |
@@ -453,16 +454,16 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
 
 #### 录制输出文件
 
-- **单流录制**：在 `Examples/recorder_result/` 目录下生成多个 MP4 文件，以各用户的 UID 命名
-- **混合录制**：在 `Examples` 目录下生成单个 MP4 文件，文件名按 JSON 配置指定
+- **单流录制**：在 `Examples-Cmd/recorder_result/` 目录下生成多个 MP4 文件，以各用户的 UID 命名
+- **混合录制**：在 `Examples-Cmd` 目录下生成单个 MP4 文件，文件名按 JSON 配置指定
 
 #### 常见问题排查
 
 - 如果录制没有输出文件，检查 AppID、Token 和频道名是否正确
 - 确保频道中有活跃用户在发送媒体流
-- 检查日志文件了解详细错误信息，日志通常位于 `Examples/logs/` 目录
+- 检查日志文件了解详细错误信息，日志通常位于 `Examples-Cmd/logs/` 目录
 
-> **提示**：更多高级配置选项和详细参数说明，请参考 `Examples/config/recorder_json.example` 文件中的注释。
+> **提示**：更多高级配置选项和详细参数说明，请参考 `Examples-Cmd/config/recorder_json.example` 文件中的注释。
 
 ### 调用 API 录制
 
@@ -472,13 +473,23 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
 
 #### 调用 API 实现录制
 
-以下示例代码基于 `Examples` 目录中的实际示例项目，展示了如何使用录制 SDK API 进行录制。
+以下示例代码基于 `Examples-Cmd` 目录中的实际示例项目，展示了如何使用录制 SDK API 进行录制。
 
 ##### 初始化服务
 
 ```java
 // 创建 AgoraService 实例
 AgoraService agoraService = new AgoraService();
+
+// 配置本地代理，配置必须放在 initialize 之前
+LocalAccessPointConfiguration localAccessPointConfig = new LocalAccessPointConfiguration();
+localAccessPointConfig.setMode(Constants.LocalProxyMode.LocalOnly);
+localAccessPointConfig.setDomainList(new String[] { "" });
+localAccessPointConfig.setIpList(new String[] { "10.xx.xx.xx" });
+localAccessPointConfig.setDomainListSize(1);
+localAccessPointConfig.setIpListSize(1);
+localAccessPointConfig.setVerifyDomainName("ap.xxx.agora.local");
+int setGlobalLocalAccessPointRet = agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
 
 // 创建并配置服务配置对象
 AgoraServiceConfiguration config = new AgoraServiceConfiguration();
@@ -663,19 +674,87 @@ agoraService.release();
 
 录制文件将根据录制类型保存在不同位置：
 
-- **单流录制**：在 `Examples` 目录下指定文件夹下生成单流录制的 mp4 文件，文件名是 UID 开头的，如 `uid_123456_timestamp.mp4`。
+- **单流录制**：在 `Examples-Cmd` 目录下指定文件夹下生成单流录制的 mp4 文件，文件名是 UID 开头的，如 `uid_123456_timestamp.mp4`。
 
-- **合流录制**：在 `Examples` 目录下生成合流的录制 mp4 文件，文件名是通过 `MediaRecorderConfiguration` 对象的 `storagePath` 参数配置的。
+- **合流录制**：在 `Examples-Cmd` 目录下生成合流的录制 mp4 文件，文件名是通过 `MediaRecorderConfiguration` 对象的 `storagePath` 参数配置的。
 
 在实际应用中，建议为每次录制设置唯一的文件路径，可以使用频道名、时间戳等作为文件名的一部分，以避免文件覆盖。
 
 更多录制选项和高级功能，请参考 `MediaRecorderConfiguration` 类的 API 文档。
+
+### 跑通 Maven 工程
+
+本 SDK 提供了基于 Spring Boot 的 Maven 示例工程，方便你快速验证和二次开发。以下为跑通 `Examples-Maven` 工程的基本流程：
+
+#### 1. 编译打包
+
+进入 `Examples-Maven` 目录，执行：
+
+```sh
+mvn clean package
+```
+
+编译成功后，会在 `target/` 目录下生成 `agora-example.jar`。
+
+#### 2. 配置密钥
+
+在 `Examples-Maven` 目录下创建 `.keys` 文件，内容如下（请替换为你的实际信息）：
+
+```
+appId=你的AppId
+token=你的Token
+```
+
+#### 3. 准备 so 库
+
+确保 `libs/native/linux/x86_64/` 目录下包含所有必要的 so 文件（如 `libagora_rtc_sdk.so`、`librecording.so` 等）。
+
+#### 4. 运行示例服务
+
+在 `Examples-Maven` 目录下执行：
+
+```sh
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=18080 -jar target/agora-example.jar
+```
+
+- 该命令会启动 Spring Boot 服务，监听 18080 端口。
+- 如需更换端口，可修改 `-Dserver.port` 参数。
+
+#### 5. 通过 API 启动/停止录制
+
+- 启动录制：
+  ```
+  http://<服务器IP>:18080/api/recording/start?configFileName=mix_stream_recorder_audio_video_water_marks.json
+  ```
+- 停止录制：
+  ```
+  http://<服务器IP>:18080/api/recording/stop?taskId=<任务ID>
+  ```
+
+> 录制配置文件需放在 `Examples-Maven/src/main/resources/` 目录下。
+
+#### 6. 常见问题
+
+- 若服务无法启动，请检查 so 文件路径、.keys 文件内容及端口占用。
+- 录制无输出时，请检查频道内有无活跃用户、AppId/Token/频道名是否正确。
+
+---
 
 ## API 参考
 
 有关 SDK API 的详细说明，请参考 [API-reference.zh.md](API-reference.zh.md) 文档，每个类和方法都提供了详细的参数说明、返回值解释。
 
 ## 更新日志
+
+### v4.4.150.2（2025-05-09）
+
+#### API 变更
+
+- **新增**：`AgoraService` 类中添加 `setGlobalLocalAccessPoint` 函数，用于配置全局本地接入点。
+
+#### 改进与优化
+
+- **修复**：修复 SpringBot 打包回调处理问题
 
 ### v4.4.150.1（2025-03-28）
 

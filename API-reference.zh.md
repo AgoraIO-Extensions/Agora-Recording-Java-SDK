@@ -30,6 +30,9 @@
   - [RemoteVideoStatistics](#remotevideostatistics)
   - [RemoteAudioStatistics](#remoteaudiostatistics)
   - [RecorderInfo](#recorderinfo)
+  - [AdvancedConfigInfo](#advancedconfiginfo)
+  - [LogUploadServerInfo](#loguploadserverinfo)
+  - [LocalAccessPointConfiguration](#localaccesspointconfiguration)
 - [实用工具类](#utility-classes)
   - [Constants](#constants)
   - [Utils](#utils)
@@ -120,6 +123,21 @@
 
 - `0`: 成功
 - `< 0`: 失败
+
+##### `int setGlobalLocalAccessPoint(LocalAccessPointConfiguration config)`
+
+设置本地 AP 模式下的全局本地接入点地址（也会调用本地代理）。
+
+**注意：** 此方法必须在 AgoraService 的 `initialize(AgoraServiceConfiguration)` 之前调用。它会影响同一进程下的所有录制实例，每个进程只需调用一次。
+
+**参数**：
+
+- `config`: {@link LocalAccessPointConfiguration} 对象。详见 LocalAccessPointConfiguration 的定义。
+
+**返回值**：
+
+- `0`: 方法调用成功。
+- `< 0`: 方法调用失败。
 
 ### AgoraMediaComponentFactory
 
@@ -1123,6 +1141,69 @@
 - **fileName**: 录制文件的绝对路径。
 - **durationMs**: 录制时长（毫秒）。
 - **fileSize**: 录制文件的大小（字节）。
+
+### AdvancedConfigInfo
+
+`AdvancedConfigInfo` 类用于高级配置，目前主要用于日志上传服务器设置。
+
+#### 主要属性
+
+- **logUploadServer**: 日志上传服务器配置。参见 {@link LogUploadServerInfo}。
+
+#### 主要方法
+
+- `getLogUploadServer()`: 获取日志上传服务器配置。
+- `setLogUploadServer(LogUploadServerInfo logUploadServer)`: 设置日志上传服务器配置。
+
+### LogUploadServerInfo
+
+`LogUploadServerInfo` 类描述日志上传服务器的信息。
+
+#### 主要属性
+
+- **serverDomain**: 日志上传服务器域名。
+- **serverPath**: 日志上传服务器路径。
+- **serverPort**: 日志上传服务器端口。
+- **serverHttps**: 是否使用 HTTPS 请求（`true` 为 HTTPS，`false` 为 HTTP）。
+
+#### 主要方法
+
+- `getServerDomain()/setServerDomain(String)`: 获取/设置服务器域名。
+- `getServerPath()/setServerPath(String)`: 获取/设置服务器路径。
+- `getServerPort()/setServerPort(int)`: 获取/设置服务器端口。
+- `isServerHttps()/setServerHttps(boolean)`: 获取/设置是否使用 HTTPS。
+
+### LocalAccessPointConfiguration
+
+`LocalAccessPointConfiguration` 类用于本地代理接入点的配置。
+
+#### 主要属性
+
+- **ipList**: 本地接入点 IP 地址列表。
+- **ipListSize**: IP 地址数量。
+- **domainList**: 本地接入点域名列表。
+- **domainListSize**: 域名数量。
+- **verifyDomainName**: 安装在特定本地接入点的证书域名。空字符串表示使用 SNI 域名。
+- **mode**: 代理连接模式。参见 {@link Constants.LocalProxyMode}。
+- **advancedConfig**: 高级配置。参见 {@link AdvancedConfigInfo}。
+- **disableAut**: 是否禁用 vos-aut（默认：`true`）。
+
+#### 主要方法
+
+- `getIpList()/setIpList(String[])`: 获取/设置 IP 地址列表。
+- `getIpListSize()/setIpListSize(int)`: 获取/设置 IP 数量。
+- `getDomainList()/setDomainList(String[])`: 获取/设置域名列表。
+- `getDomainListSize()/setDomainListSize(int)`: 获取/设置域名数量。
+- `getVerifyDomainName()/setVerifyDomainName(String)`: 获取/设置证书域名。
+- `getMode()/setMode(Constants.LocalProxyMode)`: 获取/设置代理连接模式。
+- `getAdvancedConfig()/setAdvancedConfig(AdvancedConfigInfo)`: 获取/设置高级配置。
+- `isDisableAut()/setDisableAut(boolean)`: 获取/设置是否禁用 vos-aut。
+
+#### 使用说明
+
+- `LocalAccessPointConfiguration` 可用于 `AgoraService#setGlobalLocalAccessPoint` 方法，影响同一进程下所有录制实例。
+- `AdvancedConfigInfo` 目前主要用于日志上传服务器配置，后续可扩展更多高级参数。
+- `LogUploadServerInfo` 支持自定义日志上传服务器的域名、路径、端口及 HTTPS 设置。
 
 ## 实用工具类
 

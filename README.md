@@ -32,13 +32,14 @@
         - [Join Channel](#join-channel)
         - [Configure and Start Recording](#configure-and-start-recording)
         - [Stop Recording](#stop-recording-1)
+    - [Run the Maven Example Project](#run-the-maven-example-project)
 6.  [API Reference](#api-reference)
 7.  [Changelog](#changelog)
 8.  [Other References](#other-references)
 
 ## Introduction
 
-The Agora Recording Java SDK (v4.4.150.1) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
+The Agora Recording Java SDK (v4.4.150.2) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
 
 ## Development Environment Requirements
 
@@ -75,7 +76,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.1</version>
+    <version>4.4.150.2</version>
 </dependency>
 ```
 
@@ -93,7 +94,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 
 #### x86_64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-3a6fa4362f-20250402_161914](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.1-x86_64-631687-3a6fa4362f-20250402_161914.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.2-x86_64-693846-e8c947cbcd-20250508_163339](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.2-x86_64-693846-e8c947cbcd-20250508_163339.zip)
 
 #### arm64 Platform
 
@@ -116,7 +117,7 @@ Add the following dependency to your project's `pom.xml` file:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.1</version>
+    <version>4.4.150.2</version>
 </dependency>
 
 <!-- arm64 Platform -->
@@ -158,7 +159,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.1 \
+  -Dversion=4.4.150.2 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -170,7 +171,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.1 \
+  -Dversion=4.4.150.2 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -182,7 +183,7 @@ After installation, add the dependency in `pom.xml`:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.1</version>
+    <version>4.4.150.2</version>
 </dependency>
 ```
 
@@ -231,7 +232,7 @@ The `.so` files are contained within the `agora-recording-sdk.jar` or `linux-rec
     jar xvf agora-recording-sdk.jar
 
     # If using Maven integration, the JAR file is in the Maven cache, e.g.:
-    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.1/linux-recording-java-sdk-4.4.150.1.jar
+    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.2/linux-recording-java-sdk-4.4.150.2.jar
     ```
 
 3.  After extraction, a `native/linux/x86_64` subdirectory (or `aarch64` for ARM) will be generated in the `libs` directory, containing the required `.so` files:
@@ -341,16 +342,16 @@ Before starting, ensure you have completed the environment preparation and SDK i
 
 #### Compile Example Project
 
-Execute the build script in the `Examples` directory:
+Execute the build script in the `Examples-Cmd` directory:
 
 ```sh
-cd Examples
+cd Examples-Cmd
 ./build.sh
 ```
 
 #### Configure Recording Parameters
 
-Recording parameters are configured using JSON format, located in the `Examples/config` directory.
+Recording parameters are configured using JSON format, located in the `Examples-Cmd/config` directory.
 
 1.  View the configuration example:
 
@@ -414,7 +415,7 @@ Recording parameters are configured using JSON format, located in the `Examples/
     >
     > - Before executing recording, ensure `appId` and `token` (if applicable) are correctly filled in the JSON.
     > - `appId` and `channelName` must exactly match those used by the RTC SDK clients.
-    > - In single-stream recording mode, `recorderPath` specifies a directory path. You must manually ensure this directory exists before starting the recording (e.g., if `"recorderPath": "recorder_result/"`, ensure `Examples/recorder_result/` exists).
+    > - In single-stream recording mode, `recorderPath` specifies a directory path. You must manually ensure this directory exists before starting the recording (e.g., if `"recorderPath": "recorder_result/"`, ensure `Examples-Cmd/recorder_result/` exists).
     > - Ensure the JSON format is correct; do not miss commas, quotes, etc.
 
 #### Start Recording
@@ -422,13 +423,13 @@ Recording parameters are configured using JSON format, located in the `Examples/
 1.  Create the output directory for single-stream recording (if using):
 
     ```sh
-    mkdir -p Examples/recorder_result
+    mkdir -p Examples-Cmd/recorder_result
     ```
 
 2.  Choose and run the corresponding test script:
 
     ```sh
-    cd Examples
+    cd Examples-Cmd
     ./script/TestCaseName.sh
     ```
 
@@ -436,7 +437,7 @@ Recording parameters are configured using JSON format, located in the `Examples/
 
 #### Common Test Scripts
 
-The `Examples/script` directory provides several preset test scripts:
+The `Examples-Cmd/script` directory provides several preset test scripts:
 
 | Script Name                                      | Description                                                                 |
 | ------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -462,16 +463,16 @@ Choose a suitable script or create custom recording configurations based on thes
 
 #### Recording Output Files
 
-- **Single-Stream Recording**: Generates multiple MP4 files in the `Examples/recorder_result/` directory (or as specified by `recorderPath`), named after the UIDs of each user (e.g., `uid_123456_timestamp.mp4`).
-- **Mixed-Stream Recording**: Generates a single MP4 file in the `Examples` directory (or as specified by `recorderPath`), with the filename specified in the JSON configuration.
+- **Single-Stream Recording**: Generates multiple MP4 files in the `Examples-Cmd/recorder_result/` directory (or as specified by `recorderPath`), named after the UIDs of each user (e.g., `uid_123456_timestamp.mp4`).
+- **Mixed-Stream Recording**: Generates a single MP4 file in the `Examples-Cmd` directory (or as specified by `recorderPath`), with the filename specified in the JSON configuration.
 
 #### Troubleshooting Common Issues
 
 - If no recording file is output, check if the AppID, Token, and channel name are correct.
 - Ensure there are active users sending media streams in the channel.
-- Check the log files for detailed error messages. Logs are typically located in the `Examples/logs/` directory.
+- Check the log files for detailed error messages. Logs are typically located in the `Examples-Cmd/logs/` directory.
 
-> **Tip**: For more advanced configuration options and detailed parameter descriptions, refer to the comments in the `Examples/config/recorder_json.example` file.
+> **Tip**: For more advanced configuration options and detailed parameter descriptions, refer to the comments in the `Examples-Cmd/config/recorder_json.example` file.
 
 ### Recording via API Call
 
@@ -481,7 +482,7 @@ Before starting, ensure you have completed the environment preparation and SDK i
 
 #### Implementing Recording via API Call
 
-The following example code, based on the actual example project in the `Examples` directory, demonstrates how to use the Recording SDK API for recording.
+The following example code, based on the actual example project in the `Examples-Cmd` directory, demonstrates how to use the Recording SDK API for recording.
 
 ##### Initialize Service
 
@@ -505,6 +506,16 @@ import io.agora.recording.WatermarkConfig;
 
 // Create AgoraService instance
 AgoraService agoraService = new AgoraService();
+
+// Configure local proxy. This configuration must be set before initialize.
+LocalAccessPointConfiguration localAccessPointConfig = new LocalAccessPointConfiguration();
+localAccessPointConfig.setMode(Constants.LocalProxyMode.LocalOnly);
+localAccessPointConfig.setDomainList(new String[] { "" });
+localAccessPointConfig.setIpList(new String[] { "10.xx.xx.xx" });
+localAccessPointConfig.setDomainListSize(1);
+localAccessPointConfig.setIpListSize(1);
+localAccessPointConfig.setVerifyDomainName("ap.xxx.agora.local");
+int setGlobalLocalAccessPointRet = agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
 
 // Create and configure the service configuration object
 AgoraServiceConfiguration config = new AgoraServiceConfiguration();
@@ -801,11 +812,77 @@ In practical applications, it is recommended to set a unique file path for each 
 
 For more recording options and advanced features, please refer to the API documentation for the `MediaRecorderConfiguration` class.
 
+### Run the Maven Example Project
+
+The SDK provides a Spring Boot-based Maven example project for quick verification and secondary development. Below are the basic steps to run the `Examples-Maven` project:
+
+#### 1. Build the Project
+
+Navigate to the `Examples-Maven` directory and run:
+
+```sh
+mvn clean package
+```
+
+After a successful build, `agora-example.jar` will be generated in the `target/` directory.
+
+#### 2. Configure Keys
+
+Create a `.keys` file in the `Examples-Maven` directory with the following content (replace with your actual values):
+
+```
+appId=YOUR_APPID
+token=YOUR_TOKEN
+```
+
+#### 3. Prepare .so Libraries
+
+Ensure the `libs/native/linux/x86_64/` directory contains all required `.so` files (such as `libagora_rtc_sdk.so`, `librecording.so`, etc.).
+
+#### 4. Run the Example Service
+
+In the `Examples-Maven` directory, execute:
+
+```sh
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=18080 -jar target/agora-example.jar
+```
+
+- This command starts the Spring Boot service on port 18080.
+- To change the port, modify the `-Dserver.port` parameter.
+
+#### 5. Start/Stop Recording via API
+
+- Start recording:
+  ```
+  http://<server_ip>:18080/api/recording/start?configFileName=mix_stream_recorder_audio_video_water_marks.json
+  ```
+- Stop recording:
+  ```
+  http://<server_ip>:18080/api/recording/stop?taskId=<task_id>
+  ```
+
+> The recording config file should be placed in the `Examples-Maven/src/main/resources/` directory.
+
+#### 6. Troubleshooting
+
+- If the service fails to start, check the `.so` file path, `.keys` file content, and port usage.
+- If there is no recording output, ensure there are active users in the channel and that AppId/Token/channel name are correct.
+
 ## API Reference
 
 For detailed descriptions of the SDK APIs, please refer to the [API-reference.md](API-reference.md) document, each class and method provides detailed parameter descriptions and return value explanations.
 
 ## Changelog
+
+### v4.4.150.2 (2025-05-09)
+
+#### API Changes
+
+- **Added**: Added the `setGlobalLocalAccessPoint` function to the `AgoraService` class for configuring the global local access point.
+
+#### Improvements & Optimizations
+
+- **Fixed**: Fixed the callback handling issue when packaging with SpringBot.
 
 ### v4.4.150.1 (2025-03-28)
 

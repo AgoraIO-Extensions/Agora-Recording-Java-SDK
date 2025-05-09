@@ -30,6 +30,9 @@ This document provides a detailed description of the API interfaces for the Agor
   - [RemoteVideoStatistics](#remotevideostatistics)
   - [RemoteAudioStatistics](#remoteaudiostatistics)
   - [RecorderInfo](#recorderinfo)
+  - [AdvancedConfigInfo](#advancedconfiginfo)
+  - [LogUploadServerInfo](#loguploadserverinfo)
+  - [LocalAccessPointConfiguration](#localaccesspointconfiguration)
 - [Utility Classes](#utility-classes)
   - [Constants](#constants)
   - [Utils](#utils)
@@ -120,6 +123,21 @@ Releases the `AgoraService` object and its associated resources. The instance be
 
 - `0`: Success
 - `< 0`: Failure
+
+##### `int setGlobalLocalAccessPoint(LocalAccessPointConfiguration config)`
+
+Sets global local access point addresses in local AP mode (which also calls local proxy).
+
+**Note:** This method must be called before `initialize(AgoraServiceConfiguration)` of AgoraService. It will affect all recorder instances in the same process, and only needs to be called once per process.
+
+**Parameters**:
+
+- `config`: The {@link LocalAccessPointConfiguration} object. See the definition of LocalAccessPointConfiguration for details.
+
+**Return Value**:
+
+- `0`: Method call successful.
+- `< 0`: Method call failed.
 
 ### AgoraMediaComponentFactory
 
@@ -1123,6 +1141,69 @@ The `RecorderInfo` class contains recording information.
 - **fileName**: The absolute path of the recording file.
 - **durationMs**: The recording duration in milliseconds.
 - **fileSize**: The size in bytes of the recording file.
+
+### AdvancedConfigInfo
+
+The `AdvancedConfigInfo` class is used for advanced configuration, currently mainly for log upload server settings.
+
+#### Main Properties
+
+- **logUploadServer**: The log upload server configuration. See {@link LogUploadServerInfo}.
+
+#### Main Methods
+
+- `getLogUploadServer()`: Gets the log upload server configuration.
+- `setLogUploadServer(LogUploadServerInfo logUploadServer)`: Sets the log upload server configuration.
+
+### LogUploadServerInfo
+
+The `LogUploadServerInfo` class describes the log upload server information.
+
+#### Main Properties
+
+- **serverDomain**: The log upload server domain.
+- **serverPath**: The log upload server path.
+- **serverPort**: The log upload server port.
+- **serverHttps**: Whether to use HTTPS requests (`true` for HTTPS, `false` for HTTP).
+
+#### Main Methods
+
+- `getServerDomain()/setServerDomain(String)`: Get/set the server domain.
+- `getServerPath()/setServerPath(String)`: Get/set the server path.
+- `getServerPort()/setServerPort(int)`: Get/set the server port.
+- `isServerHttps()/setServerHttps(boolean)`: Get/set whether to use HTTPS.
+
+### LocalAccessPointConfiguration
+
+The `LocalAccessPointConfiguration` class is used to configure local proxy access points.
+
+#### Main Properties
+
+- **ipList**: Local access point IP address list.
+- **ipListSize**: Number of IP addresses.
+- **domainList**: Local access point domain list.
+- **domainListSize**: Number of domains.
+- **verifyDomainName**: Certificate domain name installed on the specific local access point. An empty string means using the SNI domain.
+- **mode**: Proxy connection mode. See {@link Constants.LocalProxyMode}.
+- **advancedConfig**: Advanced configuration. See {@link AdvancedConfigInfo}.
+- **disableAut**: Whether to disable vos-aut (default: `true`).
+
+#### Main Methods
+
+- `getIpList()/setIpList(String[])`: Get/set the IP address list.
+- `getIpListSize()/setIpListSize(int)`: Get/set the number of IP addresses.
+- `getDomainList()/setDomainList(String[])`: Get/set the domain list.
+- `getDomainListSize()/setDomainListSize(int)`: Get/set the number of domains.
+- `getVerifyDomainName()/setVerifyDomainName(String)`: Get/set the certificate domain name.
+- `getMode()/setMode(Constants.LocalProxyMode)`: Get/set the proxy connection mode.
+- `getAdvancedConfig()/setAdvancedConfig(AdvancedConfigInfo)`: Get/set the advanced configuration.
+- `isDisableAut()/setDisableAut(boolean)`: Get/set whether to disable vos-aut.
+
+#### Usage Note
+
+- `LocalAccessPointConfiguration` can be used in the `AgoraService#setGlobalLocalAccessPoint` method, which affects all recorder instances in the same process.
+- `AdvancedConfigInfo` is currently mainly used for log upload server configuration and can be extended for more advanced parameters in the future.
+- `LogUploadServerInfo` supports custom log upload server domain, path, port, and HTTPS settings.
 
 ## Utility Classes
 
