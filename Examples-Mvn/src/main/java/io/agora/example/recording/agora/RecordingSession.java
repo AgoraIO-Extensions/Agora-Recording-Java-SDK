@@ -472,4 +472,19 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     public void onEncryptionError(String channelId, Constants.EncryptionErrorType errorType) {
         log.info("[" + taskId + "]onEncryptionError channelId:" + channelId + " errorType:" + errorType);
     }
+
+    @Override
+    public void onError(String channelId, Constants.ErrorCodeType error, String message) {
+        log.info("[" + taskId + "]onError channelId:" + channelId + " error:" + error + " message:" + message);
+    }
+
+    @Override
+    public void onTokenPrivilegeWillExpire(String channelId, String token) {
+        log.info("[" + taskId + "]onTokenPrivilegeWillExpire channelId:" + channelId + " token:" + token);
+    }
+
+    @Override
+    public void onTokenPrivilegeDidExpire(String channelId) {
+        log.info("[" + taskId + "]onTokenPrivilegeDidExpire channelId:" + channelId);
+    }
 }

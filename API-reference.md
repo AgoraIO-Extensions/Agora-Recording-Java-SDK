@@ -921,6 +921,38 @@ Triggered when an error occurs in the encryption process.
 - `channelId`: Channel ID.
 - `errorType`: Type of encryption error. See {@link Constants.EncryptionErrorType}.
 
+##### `void onError(String channelId, Constants.ErrorCodeType error, String message)`
+
+Reports the error code and error message.
+
+**Parameters**:
+
+- `channelId`: The channel ID.
+- `error`: The error code. See {@link io.agora.recording.Constants.ErrorCodeType ErrorCode} for details.
+- `message`: Error message.
+
+##### `void onTokenPrivilegeWillExpire(String channelId, String token)`
+
+Occurs when the token privilege is about to expire in 30 seconds.
+
+The SDK triggers this callback to remind the app to get a new token before the token privilege expires.
+Upon receiving this callback, you must generate a new token on your server.
+
+**Parameters**:
+
+- `channelId`: The channel ID.
+- `token`: The token that is about to expire in 30 seconds.
+
+##### `void onTokenPrivilegeDidExpire(String channelId)`
+
+Occurs when the token has expired.
+
+Upon receiving this callback, you must generate a new token on your server.
+
+**Parameters**:
+
+- `channelId`: The channel ID.
+
 ## Data Structures
 
 ### AgoraServiceConfiguration

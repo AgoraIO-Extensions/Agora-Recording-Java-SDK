@@ -39,7 +39,7 @@
 
 ## 简介
 
-Agora Recording Java SDK (v4.4.150.2) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
+Agora Recording Java SDK (v4.4.150.3) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
 
 ## 开发环境要求
 
@@ -76,7 +76,7 @@ Agora Recording Java SDK (v4.4.150.2) 为您提供了强大的实时音视频录
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.2</version>
+    <version>4.4.150.3</version>
 </dependency>
 ```
 
@@ -94,7 +94,7 @@ Agora Recording Java SDK (v4.4.150.2) 为您提供了强大的实时音视频录
 
 #### x86_64 平台
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.2-x86_64-693846-e8c947cbcd-20250508_163339](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.2-x86_64-693846-e8c947cbcd-20250508_163339.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.3-x86_64-702308-83b3dc2cc1-20250520_141254](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.3-x86_64-702308-83b3dc2cc1-20250520_141254.zip)
 
 #### arm64 平台
 
@@ -117,7 +117,7 @@ Maven 集成是最简单的方式，可以自动管理 Java 依赖关系。
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.2</version>
+    <version>4.4.150.3</version>
 </dependency>
 
 <!-- arm64 平台 -->
@@ -159,7 +159,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.2 \
+  -Dversion=4.4.150.3 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -171,7 +171,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.2 \
+  -Dversion=4.4.150.3 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -183,7 +183,7 @@ mvn install:install-file \
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.2</version>
+    <version>4.4.150.3</version>
 </dependency>
 ```
 
@@ -232,7 +232,7 @@ Agora Linux Recording Java SDK 依赖于底层的 C++ 原生库（`.so` 文件�
     jar xvf agora-recording-sdk.jar
 
     # 如果使用 Maven 集成方式，JAR 文件在 Maven 缓存中，例如：
-    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.2/linux-recording-java-sdk-4.4.150.2.jar
+    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.3/linux-recording-java-sdk-4.4.150.3.jar
     ```
 
 3.  提取后，`libs` 目录下会生成 `native/linux/x86_64` 子目录，其中包含所需的 `.so` 文件：
@@ -684,11 +684,11 @@ agoraService.release();
 
 ### 跑通 Maven 工程
 
-本 SDK 提供了基于 Spring Boot 的 Maven 示例工程，方便你快速验证和二次开发。以下为跑通 `Examples-Maven` 工程的基本流程：
+本 SDK 提供了基于 Spring Boot 的 Maven 示例工程，方便你快速验证和二次开发。以下为跑通 `Examples-Mvn` 工程的基本流程：
 
 #### 1. 编译打包
 
-进入 `Examples-Maven` 目录，执行：
+进入 `Examples-Mvn` 目录，执行：
 
 ```sh
 mvn clean package
@@ -698,7 +698,7 @@ mvn clean package
 
 #### 2. 配置密钥
 
-在 `Examples-Maven` 目录下创建 `.keys` 文件，内容如下（请替换为你的实际信息）：
+在 `Examples-Mvn` 目录下创建 `.keys` 文件，内容如下（请替换为你的实际信息）：
 
 ```
 appId=你的AppId
@@ -711,7 +711,7 @@ token=你的Token
 
 #### 4. 运行示例服务
 
-在 `Examples-Maven` 目录下执行：
+在 `Examples-Mvn` 目录下执行：
 
 ```sh
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=18080 -jar target/agora-example.jar
@@ -731,7 +731,7 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
   http://<服务器IP>:18080/api/recording/stop?taskId=<任务ID>
   ```
 
-> 录制配置文件需放在 `Examples-Maven/src/main/resources/` 目录下。
+> 录制配置文件需放在 `Examples-Mvn/src/main/resources/` 目录下。
 
 #### 6. 常见问题
 
@@ -745,6 +745,12 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
 有关 SDK API 的详细说明，请参考 [API-reference.zh.md](API-reference.zh.md) 文档，每个类和方法都提供了详细的参数说明、返回值解释。
 
 ## 更新日志
+
+### v4.4.150.3（2025-05-20）
+
+#### API 变更
+
+- **新增**：`IAgoraMediaRtcRecorderEventHandler` 新增 `onError`、`onTokenPrivilegeWillExpire`、`onTokenPrivilegeDidExpire` 回调方法，支持错误上报及 Token 即将过期/已过期通知。
 
 ### v4.4.150.2（2025-05-09）
 

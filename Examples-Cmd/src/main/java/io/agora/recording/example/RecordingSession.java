@@ -109,6 +109,8 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         if (!io.agora.recording.utils.Utils.isNullOrEmpty(channelName)) {
             channelNameInternal = channelName;
         }
+        SampleLogger.info("[" + taskId + "]joinChannel channelNameInternal:" + channelNameInternal + " userId:"
+                + recorderConfig.getUserId());
         agoraMediaRtcRecorder.joinChannel(recorderConfig.getToken(),
                 channelNameInternal,
                 recorderConfig.getUserId());
@@ -239,7 +241,8 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
 
         if (!waitForUpdateUiUserInfos.isEmpty()) {
             for (RecordingUserInfo waitUserId : waitForUpdateUiUserInfos) {
-                taskExecutorService.submit(() -> videoLayoutManager.addRecordingUserInfo(waitUserId.getUserId(), waitUserId.getVideoWidth(),
+                taskExecutorService.submit(() -> videoLayoutManager.addRecordingUserInfo(waitUserId.getUserId(),
+                        waitUserId.getVideoWidth(),
                         waitUserId.getVideoHeight()));
             }
             waitForUpdateUiUserInfos.clear();
@@ -476,5 +479,20 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     @Override
     public void onEncryptionError(String channelId, Constants.EncryptionErrorType errorType) {
         SampleLogger.info("[" + taskId + "]onEncryptionError channelId:" + channelId + " errorType:" + errorType);
+    }
+
+    @Override
+    public void onError(String channelId, Constants.ErrorCodeType error, String message) {
+        SampleLogger.info("[" + taskId + "]onError channelId:" + channelId + " error:" + error + " message:" + message);
+    }
+
+    @Override
+    public void onTokenPrivilegeWillExpire(String channelId, String token) {
+        SampleLogger.info("[" + taskId + "]onTokenPrivilegeWillExpire channelId:" + channelId + " token:" + token);
+    }
+
+    @Override
+    public void onTokenPrivilegeDidExpire(String channelId) {
+        SampleLogger.info("[" + taskId + "]onTokenPrivilegeDidExpire channelId:" + channelId);
     }
 }

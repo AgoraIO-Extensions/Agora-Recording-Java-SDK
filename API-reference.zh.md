@@ -921,6 +921,38 @@
 - `channelId`: 频道 ID。
 - `errorType`: 加密错误的类型。参见 {@link Constants.EncryptionErrorType}。
 
+##### `void onError(String channelId, Constants.ErrorCodeType error, String message)`
+
+报告错误码和错误消息。
+
+**参数**:
+
+- `channelId`: 频道 ID。
+- `error`: 错误码。详见 {@link io.agora.recording.Constants.ErrorCodeType ErrorCode}。
+- `message`: 错误消息。
+
+##### `void onTokenPrivilegeWillExpire(String channelId, String token)`
+
+Token 即将在 30 秒内过期时触发。
+
+SDK 触发此回调以提醒应用在 Token 权限过期之前获取新 Token。
+收到此回调后，你必须在你的服务器上生成一个新的 Token。
+
+**参数**:
+
+- `channelId`: 频道 ID。
+- `token`: 即将在 30 秒内过期的 Token。
+
+##### `void onTokenPrivilegeDidExpire(String channelId)`
+
+Token 已过期时触发。
+
+收到此回调后，你必须在你的服务器上生成一个新的 Token。
+
+**参数**:
+
+- `channelId`: 频道 ID。
+
 ## 数据结构
 
 ### AgoraServiceConfiguration
