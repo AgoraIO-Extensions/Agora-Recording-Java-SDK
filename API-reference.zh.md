@@ -497,6 +497,20 @@
 - `0`: 方法调用成功。
 - `< 0`: 方法调用失败。
 
+##### `int renewToken(String token)`
+
+更新当前会话的 Token。
+Token 在一段时间后会过期。当 `IAgoraMediaRtcRecorderEventHandler#onError(String, Constants.ErrorCodeType, String)` 回调报告 `Constants.ErrorCodeType#ERR_TOKEN_EXPIRED (109)`，或者当 `IAgoraMediaRtcRecorderEventHandler#onTokenPrivilegeWillExpire(String, String)` 或 `IAgoraMediaRtcRecorderEventHandler#onTokenPrivilegeDidExpire(String)` 被触发时，你必须在你的服务器上生成一个新的 Token，并调用此方法来更新它。否则，SDK 将会与 Agora 频道断开连接。
+
+**参数**:
+
+- `token`: 从你的服务器生成的新 Token。
+
+**返回值**:
+
+- `0`: 方法调用成功。
+- `< 0`: 方法调用失败 (例如，如果 Token 为 null 或空)。
+
 ##### `int release()`
 
 释放录制器实例及相关资源。
@@ -936,7 +950,10 @@
 Token 即将在 30 秒内过期时触发。
 
 SDK 触发此回调以提醒应用在 Token 权限过期之前获取新 Token。
-收到此回调后，你必须在你的服务器上生成一个新的 Token。
+
+<p>
+收到此回调后，你必须在你的服务器上生成一个新的 Token，并调用
+{@link AgoraMediaRtcRecorder#renewToken(String)} 来更新它。
 
 **参数**:
 
@@ -947,7 +964,8 @@ SDK 触发此回调以提醒应用在 Token 权限过期之前获取新 Token。
 
 Token 已过期时触发。
 
-收到此回调后，你必须在你的服务器上生成一个新的 Token。
+收到此回调后，你必须在你的服务器上生成一个新的 Token，并调用
+{@link AgoraMediaRtcRecorder#renewToken(String)} 来更新它。
 
 **参数**:
 
@@ -1075,7 +1093,7 @@ Token 已过期时触发。
 #### 主要属性
 
 - **visibleInPreview**: 水印图像是否在本地视频预览中可见。默认值：`true`。
-- **mode**: 水印适配模式。默认值：`FIT_MODE_COVER_POSITION`。参见 {@link Constants.WaterMaskFitMode}。
+- **mode**: 水印适配模式。默认值：`FIT_MODE_COVER_POSITION`。参见 {@link Constants.WatermarkFitMode}。
 - **positionInLandscapeMode**: 当 `mode` 为 `FIT_MODE_COVER_POSITION` 时，用于设置横屏模式下的水印区域。参见 {@link Rectangle}。默认值：(0, 0, 0, 0)。
 - **positionInPortraitMode**: 当 `mode` 为 `FIT_MODE_COVER_POSITION` 时，用于设置竖屏模式下的水印区域。参见 {@link Rectangle}。默认值：(0, 0, 0, 0)。
 - **watermarkRatio**: 当 `mode` 为 `FIT_MODE_USE_IMAGE_RATIO` 时，用于设置水印坐标。参见 {@link WatermarkRatio}。默认值：默认的 `WatermarkRatio` 对象。
@@ -1259,7 +1277,7 @@ Token 已过期时触发。
 - **`MediaRecorderStreamType`**: 定义要录制的内容（音频、视频、两者）。
 - **`VideoSourceType`**: 定义视频流的来源（摄像头、屏幕等）。
 - **`WatermarkSourceType`**: 定义水印源的类型（字面量、时间戳、图片）。
-- **`WaterMaskFitMode`**: 定义水印如何适应视频尺寸。
+- **`WatermarkFitMode`**: 定义水印如何适应视频尺寸。
 - **`ConnectionChangedReasonType`**: 定义连接状态更改的原因。
 - **`UserOfflineReasonType`**: 定义远程用户离线的原因。
 - **`RemoteVideoState`**: 定义远程视频流的状态。

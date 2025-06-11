@@ -88,9 +88,21 @@ public class VideoLayoutManager {
                 }
             }
 
+            if (recorderConfig.getBackgroundImage() != null && !recorderConfig.getBackgroundImage().isEmpty()) {
+                for (int i = 0; i < useLayout.length; i++) {
+                    useLayout[i].getConfig().setImagePath(recorderConfig.getBackgroundImage());
+                }
+            }
+
             layout.setUserLayoutConfigs(useLayout);
             int ret = recorder.setVideoMixingLayout(layout);
             SampleLogger.info("updateVideoMixLayout layout:" + layout + " ret: " + ret);
+        } else {
+            UserMixerLayout[] useLayout = new UserMixerLayout[0];
+            VideoMixingLayout layout = new VideoMixingLayout();
+            layout.setUserLayoutConfigs(useLayout);
+            int ret = recorder.setVideoMixingLayout(layout);
+            SampleLogger.info("updateVideoMixLayout layout is empty:" + layout + " ret: " + ret);
         }
     }
 

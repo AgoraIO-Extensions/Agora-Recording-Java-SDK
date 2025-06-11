@@ -39,7 +39,7 @@
 
 ## Introduction
 
-The Agora Recording Java SDK (v4.4.150.3) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
+The Agora Recording Java SDK (v4.4.150.4) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
 
 ## Development Environment Requirements
 
@@ -76,7 +76,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.3</version>
+    <version>4.4.150.4</version>
 </dependency>
 ```
 
@@ -94,7 +94,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 
 #### x86_64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.3-x86_64-702308-83b3dc2cc1-20250520_141254](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.3-x86_64-702308-83b3dc2cc1-20250520_141254.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.4-x86_64-738709-c4b18ea837-20250611_162648](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.4-x86_64-738709-c4b18ea837-20250611_162648.zip)
 
 #### arm64 Platform
 
@@ -117,7 +117,7 @@ Add the following dependency to your project's `pom.xml` file:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.3</version>
+    <version>4.4.150.4</version>
 </dependency>
 
 <!-- arm64 Platform -->
@@ -159,7 +159,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.3 \
+  -Dversion=4.4.150.4 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -171,7 +171,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.3 \
+  -Dversion=4.4.150.4 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -183,7 +183,7 @@ After installation, add the dependency in `pom.xml`:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.3</version>
+    <version>4.4.150.4</version>
 </dependency>
 ```
 
@@ -232,7 +232,7 @@ The `.so` files are contained within the `agora-recording-sdk.jar` or `linux-rec
     jar xvf agora-recording-sdk.jar
 
     # If using Maven integration, the JAR file is in the Maven cache, e.g.:
-    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.3/linux-recording-java-sdk-4.4.150.3.jar
+    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.4/linux-recording-java-sdk-4.4.150.4.jar
     ```
 
 3.  After extraction, a `native/linux/x86_64` subdirectory (or `aarch64` for ARM) will be generated in the `libs` directory, containing the required `.so` files:
@@ -873,6 +873,17 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
 For detailed descriptions of the SDK APIs, please refer to the [API-reference.md](API-reference.md) document, each class and method provides detailed parameter descriptions and return value explanations.
 
 ## Changelog
+
+### v4.4.150.4 (2025-06-11)
+
+#### API Changes
+
+- **Added**: Added `renewToken` method to `AgoraMediaRtcRecorder` class to support dynamic channel token renewal, preventing recording interruption due to token expiration
+- **Changed**: Renamed `Constants.WaterMaskFitMode` to `Constants.WatermarkFitMode` to fix spelling error and maintain naming consistency
+
+#### Improvements & Bug Fixes
+
+- **Fixed**: Fixed `imagePath` property setting issue in `MixerLayoutConfig` class to ensure proper background image path configuration
 
 ### v4.4.150.3 (2025-05-20)
 

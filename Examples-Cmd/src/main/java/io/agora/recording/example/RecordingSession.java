@@ -143,7 +143,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                 }
 
                 WatermarkOptions watermarkOptions = new WatermarkOptions();
-                watermarkOptions.setMode(Constants.WaterMaskFitMode.FIT_MODE_COVER_POSITION);
+                watermarkOptions.setMode(Constants.WatermarkFitMode.FIT_MODE_COVER_POSITION);
                 watermarkOptions.setZOrder(recorderConfig.getWaterMark().get(i).getZorder());
 
                 io.agora.recording.Rectangle positionInPortraitMode = new io.agora.recording.Rectangle();
@@ -489,10 +489,22 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
     @Override
     public void onTokenPrivilegeWillExpire(String channelId, String token) {
         SampleLogger.info("[" + taskId + "]onTokenPrivilegeWillExpire channelId:" + channelId + " token:" + token);
+        taskExecutorService.submit(() -> {
+            if (null != agoraMediaRtcRecorder) {
+                // just for test, renew token when token privilege will expire
+                agoraMediaRtcRecorder.renewToken(recorderConfig.getToken());
+            }
+        });
     }
 
     @Override
     public void onTokenPrivilegeDidExpire(String channelId) {
         SampleLogger.info("[" + taskId + "]onTokenPrivilegeDidExpire channelId:" + channelId);
+        taskExecutorService.submit(() -> {
+            if (null != agoraMediaRtcRecorder) {
+                // just for test, renew token when token privilege did expire
+                agoraMediaRtcRecorder.renewToken(recorderConfig.getToken());
+            }
+        });
     }
 }

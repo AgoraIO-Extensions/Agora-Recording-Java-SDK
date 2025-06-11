@@ -497,6 +497,20 @@ Sets the interval for the `onAudioVolumeIndication` callback.
 - `0`: Method call successful.
 - `< 0`: Method call failed.
 
+##### `int renewToken(String token)`
+
+Renews the token for the current session.
+The token expires after a certain period of time. When the `IAgoraMediaRtcRecorderEventHandler#onError(String, Constants.ErrorCodeType, String)` callback reports `Constants.ErrorCodeType#ERR_TOKEN_EXPIRED (109)`, or when `IAgoraMediaRtcRecorderEventHandler#onTokenPrivilegeWillExpire(String, String)` or `IAgoraMediaRtcRecorderEventHandler#onTokenPrivilegeDidExpire(String)` is triggered, you must generate a new token on your server and call this method to renew it. Otherwise, the SDK will disconnect from the Agora channel.
+
+**Parameters**:
+
+- `token`: The new token generated from your server.
+
+**Return Value**:
+
+- `0`: Method call successful.
+- `< 0`: Method call failed (e.g., if the token is null or empty).
+
 ##### `int release()`
 
 Releases the recorder instance and associated resources.
@@ -935,8 +949,13 @@ Reports the error code and error message.
 
 Occurs when the token privilege is about to expire in 30 seconds.
 
-The SDK triggers this callback to remind the app to get a new token before the token privilege expires.
-Upon receiving this callback, you must generate a new token on your server.
+<p>
+The SDK triggers this callback to remind the app to get a new token before
+the token privilege expires.
+<p>
+Upon receiving this callback, you must generate a new token on your server
+and call
+{@link AgoraMediaRtcRecorder#renewToken(String)} to renew it.
 
 **Parameters**:
 
@@ -947,7 +966,10 @@ Upon receiving this callback, you must generate a new token on your server.
 
 Occurs when the token has expired.
 
-Upon receiving this callback, you must generate a new token on your server.
+<p>
+Upon receiving this callback, you must generate a new token on your server
+and call
+{@link AgoraMediaRtcRecorder#renewToken(String)} to renew it.
 
 **Parameters**:
 
@@ -1075,7 +1097,7 @@ The `WatermarkOptions` class is used to configure watermark display options.
 #### Main Properties
 
 - **visibleInPreview**: Whether the watermark image is visible in the local video preview. Default: `true`.
-- **mode**: Watermark adaptation mode. Default: `FIT_MODE_COVER_POSITION`. See {@link Constants.WaterMaskFitMode}.
+- **mode**: Watermark adaptation mode. Default: `FIT_MODE_COVER_POSITION`. See {@link Constants.WatermarkFitMode}.
 - **positionInLandscapeMode**: Used to set the watermark area in landscape mode when `mode` is `FIT_MODE_COVER_POSITION`. See {@link Rectangle}. Default: (0, 0, 0, 0).
 - **positionInPortraitMode**: Used to set the watermark area in portrait mode when `mode` is `FIT_MODE_COVER_POSITION`. See {@link Rectangle}. Default: (0, 0, 0, 0).
 - **watermarkRatio**: Used to set watermark coordinates when `mode` is `FIT_MODE_USE_IMAGE_RATIO`. See {@link WatermarkRatio}. Default: Default `WatermarkRatio` object.
@@ -1259,7 +1281,7 @@ Below are some of the key enumerations defined in this class. Refer to the `Cons
 - **`MediaRecorderStreamType`**: Defines what content to record (Audio, Video, Both).
 - **`VideoSourceType`**: Defines the source of the video stream (Camera, Screen, etc.).
 - **`WatermarkSourceType`**: Defines the type of watermark source (Literal, Timestamp, Picture).
-- **`WaterMaskFitMode`**: Defines how watermarks adapt to video dimensions.
+- **`WatermarkFitMode`**: Defines how watermarks adapt to video dimensions.
 - **`ConnectionChangedReasonType`**: Defines reasons for connection state changes.
 - **`UserOfflineReasonType`**: Defines reasons why a remote user goes offline.
 - **`RemoteVideoState`**: Defines states of remote video streams.

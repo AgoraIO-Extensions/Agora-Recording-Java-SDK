@@ -76,7 +76,7 @@ http://10.200.0.85:18080/api/recording/start?configFileName=mix_stream_recorder_
 
 http://10.200.0.85:18080/api/recording/stop?taskId=20250508145257826-aa646c12eaea42e0946d2e6d52f88f51
 
-http://10.200.0.85:18080/api/recording/stop
+http://10.200.0.85:18080/api/recording/destroy
 ```
 
 将 `20250508145257826-aa646c12eaea42e0946d2e6d52f88f51` 替换为您想要停止的录制任务 ID。

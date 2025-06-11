@@ -21,14 +21,16 @@ public class AgoraServiceInitializer {
         if (agoraService == null) {
             agoraService = new AgoraService();
 
-            // LocalAccessPointConfiguration localAccessPointConfig = new LocalAccessPointConfiguration();
+            // LocalAccessPointConfiguration localAccessPointConfig = new
+            // LocalAccessPointConfiguration();
             // localAccessPointConfig.setMode(Constants.LocalProxyMode.LocalOnly);
             // localAccessPointConfig.setDomainList(new String[] { "" });
             // localAccessPointConfig.setIpList(new String[] { "10.xx.xx.xx" });
             // localAccessPointConfig.setDomainListSize(1);
             // localAccessPointConfig.setIpListSize(1);
             // localAccessPointConfig.setVerifyDomainName("ap.xxx.agora.local");
-            // int setGlobalLocalAccessPointRet = agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
+            // int setGlobalLocalAccessPointRet =
+            // agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
 
             AgoraServiceConfiguration config = new AgoraServiceConfiguration();
             config.setEnableAudioDevice(false);
@@ -37,7 +39,7 @@ public class AgoraServiceInitializer {
             config.setAppId(recorderConfig.getAppId());
             config.setUseStringUid(recorderConfig.isUseStringUid());
             LogConfig logConfig = new LogConfig();
-            logConfig.setFileSizeInKB(1024 * 1024 * 5);
+            logConfig.setFileSizeInKB(1024 * 20);
             logConfig.setFilePath("logs/agora_logs/agorasdk.log");
             config.setLogConfig(logConfig);
             int ret = agoraService.initialize(config);
@@ -45,17 +47,19 @@ public class AgoraServiceInitializer {
                 log.info("Failed to initialize AgoraService, error: " + ret);
                 return;
             }
-        }
 
-        AgoraParameter parameter = agoraService.getAgoraParameter();
-        if (recorderConfig.isUseCloudProxy()) {
-            if (parameter != null) {
-                parameter.setBool("rtc.enable_proxy", true);
-                log.info("set the Cloud_Proxy Open!");
+            AgoraParameter parameter = agoraService.getAgoraParameter();
+            if (recorderConfig.isUseCloudProxy()) {
+                if (parameter != null) {
+                    parameter.setBool("rtc.enable_proxy", true);
+                    log.info("set the Cloud_Proxy Open!");
+                }
             }
-        }
-        if (recorderConfig.isRecoverFile()) {
-            parameter.setBool("che.media_recorder_recover_files", true);
+            if (recorderConfig.isRecoverFile()) {
+                if (parameter != null) {
+                    parameter.setBool("che.media_recorder_recover_files", true);
+                }
+            }
         }
 
         if (factory == null) {
