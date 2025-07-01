@@ -1,6 +1,6 @@
 {
-    "appId": "xxx",
-    "token": "xxx",
+    "appId": "",
+    "token": "",
     "channelName": "rtest",
     "useStringUid": true,
     "useCloudProxy": false,

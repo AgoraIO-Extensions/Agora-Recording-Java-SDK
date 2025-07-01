@@ -289,7 +289,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         } catch (InterruptedException e) {
             SampleLogger.error("stopRecording Thread.sleep failed");
         }
-        agoraMediaRtcRecorder.unregisterRecorderEventHandle(this);
+        agoraMediaRtcRecorder.unregisterRecorderEventHandler(this);
 
         agoraMediaRtcRecorder.release();
         agoraMediaRtcRecorder = null;

@@ -39,7 +39,7 @@
 
 ## 简介
 
-Agora Recording Java SDK (v4.4.150.4) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
+Agora Recording Java SDK (v4.4.150.5) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
 
 ## 开发环境要求
 
@@ -76,7 +76,7 @@ Agora Recording Java SDK (v4.4.150.4) 为您提供了强大的实时音视频录
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.4</version>
+    <version>4.4.150.5</version>
 </dependency>
 ```
 
@@ -86,7 +86,7 @@ Agora Recording Java SDK (v4.4.150.4) 为您提供了强大的实时音视频录
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150-aarch64</version>
+    <version>4.4.150.5-aarch64</version>
 </dependency>
 ```
 
@@ -94,11 +94,11 @@ Agora Recording Java SDK (v4.4.150.4) 为您提供了强大的实时音视频录
 
 #### x86_64 平台
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.4-x86_64-738709-c4b18ea837-20250611_162648](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.4-x86_64-738709-c4b18ea837-20250611_162648.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.5-x86_64-762876-ee62852ef2-20250630_105128](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.5-x86_64-762876-ee62852ef2-20250630_105128.zip)
 
 #### arm64 平台
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934.jar)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.5-aarch64-762913-03b1b3da07-20250630_115505](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.5-aarch64-762913-03b1b3da07-20250630_115505.zip)
 
 ## 集成 SDK
 
@@ -117,7 +117,7 @@ Maven 集成是最简单的方式，可以自动管理 Java 依赖关系。
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.4</version>
+    <version>4.4.150.5</version>
 </dependency>
 
 <!-- arm64 平台 -->
@@ -159,7 +159,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.4 \
+  -Dversion=4.4.150.5 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -171,7 +171,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.4 \
+  -Dversion=4.4.150.5 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -183,7 +183,7 @@ mvn install:install-file \
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.4</version>
+    <version>4.4.150.5</version>
 </dependency>
 ```
 
@@ -218,38 +218,43 @@ Agora Linux Recording Java SDK 依赖于底层的 C++ 原生库（`.so` 文件�
 
 `.so` 文件包含在 `agora-recording-sdk.jar` 或 `linux-recording-java-sdk-x.x.x.x.jar` 文件内部。你需要先将它们提取出来：
 
-1.  在你的项目或部署目录下创建一个用于存放库文件的目录，例如 `libs`：
+1. 在你的项目或部署目录下创建一个用于存放库文件的目录，例如 `libs`：
 
-    ```sh
-    mkdir -p libs
-    cd libs
-    ```
+   ```sh
+   mkdir -p libs
+   cd libs
+   ```
 
-2.  使用 `jar` 命令从 SDK 的 JAR 文件中提取内容（假设 JAR 文件位于 `libs` 目录下或 Maven 缓存中）：
+2. 使用 `jar` 命令从 SDK 的 JAR 文件中提取内容（假设 JAR 文件位于 `libs` 目录下或 Maven 缓存中）：
 
-    ```sh
-    # 如果使用本地集成方式，JAR 文件通常在 libs 目录下
-    jar xvf agora-recording-sdk.jar
+   ```sh
+   # 如果使用本地集成方式，JAR 文件通常在 libs 目录下
+   jar xvf agora-recording-sdk.jar
 
-    # 如果使用 Maven 集成方式，JAR 文件在 Maven 缓存中，例如：
-    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.4/linux-recording-java-sdk-4.4.150.4.jar
-    ```
+   # 如果使用 Maven 集成方式，JAR 文件在 Maven 缓存中，例如：
+   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.5/linux-recording-java-sdk-4.4.150.5.jar
+   ```
 
-3.  提取后，`libs` 目录下会生成 `native/linux/x86_64` 子目录，其中包含所需的 `.so` 文件：
+3. 提取后，`libs` 目录下会生成 `native/linux/x86_64` 子目录，其中包含所需的 `.so` 文件：
 
-    ```
-    libs/
-    ├── agora-recording-sdk.jar (或者空的，如果仅用于提取)
-    ├── io/          # Java 的 class 类所在，无需关注
-    ├── META-INF/    # JAR 文件和应用程序相关的元数据，无需关注
-    └── native/      # 对应平台的 so 库文件
-        └── linux/
-            └── x86_64/   # x86_64 平台 so 库
-                ├── libagora_rtc_sdk.so
-                ├── libagora-fdkaac.so
-                ├── libaosl.so
-                └── librecording.so
-    ```
+   ```
+   libs/
+   ├── agora-recording-sdk.jar (或者空的，如果仅用于提取)
+   ├── io/          # Java 的 class 类所在，无需关注
+   ├── META-INF/    # JAR 文件和应用程序相关的元数据，无需关注
+   └── native/      # 对应平台的 so 库文件
+       └── linux/
+           └── x86_64/   # x86_64 平台 so 库
+               ├── libagora_rtc_sdk.so
+               ├── libagora-fdkaac.so
+               ├── libaosl.so
+               └── librecording.so
+           └── aarch64/   # arm64 平台 so 库 (如果存在)
+               ├── libagora_rtc_sdk.so
+               ├── libagora-fdkaac.so
+               ├── libaosl.so
+               └── librecording.so
+   ```
 
 #### 3.2 配置加载路径
 
@@ -660,7 +665,7 @@ if (启用混流) {
 }
 
 // 注销事件处理器
-agoraMediaRtcRecorder.unregisterRecorderEventHandle(handler);
+agoraMediaRtcRecorder.unregisterRecorderEventHandler(handler);
 
 // 离开频道并释放资源
 agoraMediaRtcRecorder.leaveChannel();
@@ -723,10 +728,13 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
 #### 5. 通过 API 启动/停止录制
 
 - 启动录制：
+
   ```
   http://<服务器IP>:18080/api/recording/start?configFileName=mix_stream_recorder_audio_video_water_marks.json
   ```
+
 - 停止录制：
+
   ```
   http://<服务器IP>:18080/api/recording/stop?taskId=<任务ID>
   ```
@@ -745,6 +753,17 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
 有关 SDK API 的详细说明，请参考 [API-reference.zh.md](API-reference.zh.md) 文档，每个类和方法都提供了详细的参数说明、返回值解释。
 
 ## 更新日志
+
+### v4.4.150.5（2025-06-30）
+
+#### API 变更
+
+- **修改**：`AgoraMediaRtcRecorder` 类中 `unregisterRecorderEventHandle` 方法名修正为 `unregisterRecorderEventHandler`，统一方法命名规范
+
+#### 改进与优化
+
+- **修复**：修复设置画面布局接口的线程安全问题，提升多线程环境下的稳定性
+- **优化**：调整单个日志文件最大大小限制至 1GB，改善日志管理和磁盘空间利用
 
 ### v4.4.150.4（2025-06-11）
 

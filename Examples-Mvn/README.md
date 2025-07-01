@@ -61,6 +61,10 @@ token=XXX
 
 ```
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=18080 -jar target/agora-example.jar
+
+mvn clean package && sudo lsof -ti :18080 | xargs -r sudo kill -9 && LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=18080 -jar target/agora-example.jar
+
+mvn clean package && sudo lsof -ti :18080 | xargs -r sudo kill -9 && LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/aarch64" java -Dserver.port=18080 -jar target/agora-example.jar
 ```
 
 此命令执行以下操作：

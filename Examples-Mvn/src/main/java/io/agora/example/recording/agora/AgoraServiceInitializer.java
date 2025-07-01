@@ -5,6 +5,7 @@ import io.agora.recording.AgoraParameter;
 import io.agora.recording.AgoraService;
 import io.agora.recording.AgoraServiceConfiguration;
 import io.agora.recording.LogConfig;
+import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -13,12 +14,13 @@ public class AgoraServiceInitializer {
     private static AgoraMediaComponentFactory factory;
 
     public static void initService(RecorderConfig recorderConfig) {
-        log.info("AgoraService initService SDK Version: " + AgoraService.getSdkVersion());
         if (recorderConfig == null) {
             log.info("recorderConfig is null");
             return;
         }
+
         if (agoraService == null) {
+            log.info("AgoraService initService SDK Version: " + AgoraService.getSdkVersion());
             agoraService = new AgoraService();
 
             // LocalAccessPointConfiguration localAccessPointConfig = new
@@ -60,6 +62,8 @@ public class AgoraServiceInitializer {
                     parameter.setBool("che.media_recorder_recover_files", true);
                 }
             }
+            initData();
+            log.info("AgoraService initialized");
         }
 
         if (factory == null) {
@@ -69,8 +73,13 @@ public class AgoraServiceInitializer {
                 return;
             }
         }
+    }
 
-        log.info("AgoraService initialized");
+    private static void initData() {
+        File testDataOutFile = new File("recorder_result/");
+        if (!testDataOutFile.exists()) {
+            testDataOutFile.mkdirs();
+        }
     }
 
     public static void destroy() {

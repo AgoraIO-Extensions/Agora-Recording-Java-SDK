@@ -420,7 +420,7 @@
 - `0`: 注册成功。
 - `< 0`: 注册失败。
 
-##### `int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handler)`
+##### `int unregisterRecorderEventHandler(IAgoraMediaRtcRecorderEventHandler handler)`
 
 取消注册事件处理程序。
 

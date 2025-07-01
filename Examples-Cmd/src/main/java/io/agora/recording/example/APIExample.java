@@ -109,7 +109,7 @@ public class APIExample implements IAgoraMediaRtcRecorderEventHandler {
             agoraMediaRtcRecorder.stopSingleRecordingByUid("userId");
         }
 
-        agoraMediaRtcRecorder.unregisterRecorderEventHandle(handler);
+        agoraMediaRtcRecorder.unregisterRecorderEventHandler(handler);
 
         agoraMediaRtcRecorder.leaveChannel();
         agoraMediaRtcRecorder.release();

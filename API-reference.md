@@ -420,7 +420,7 @@ Registers an event handler for recording events.
 - `0`: Registration successful.
 - `< 0`: Registration failed.
 
-##### `int unregisterRecorderEventHandle(IAgoraMediaRtcRecorderEventHandler handler)`
+##### `int unregisterRecorderEventHandler(IAgoraMediaRtcRecorderEventHandler handler)`
 
 Unregisters the event handler.
 

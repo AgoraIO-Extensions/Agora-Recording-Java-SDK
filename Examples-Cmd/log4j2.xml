@@ -20,29 +20,19 @@
             filePattern="logs/${sys:log.filename}-%d{yyyyMMdd_HHmmss}-%i.log.gz">
             <PatternLayout pattern="%d{HH:mm:ss.SSS}[%t]%-5level:%msg%n" />
             <Policies>
-                <SizeBasedTriggeringPolicy size="100 MB" />
-                <DeleteAction basePath="logs" maxDepth="1">
-                    <IfFileName glob="*.gz">
-                        <IfLastModified age="5d">
-                            <Delete />
-                        </IfLastModified>
-                    </IfFileName>
-                </DeleteAction>
-                <DeleteAction basePath="logs" maxDepth="1">
-                    <IfFileName glob="*.gz">
-                        <IfAccumulatedFileCount exceeds="100">
-                            <Delete basePath="logs" maxDepth="1">
-                                <IfFileName glob="*.gz">
-                                    <IfLastModified age="1d">
-                                        <Delete />
-                                    </IfLastModified>
-                                </IfFileName>
-                            </Delete>
-                        </IfAccumulatedFileCount>
-                    </IfFileName>
-                </DeleteAction>
+                <SizeBasedTriggeringPolicy size="1024 MB" />
             </Policies>
-            <DefaultRolloverStrategy max="10" />
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="logs" maxDepth="1">
+                    <IfFileName glob="*.gz" />
+                    <IfLastModified age="5d" />
+                </Delete>
+                <Delete basePath="logs" maxDepth="1">
+                    <IfFileName glob="*.gz" />
+                    <IfAccumulatedFileCount exceeds="100" />
+                    <IfLastModified age="1d" />
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
 
         <!-- 异步文件输出 -->

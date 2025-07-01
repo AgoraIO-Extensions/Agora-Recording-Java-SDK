@@ -4,42 +4,42 @@
 
 ## Table of Contents
 
-1.  [Introduction](#introduction)
-2.  [Development Environment Requirements](#development-environment-requirements)
-    - [Hardware Environment](#hardware-environment)
-    - [Network Requirements](#network-requirements)
-    - [Bandwidth Requirements](#bandwidth-requirements)
-    - [Software Environment](#software-environment)
-3.  [SDK Download](#sdk-download)
-4.  [Integrating the SDK](#integrating-the-sdk)
-    - [1. Maven Integration](#1-maven-integration)
-    - [2. Local SDK Integration](#2-local-sdk-integration)
-    - [3. Loading Native Libraries (.so files)](#3-loading-native-libraries-so-files)
-      - [3.1 Extracting .so Files](#31-extracting-so-files)
-      - [3.2 Configuring Load Paths](#32-configuring-load-paths)
-5.  [Quick Start](#quick-start)
-    - [Enable Service](#enable-service)
-    - [Recording via Command Line](#recording-via-command-line)
-      - [Prerequisites](#prerequisites)
-      - [Compile Example Project](#compile-example-project)
-      - [Configure Recording Parameters](#configure-recording-parameters)
-      - [Start Recording](#start-recording)
-      - [Stop Recording](#stop-recording)
-    - [Recording via API Call](#recording-via-api-call)
-      - [Prerequisites](#prerequisites-1)
-      - [Implementing Recording via API Call](#implementing-recording-via-api-call)
-        - [Initialize Service](#initialize-service)
-        - [Join Channel](#join-channel)
-        - [Configure and Start Recording](#configure-and-start-recording)
-        - [Stop Recording](#stop-recording-1)
-    - [Run the Maven Example Project](#run-the-maven-example-project)
-6.  [API Reference](#api-reference)
-7.  [Changelog](#changelog)
-8.  [Other References](#other-references)
+1. [Introduction](#introduction)
+2. [Development Environment Requirements](#development-environment-requirements)
+   - [Hardware Environment](#hardware-environment)
+   - [Network Requirements](#network-requirements)
+   - [Bandwidth Requirements](#bandwidth-requirements)
+   - [Software Environment](#software-environment)
+3. [SDK Download](#sdk-download)
+4. [Integrating the SDK](#integrating-the-sdk)
+   - [1. Maven Integration](#1-maven-integration)
+   - [2. Local SDK Integration](#2-local-sdk-integration)
+   - [3. Loading Native Libraries (.so files)](#3-loading-native-libraries-so-files)
+     - [3.1 Extracting .so Files](#31-extracting-so-files)
+     - [3.2 Configuring Load Paths](#32-configuring-load-paths)
+5. [Quick Start](#quick-start)
+   - [Enable Service](#enable-service)
+   - [Recording via Command Line](#recording-via-command-line)
+     - [Prerequisites](#prerequisites)
+     - [Compile Example Project](#compile-example-project)
+     - [Configure Recording Parameters](#configure-recording-parameters)
+     - [Start Recording](#start-recording)
+     - [Stop Recording](#stop-recording)
+   - [Recording via API Call](#recording-via-api-call)
+     - [Prerequisites](#prerequisites-1)
+     - [Implementing Recording via API Call](#implementing-recording-via-api-call)
+       - [Initialize Service](#initialize-service)
+       - [Join Channel](#join-channel)
+       - [Configure and Start Recording](#configure-and-start-recording)
+       - [Stop Recording](#stop-recording-1)
+   - [Run the Maven Example Project](#run-the-maven-example-project)
+6. [API Reference](#api-reference)
+7. [Changelog](#changelog)
+8. [Other References](#other-references)
 
 ## Introduction
 
-The Agora Recording Java SDK (v4.4.150.4) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
+The Agora Recording Java SDK (v4.4.150.5) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
 
 ## Development Environment Requirements
 
@@ -76,7 +76,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.4</version>
+    <version>4.4.150.5</version>
 </dependency>
 ```
 
@@ -86,7 +86,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150-aarch64</version>
+    <version>4.4.150.5-aarch64</version>
 </dependency>
 ```
 
@@ -94,11 +94,11 @@ The required bandwidth depends on the number of channels to be recorded simultan
 
 #### x86_64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.4-x86_64-738709-c4b18ea837-20250611_162648](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.4-x86_64-738709-c4b18ea837-20250611_162648.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.5-x86_64-762876-ee62852ef2-20250630_105128](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.5-x86_64-762876-ee62852ef2-20250630_105128.zip)
 
 #### arm64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150-aarch64-565361-c502888569-20250213_112934.jar)
+[Agora-Linux-Recording-Java-SDK-v4.4.150.5-aarch64-762913-03b1b3da07-20250630_115505](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.5-aarch64-762913-03b1b3da07-20250630_115505.zip)
 
 ## Integrating the SDK
 
@@ -117,14 +117,14 @@ Add the following dependency to your project's `pom.xml` file:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.4</version>
+    <version>4.4.150.5</version>
 </dependency>
 
 <!-- arm64 Platform -->
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150-aarch64</version>
+    <version>4.4.150.5-aarch64</version>
 </dependency>
 ```
 
@@ -159,7 +159,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.4 \
+  -Dversion=4.4.150.5 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -171,7 +171,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.4 \
+  -Dversion=4.4.150.5 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -183,28 +183,28 @@ After installation, add the dependency in `pom.xml`:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.4</version>
+    <version>4.4.150.5</version>
 </dependency>
 ```
 
 ###### Direct Reference Method
 
-1.  Copy the JAR files to your project's `libs` directory:
+1. Copy the JAR files to your project's `libs` directory:
 
-    ```sh
-    mkdir -p libs
-    cp sdk/agora-recording-sdk.jar libs/
-    cp sdk/agora-recording-sdk-javadoc.jar libs/  # Optional, for IDE support
-    ```
+   ```sh
+   mkdir -p libs
+   cp sdk/agora-recording-sdk.jar libs/
+   cp sdk/agora-recording-sdk-javadoc.jar libs/  # Optional, for IDE support
+   ```
 
-2.  Add the classpath reference in your Java project:
+2. Add the classpath reference in your Java project:
 
-    ```sh
-    # Use the SDK JAR
-    java -cp .:libs/agora-recording-sdk.jar YourMainClass
+   ```sh
+   # Use the SDK JAR
+   java -cp .:libs/agora-recording-sdk.jar YourMainClass
 
-    # Configure JavaDoc in your IDE (common IDEs like IntelliJ IDEA or Eclipse support direct association of JavaDoc JARs)
-    ```
+   # Configure JavaDoc in your IDE (common IDEs like IntelliJ IDEA or Eclipse support direct association of JavaDoc JARs)
+   ```
 
 #### 2.3 Integrate .so Library Files
 
@@ -218,39 +218,43 @@ The Agora Linux Recording Java SDK depends on underlying C++ native libraries (`
 
 The `.so` files are contained within the `agora-recording-sdk.jar` or `linux-recording-java-sdk-x.x.x.x.jar` file. You need to extract them first:
 
-1.  Create a directory in your project or deployment location to store the library files, for example, `libs`:
+1. Create a directory in your project or deployment location to store the library files, for example, `libs`:
 
-    ```sh
-    mkdir -p libs
-    cd libs
-    ```
+   ```sh
+   mkdir -p libs
+   cd libs
+   ```
 
-2.  Use the `jar` command to extract the contents from the SDK's JAR file (assuming the JAR file is in the `libs` directory or Maven cache):
+2. Use the `jar` command to extract the contents from the SDK's JAR file (assuming the JAR file is in the `libs` directory or Maven cache):
 
-    ```sh
-    # If using local integration, the JAR file is usually in the libs directory
-    jar xvf agora-recording-sdk.jar
+   ```sh
+   # If using local integration, the JAR file is usually in the libs directory
+   jar xvf agora-recording-sdk.jar
 
-    # If using Maven integration, the JAR file is in the Maven cache, e.g.:
-    # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.4/linux-recording-java-sdk-4.4.150.4.jar
-    ```
+   # If using Maven integration, the JAR file is in the Maven cache, e.g.:
+   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.5/linux-recording-java-sdk-4.4.150.5.jar
+   ```
 
-3.  After extraction, a `native/linux/x86_64` subdirectory (or `aarch64` for ARM) will be generated in the `libs` directory, containing the required `.so` files:
+3. After extraction, a `native/linux/x86_64` subdirectory (or `aarch64` for ARM) will be generated in the `libs` directory, containing the required `.so` files:
 
-    ```
-    libs/
-    ├── agora-recording-sdk.jar (or empty, if only used for extraction)
-    ├── io/          # Java class files location, no need to worry about
-    ├── META-INF/    # JAR file and application-related metadata, no need to worry about
-    └── native/      # Native library files for the corresponding platform
-        └── linux/
-            └── x86_64/   # x86_64 platform .so libraries
-                ├── libagora_rtc_sdk.so
-                ├── libagora-fdkaac.so
-                ├── libaosl.so
-                └── librecording.so
-            └── aarch64/  # arm64 platform .so libraries (if available)
-    ```
+   ```
+   libs/
+   ├── agora-recording-sdk.jar (or empty, if only used for extraction)
+   ├── io/          # Java class files location, no need to worry about
+   ├── META-INF/    # JAR file and application-related metadata, no need to worry about
+   └── native/      # Native library files for the corresponding platform
+       └── linux/
+           └── x86_64/   # x86_64 platform .so libraries
+               ├── libagora_rtc_sdk.so
+               ├── libagora-fdkaac.so
+               ├── libaosl.so
+               └── librecording.so
+           └── aarch64/  # arm64 platform .so libraries (if available)
+               ├── libagora_rtc_sdk.so
+               ├── libagora-fdkaac.so
+               ├── libaosl.so
+               └── librecording.so
+   ```
 
 #### 3.2 Configuring Load Paths
 
@@ -353,87 +357,87 @@ cd Examples-Cmd
 
 Recording parameters are configured using JSON format, located in the `Examples-Cmd/config` directory.
 
-1.  View the configuration example:
+1. View the configuration example:
 
-    ```sh
-    cat config/recorder_json.example
-    ```
+   ```sh
+   cat config/recorder_json.example
+   ```
 
-2.  Create or modify your own configuration file, e.g., `config/my_recorder.json`, ensuring the JSON format is correct.
+2. Create or modify your own configuration file, e.g., `config/my_recorder.json`, ensuring the JSON format is correct.
 
-3.  Full Parameter Description:
+3. Full Parameter Description:
 
-    | Parameter                | Type     | Description                                                                                                                                             |
-    | ------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | appId                    | String   | The App ID of the project, must be consistent with the App ID in the RTC SDK.                                                                           |
-    | token                    | String   | The channel Token. Required if the channel has security mode enabled.                                                                                   |
-    | channelName              | String   | The channel name, must be consistent with the channel name in the RTC SDK.                                                                              |
-    | useStringUid             | Boolean  | Whether to use string user IDs.                                                                                                                         |
-    | useCloudProxy            | Boolean  | Whether to use the cloud proxy service.                                                                                                                 |
-    | userId                   | String   | The user ID for the recorder client.                                                                                                                    |
-    | subAllAudio              | Boolean  | Whether to subscribe to all audio streams. If false, specify user IDs in `subAudioUserList`.                                                            |
-    | subAudioUserList         | String[] | List of user IDs to subscribe to audio from, effective only when `subAllAudio` is false.                                                                |
-    | subAllVideo              | Boolean  | Whether to subscribe to all video streams. If false, specify user IDs in `subVideoUserList`.                                                            |
-    | subVideoUserList         | String[] | List of user IDs to subscribe to video from, effective only when `subAllVideo` is false.                                                                |
-    | subStreamType            | String   | The type of stream to subscribe to, supports `high` (high-resolution) and `low` (low-resolution).                                                       |
-    | isMix                    | Boolean  | Whether to perform mixed-stream recording.                                                                                                              |
-    | backgroundColor          | Long     | Background color for mixed-stream recording. Use RGB format (0xRRGGBB), converted to a long value. E.g., Red=0xFF0000, Green=0x00FF00, Blue=0x0000FF.   |
-    | backgroundImage          | String   | Path to the background image for mixed-stream recording, supports PNG and JPG. Takes precedence over `backgroundColor` if both are set.                 |
-    | layoutMode               | String   | Layout mode for mixed-stream recording, supports `default`, `bestfit`, `vertical`.                                                                      |
-    | maxResolutionUid         | String   | In `vertical` layout, sets the user ID whose video is displayed at the maximum resolution.                                                              |
-    | recorderStreamType       | String   | Recording type, supports `audio_only`, `video_only`, `both`.                                                                                            |
-    | recorderPath             | String   | Recording file path. For mixed-stream, it's the filename; for single-stream, it's the directory where MP4 files named after each user ID will be saved. |
-    | maxDuration              | Integer  | Recording duration in seconds.                                                                                                                          |
-    | recoverFile              | Boolean  | Whether to write separate h264 and aac files during recording, allowing MP4 recovery if the program crashes.                                            |
-    | audio                    | Object   | Audio settings.                                                                                                                                         |
-    | audio.sampleRate         | Integer  | Audio sample rate (Hz).                                                                                                                                 |
-    | audio.numOfChannels      | Integer  | Number of audio channels.                                                                                                                               |
-    | video                    | Object   | Video settings.                                                                                                                                         |
-    | video.width              | Integer  | Video width (pixels).                                                                                                                                   |
-    | video.height             | Integer  | Video height (pixels).                                                                                                                                  |
-    | video.fps                | Integer  | Video frame rate (fps).                                                                                                                                 |
-    | waterMark                | Object[] | Watermark settings.                                                                                                                                     |
-    | waterMark[].type         | String   | Watermark type, supports `litera` (text), `time` (timestamp), `picture`.                                                                                |
-    | waterMark[].litera       | String   | Text content, effective only when type is `litera`.                                                                                                     |
-    | waterMark[].fontFilePath | String   | Font file path.                                                                                                                                         |
-    | waterMark[].fontSize     | Integer  | Font size.                                                                                                                                              |
-    | waterMark[].x            | Integer  | Watermark X coordinate.                                                                                                                                 |
-    | waterMark[].y            | Integer  | Watermark Y coordinate.                                                                                                                                 |
-    | waterMark[].width        | Integer  | Watermark width.                                                                                                                                        |
-    | waterMark[].height       | Integer  | Watermark height.                                                                                                                                       |
-    | waterMark[].zorder       | Integer  | Watermark layer order (z-index).                                                                                                                        |
-    | waterMark[].imgUrl       | String   | Image watermark URL, effective only when type is `picture`.                                                                                             |
-    | encryption               | Object   | Media stream encryption settings.                                                                                                                       |
-    | encryption.mode          | String   | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.     |
-    | encryption.key           | String   | Encryption key.                                                                                                                                         |
-    | encryption.salt          | String   | Encryption salt, a 32-byte value (often represented as a string).                                                                                       |
-    | rotation                 | Object[] | Video rotation settings.                                                                                                                                |
-    | rotation[].uid           | String   | User ID whose video needs rotation.                                                                                                                     |
-    | rotation[].degree        | Integer  | Rotation angle, supports 0, 90, 180, 270.                                                                                                               |
+   | Parameter                | Type     | Description                                                                                                                                             |
+   | ------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | appId                    | String   | The App ID of the project, must be consistent with the App ID in the RTC SDK.                                                                           |
+   | token                    | String   | The channel Token. Required if the channel has security mode enabled.                                                                                   |
+   | channelName              | String   | The channel name, must be consistent with the channel name in the RTC SDK.                                                                              |
+   | useStringUid             | Boolean  | Whether to use string user IDs.                                                                                                                         |
+   | useCloudProxy            | Boolean  | Whether to use the cloud proxy service.                                                                                                                 |
+   | userId                   | String   | The user ID for the recorder client.                                                                                                                    |
+   | subAllAudio              | Boolean  | Whether to subscribe to all audio streams. If false, specify user IDs in `subAudioUserList`.                                                            |
+   | subAudioUserList         | String[] | List of user IDs to subscribe to audio from, effective only when `subAllAudio` is false.                                                                |
+   | subAllVideo              | Boolean  | Whether to subscribe to all video streams. If false, specify user IDs in `subVideoUserList`.                                                            |
+   | subVideoUserList         | String[] | List of user IDs to subscribe to video from, effective only when `subAllVideo` is false.                                                                |
+   | subStreamType            | String   | The type of stream to subscribe to, supports `high` (high-resolution) and `low` (low-resolution).                                                       |
+   | isMix                    | Boolean  | Whether to perform mixed-stream recording.                                                                                                              |
+   | backgroundColor          | Long     | Background color for mixed-stream recording. Use RGB format (0xRRGGBB), converted to a long value. E.g., Red=0xFF0000, Green=0x00FF00, Blue=0x0000FF.   |
+   | backgroundImage          | String   | Path to the background image for mixed-stream recording, supports PNG and JPG. Takes precedence over `backgroundColor` if both are set.                 |
+   | layoutMode               | String   | Layout mode for mixed-stream recording, supports `default`, `bestfit`, `vertical`.                                                                      |
+   | maxResolutionUid         | String   | In `vertical` layout, sets the user ID whose video is displayed at the maximum resolution.                                                              |
+   | recorderStreamType       | String   | Recording type, supports `audio_only`, `video_only`, `both`.                                                                                            |
+   | recorderPath             | String   | Recording file path. For mixed-stream, it's the filename; for single-stream, it's the directory where MP4 files named after each user ID will be saved. |
+   | maxDuration              | Integer  | Recording duration in seconds.                                                                                                                          |
+   | recoverFile              | Boolean  | Whether to write separate h264 and aac files during recording, allowing MP4 recovery if the program crashes.                                            |
+   | audio                    | Object   | Audio settings.                                                                                                                                         |
+   | audio.sampleRate         | Integer  | Audio sample rate (Hz).                                                                                                                                 |
+   | audio.numOfChannels      | Integer  | Number of audio channels.                                                                                                                               |
+   | video                    | Object   | Video settings.                                                                                                                                         |
+   | video.width              | Integer  | Video width (pixels).                                                                                                                                   |
+   | video.height             | Integer  | Video height (pixels).                                                                                                                                  |
+   | video.fps                | Integer  | Video frame rate (fps).                                                                                                                                 |
+   | waterMark                | Object[] | Watermark settings.                                                                                                                                     |
+   | waterMark[].type         | String   | Watermark type, supports `litera` (text), `time` (timestamp), `picture`.                                                                                |
+   | waterMark[].litera       | String   | Text content, effective only when type is `litera`.                                                                                                     |
+   | waterMark[].fontFilePath | String   | Font file path.                                                                                                                                         |
+   | waterMark[].fontSize     | Integer  | Font size.                                                                                                                                              |
+   | waterMark[].x            | Integer  | Watermark X coordinate.                                                                                                                                 |
+   | waterMark[].y            | Integer  | Watermark Y coordinate.                                                                                                                                 |
+   | waterMark[].width        | Integer  | Watermark width.                                                                                                                                        |
+   | waterMark[].height       | Integer  | Watermark height.                                                                                                                                       |
+   | waterMark[].zorder       | Integer  | Watermark layer order (z-index).                                                                                                                        |
+   | waterMark[].imgUrl       | String   | Image watermark URL, effective only when type is `picture`.                                                                                             |
+   | encryption               | Object   | Media stream encryption settings.                                                                                                                       |
+   | encryption.mode          | String   | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.     |
+   | encryption.key           | String   | Encryption key.                                                                                                                                         |
+   | encryption.salt          | String   | Encryption salt, a 32-byte value (often represented as a string).                                                                                       |
+   | rotation                 | Object[] | Video rotation settings.                                                                                                                                |
+   | rotation[].uid           | String   | User ID whose video needs rotation.                                                                                                                     |
+   | rotation[].degree        | Integer  | Rotation angle, supports 0, 90, 180, 270.                                                                                                               |
 
-    > **Important Notes**:
-    >
-    > - Before executing recording, ensure `appId` and `token` (if applicable) are correctly filled in the JSON.
-    > - `appId` and `channelName` must exactly match those used by the RTC SDK clients.
-    > - In single-stream recording mode, `recorderPath` specifies a directory path. You must manually ensure this directory exists before starting the recording (e.g., if `"recorderPath": "recorder_result/"`, ensure `Examples-Cmd/recorder_result/` exists).
-    > - Ensure the JSON format is correct; do not miss commas, quotes, etc.
+   > **Important Notes**:
+   >
+   > - Before executing recording, ensure `appId` and `token` (if applicable) are correctly filled in the JSON.
+   > - `appId` and `channelName` must exactly match those used by the RTC SDK clients.
+   > - In single-stream recording mode, `recorderPath` specifies a directory path. You must manually ensure this directory exists before starting the recording (e.g., if `"recorderPath": "recorder_result/"`, ensure `Examples-Cmd/recorder_result/` exists).
+   > - Ensure the JSON format is correct; do not miss commas, quotes, etc.
 
 #### Start Recording
 
-1.  Create the output directory for single-stream recording (if using):
+1. Create the output directory for single-stream recording (if using):
 
-    ```sh
-    mkdir -p Examples-Cmd/recorder_result
-    ```
+   ```sh
+   mkdir -p Examples-Cmd/recorder_result
+   ```
 
-2.  Choose and run the corresponding test script:
+2. Choose and run the corresponding test script:
 
-    ```sh
-    cd Examples-Cmd
-    ./script/TestCaseName.sh
-    ```
+   ```sh
+   cd Examples-Cmd
+   ./script/TestCaseName.sh
+   ```
 
-    You can modify the scripts or their corresponding JSON configuration files to customize the recording behavior.
+   You can modify the scripts or their corresponding JSON configuration files to customize the recording behavior.
 
 #### Common Test Scripts
 
@@ -791,7 +795,7 @@ if (enableMix) {
 }
 
 // Unregister the event handler
-agoraMediaRtcRecorder.unregisterRecorderEventHandle(handler);
+agoraMediaRtcRecorder.unregisterRecorderEventHandler(handler);
 
 // Leave the channel and release recorder resources
 agoraMediaRtcRecorder.leaveChannel();
@@ -853,10 +857,13 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
 #### 5. Start/Stop Recording via API
 
 - Start recording:
+
   ```
   http://<server_ip>:18080/api/recording/start?configFileName=mix_stream_recorder_audio_video_water_marks.json
   ```
+
 - Stop recording:
+
   ```
   http://<server_ip>:18080/api/recording/stop?taskId=<task_id>
   ```
@@ -873,6 +880,17 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
 For detailed descriptions of the SDK APIs, please refer to the [API-reference.md](API-reference.md) document, each class and method provides detailed parameter descriptions and return value explanations.
 
 ## Changelog
+
+### v4.4.150.5 (2025-06-30)
+
+#### API Changes
+
+- **Changed**: `unregisterRecorderEventHandle` method in `AgoraMediaRtcRecorder` class renamed to `unregisterRecorderEventHandler` to unify method naming conventions
+
+#### Improvements & Bug Fixes
+
+- **Fixed**: Fixed the thread safety issue of the `setVideoMixingLayout` method in the `AgoraMediaRtcRecorder` class
+- **Changed**: The maximum size of a single log file is changed to 1GB
 
 ### v4.4.150.4 (2025-06-11)
 
