@@ -706,8 +706,8 @@ mvn clean package
 在 `Examples-Mvn` 目录下创建 `.keys` 文件，内容如下（请替换为你的实际信息）：
 
 ```
-appId=你的AppId
-token=你的Token
+APP_ID=你的AppId
+TOKEN=你的Token
 ```
 
 #### 3. 准备 so 库
