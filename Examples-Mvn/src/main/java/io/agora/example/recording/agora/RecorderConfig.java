@@ -15,6 +15,9 @@ public class RecorderConfig {
     private boolean subAllVideo;
     private List<String> subVideoUserList;
     private String subStreamType;
+    private boolean enableRecording;
+    private boolean enableCapture;
+    private int videoFrameCaptureType;
     private boolean isMix;
     private long backgroundColor;
     private String backgroundImage;
@@ -22,6 +25,7 @@ public class RecorderConfig {
     private String maxResolutionUid;
     private String recorderStreamType;
     private String recorderPath;
+    private String capturePath;
     private int maxDuration;
     private boolean recoverFile;
     private AudioConfig audio;
@@ -38,8 +42,12 @@ public class RecorderConfig {
         waterMark = new ArrayList<>();
         encryption = new Encryption();
         rotation = new ArrayList<>();
+        capturePath = "";
         maxDuration = 120;
         recoverFile = false;
+        enableRecording = true;
+        enableCapture = false;
+        videoFrameCaptureType = 0;
     }
 
     public static class AudioConfig {
@@ -377,6 +385,30 @@ public class RecorderConfig {
         this.subStreamType = subStreamType;
     }
 
+    public boolean isEnableRecording() {
+        return enableRecording;
+    }
+
+    public void setEnableRecording(boolean enableRecording) {
+        this.enableRecording = enableRecording;
+    }
+
+    public boolean isEnableCapture() {
+        return enableCapture;
+    }
+
+    public void setEnableCapture(boolean enableCapture) {
+        this.enableCapture = enableCapture;
+    }
+
+    public int getVideoFrameCaptureType() {
+        return videoFrameCaptureType;
+    }
+
+    public void setVideoFrameCaptureType(int videoFrameCaptureType) {
+        this.videoFrameCaptureType = videoFrameCaptureType;
+    }
+
     public boolean isMix() {
         return isMix;
     }
@@ -431,6 +463,14 @@ public class RecorderConfig {
 
     public void setRecorderPath(String recorderPath) {
         this.recorderPath = recorderPath;
+    }
+
+    public String getCapturePath() {
+        return capturePath;
+    }
+
+    public void setCapturePath(String capturePath) {
+        this.capturePath = capturePath;
     }
 
     public int getMaxDuration() {
@@ -503,6 +543,9 @@ public class RecorderConfig {
                 ", subAllVideo=" + subAllVideo +
                 ", subVideoUserList=" + subVideoUserList +
                 ", subStreamType='" + subStreamType + '\'' +
+                ", enableRecording=" + enableRecording +
+                ", enableCapture=" + enableCapture +
+                ", videoFrameCaptureType=" + videoFrameCaptureType +
                 ", isMix=" + isMix +
                 ", backgroundColor=" + backgroundColor +
                 ", backgroundImage='" + backgroundImage + '\'' +
@@ -510,6 +553,7 @@ public class RecorderConfig {
                 ", maxResolutionUid='" + maxResolutionUid + '\'' +
                 ", recorderStreamType='" + recorderStreamType + '\'' +
                 ", recorderPath='" + recorderPath + '\'' +
+                ", capturePath='" + capturePath + '\'' +
                 ", maxDuration=" + maxDuration +
                 ", recoverFile=" + recoverFile +
                 ", audio=" + audio +

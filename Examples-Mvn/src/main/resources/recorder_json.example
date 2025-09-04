@@ -10,6 +10,9 @@
     "subAllVideo": true,         // 是否订阅所有视频，如果为false,在SubVideoUserList中填入订阅的uid
     "subVideoUserList": ["123"],
     "subStreamType":"high",      // 订阅大小流， 大流为high, 小流为low
+    "enableRecording": true,    // 是否录制
+    "enableCapture": false,     // 是否截图
+    "videoFrameCaptureType": 0, // 截图类型，0为编码帧，1为YUV帧，2为JPG帧，3为JPG文件
     "isMix":true,             // 是否合流录制
     "backgroundColor": 0,     // 合流录制设置背景颜色，uint32_t变量中设置 RGB 颜色，通常使用 32 位颜色格式（0xRRGGBB）RR：红色（8 位，0-255）,GG：绿色（8 位，0-255）,BB：蓝色（8 位，0-255），需要转为long类型的值
     "backgroundImage": "1.jpg",  // 合流录制设置背景图片，当同时设置了背景颜色和背景图片，背景图片生效。图片支持png和jpg
@@ -17,6 +20,7 @@
     "maxResolutionUid": "123",   // 在vertical布局中，设定显示最大分辨率的uid
     "recorderStreamType":"both",   // 录制类型， audio_only 只录音频，video_only 只录音频， both 音视频都录
     "recorderPath":"recorderTest.mp4",  // 合流录制时为录制的文件名，单流录制为录制的目录，以每一个uid为名的mp4文件
+    "capturePath":"captureTest",  // 截图时为截图的文件名或者目录
     "maxDuration": 120,  // 录制时长，单位秒s
     "recoverFile": false,   // 是否在录制时同时写h264和aac文件，程序crash后可以恢复出mp4
     "audio":{

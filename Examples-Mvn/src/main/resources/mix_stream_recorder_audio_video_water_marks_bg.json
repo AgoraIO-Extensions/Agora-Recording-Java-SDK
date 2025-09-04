@@ -14,13 +14,15 @@
         "123"
     ],
     "subStreamType": "high",
+    "enableRecording": true,
+    "enableCapture": false,
     "isMix": true,
     "backgroundColor": 16711680,
     "backgroundImage": "res/1.png",
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",
     "recorderStreamType": "both",
-    "recorderPath": "recorder_mix_audio_video_water_marks_bg.mp4",
+    "recorderPath": "recorder_result/mix/mix_audio_video_water_marks_bg.mp4",
     "audio": {
         "sampleRate": 16000,
         "numOfChannels": 1

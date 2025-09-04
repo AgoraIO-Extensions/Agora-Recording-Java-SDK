@@ -6,11 +6,11 @@ This document provides a detailed description of the API interfaces for the Agor
 
 - [Core Classes](#core-classes)
   - [AgoraService](#agoraservice)
-  - [AgoraMediaComponentFactory](#agoramediacomponentfactory)
   - [AgoraMediaRtcRecorder](#agoramediartcrecorder)
   - [AgoraParameter](#agoraparameter)
 - [Observer Interfaces](#observer-interfaces)
   - [IAgoraMediaRtcRecorderEventHandler](#iagoramediartcrecordereventhandler)
+  - [IRecorderVideoFrameObserver](#irecordervideoframeobserver)
 - [Data Structures](#data-structures)
   - [AgoraServiceConfiguration](#agoraserviceconfiguration)
   - [MediaRecorderConfiguration](#mediarecorderconfiguration)
@@ -33,6 +33,9 @@ This document provides a detailed description of the API interfaces for the Agor
   - [AdvancedConfigInfo](#advancedconfiginfo)
   - [LogUploadServerInfo](#loguploadserverinfo)
   - [LocalAccessPointConfiguration](#localaccesspointconfiguration)
+  - [RecorderVideoFrameCaptureConfig](#recordervideoframecaptureconfig)
+  - [VideoFrame](#videoframe)
+  - [EncodedVideoFrameInfo](#encodedvideoframeinfo)
 - [Utility Classes](#utility-classes)
   - [Constants](#constants)
   - [Utils](#utils)
@@ -63,14 +66,6 @@ Initializes the `AgoraService` object with the specified configuration.
 - `< 0`: Failure, specific error codes might include:
   - `ERR_INVALID_ARGUMENT (-2)`: If `context` in `AgoraServiceConfiguration` is not provided (Android only).
   - `ERR_INIT_NET_ENGINE (-?)`: If the network engine cannot be initialized (e.g., firewall blocking).
-
-##### `AgoraMediaComponentFactory createAgoraMediaComponentFactory()`
-
-Creates and returns an `AgoraMediaComponentFactory` object used for creating media components.
-
-**Return Value**:
-
-- Returns an `AgoraMediaComponentFactory` instance
 
 ##### `AgoraParameter getAgoraParameter()`
 
@@ -139,40 +134,13 @@ Sets global local access point addresses in local AP mode (which also calls loca
 - `0`: Method call successful.
 - `< 0`: Method call failed.
 
-### AgoraMediaComponentFactory
-
-The `AgoraMediaComponentFactory` class is a factory class for creating Agora media components. This class provides functionality to create media recording component instances.
-
-#### Main Methods
-
-##### `AgoraMediaRtcRecorder createMediaRtcRecorder()`
-
-Creates a new `AgoraMediaRtcRecorder` instance.
-
-**Return Value**:
-
-- A new `AgoraMediaRtcRecorder` instance
-
-**Exceptions**:
-
-- `RuntimeException`: If native recorder creation fails.
-
-##### `int release()`
-
-Releases local resources associated with the factory.
-
-**Return Value**:
-
-- `0`: Success
-- `< 0`: Failure
-
 ### AgoraMediaRtcRecorder
 
 The `AgoraMediaRtcRecorder` class provides functionality for recording Agora RTC media streams. This class allows recording audio and video streams from Agora RTC channels and provides options for stream mixing, encryption, and selective subscription.
 
 #### Main Methods
 
-##### `int initialize(AgoraService service, boolean enableMix)`
+##### `int initialize(AgoraService service, boolean enableMix, boolean recordEncodedOnly)`
 
 Initializes the recorder with the specified service and mixing settings.
 
@@ -180,11 +148,18 @@ Initializes the recorder with the specified service and mixing settings.
 
 - `service`: An Agora service instance that must be initialized before calling this method.
 - `enableMix`: Whether to enable stream mixing.
+- `recordEncodedOnly`: Whether to record encoded video only (valid when `enableMix` is false):
+  - `true`: Do not decode received video; write H.264 bitstream to container directly (watermarks are not supported).
+  - `false`: Decode to YUV and re-encode to H.264 before writing to the container (watermarks are supported).
 
 **Return Value**:
 
 - `0`: Initialization successful.
 - `< 0`: Initialization failed.
+
+##### `int initialize(AgoraService service, boolean enableMix)`
+
+Backward-compatible overload equal to calling `initialize(service, enableMix, false)`.
 
 ##### `int joinChannel(String token, String channelName, String userId)`
 
@@ -510,6 +485,33 @@ The token expires after a certain period of time. When the `IAgoraMediaRtcRecord
 
 - `0`: Method call successful.
 - `< 0`: Method call failed (e.g., if the token is null or empty).
+
+##### `int enableRecorderVideoFrameCapture(boolean enable, RecorderVideoFrameCaptureConfig config)`
+
+Enables or disables recorder video frame capture.
+
+When enabled, frames are delivered to the observer according to the configured
+`Constants.VideoFrameCaptureType`:
+
+- `VIDEO_FORMAT_ENCODED_FRAME_TYPE`
+- `VIDEO_FORMAT_YUV_FRAME_TYPE`
+- `VIDEO_FORMAT_JPG_FRAME_TYPE`
+- `VIDEO_FORMAT_JPG_FILE_TYPE`
+
+For `VIDEO_FORMAT_JPG_FILE_TYPE`, you must set `jpgFileStorePath` and `jpgCaptureIntervalInSec` in `config`.
+
+Note: To receive YUV or JPG frames through the observer, `recordEncodedOnly`
+must be set to `false` when initializing the recorder.
+
+**Parameters**:
+
+- `enable`: `true` to enable video frame capture; `false` to disable.
+- `config`: The capture configuration; if `null`, default values are used.
+
+**Return Value**:
+
+- `0`: Method call successful.
+- `< 0`: Method call failed.
 
 ##### `int release()`
 
@@ -864,6 +866,18 @@ Triggered when the SDK decodes the first frame of a remote audio stream for play
 - `channelId`: Channel ID.
 - `userId`: Remote user ID sending the audio stream.
 - `elapsed`: Time elapsed (ms) from the local user calling `joinChannel` until this event occurs.
+  
+##### `default void onVideoSizeChanged(String channelId, String userId, int width, int height, int rotation)`
+
+Triggered when the video size of a remote user changes.
+
+**Parameters**:
+
+- `channelId`: Channel ID.
+- `userId`: Remote user ID.
+- `width`: Width in pixels.
+- `height`: Height in pixels.
+- `rotation`: Rotation (see {@link Constants.VideoOrientation}).
 
 ##### `void onAudioVolumeIndication(String channelId, SpeakVolumeInfo[] speakers, int speakerNumber)`
 
@@ -974,6 +988,43 @@ and call
 **Parameters**:
 
 - `channelId`: The channel ID.
+
+### IRecorderVideoFrameObserver
+
+Observer interface to receive captured video frames from the recorder.
+
+#### Callback Methods
+
+##### `void onYuvFrameCaptured(String channelId, String userId, VideoFrame frame)`
+
+Triggered when a YUV video frame is captured.
+
+**Parameters**:
+
+- `channelId`: Channel ID.
+- `userId`: Remote user ID.
+- `frame`: The captured YUV frame. See [VideoFrame](#videoframe).
+
+##### `void onEncodedFrameReceived(String channelId, String userId, byte[] imageBuffer, EncodedVideoFrameInfo info)`
+
+Triggered when an encoded video frame is captured.
+
+**Parameters**:
+
+- `channelId`: Channel ID.
+- `userId`: Remote user ID.
+- `imageBuffer`: Encoded frame bytes.
+- `info`: Encoded frame info. See [EncodedVideoFrameInfo](#encodedvideoframeinfo).
+
+##### `void onJPGFileSaved(String channelId, String userId, String filename)`
+
+Triggered when a JPG file is saved to disk (when using `VIDEO_FORMAT_JPG_FILE_TYPE`).
+
+**Parameters**:
+
+- `channelId`: Channel ID.
+- `userId`: Remote user ID.
+- `filename`: Absolute path to the saved JPG file.
 
 ## Data Structures
 
@@ -1258,6 +1309,44 @@ The `LocalAccessPointConfiguration` class is used to configure local proxy acces
 - `LocalAccessPointConfiguration` can be used in the `AgoraService#setGlobalLocalAccessPoint` method, which affects all recorder instances in the same process.
 - `AdvancedConfigInfo` is currently mainly used for log upload server configuration and can be extended for more advanced parameters in the future.
 - `LogUploadServerInfo` supports custom log upload server domain, path, port, and HTTPS settings.
+### RecorderVideoFrameCaptureConfig
+
+Configuration for recorder video frame capture.
+
+#### Main Properties
+
+- **videoFrameType**: Capture type. See {@link Constants.VideoFrameCaptureType}.
+- **jpgFileStorePath**: Absolute directory path to store JPG files when using `VIDEO_FORMAT_JPG_FILE_TYPE`.
+- **jpgCaptureIntervalInSec**: Interval in seconds for JPG capture. Default: `5` (minimum `1`).
+- **observer**: The `IRecorderVideoFrameObserver` to receive frames.
+
+### VideoFrame
+
+Represents a raw YUV video frame delivered to the observer.
+
+#### Main Properties
+
+- **width/height**: Frame dimensions in pixels.
+- **yStride/uStride/vStride**: Strides for Y/U/V planes.
+- **yBuffer/uBuffer/vBuffer**: Plane buffers.
+- **timestampMs**: Capture/render timestamp in milliseconds.
+- **rotation**: Rotation (see {@link Constants.VideoOrientation}).
+
+### EncodedVideoFrameInfo
+
+Represents encoded video frame information.
+
+#### Main Properties
+
+- **uid**: Sender user ID.
+- **codecType**: Video codec (see {@link Constants.VideoCodecType}).
+- **width/height**: Encoded frame size.
+- **framesPerSecond**: FPS.
+- **frameType**: Frame type (see {@link Constants.VideoFrameType}).
+- **rotation**: Rotation (see {@link Constants.VideoOrientation}).
+- **trackId**: Track ID.
+- **captureTimeMs/decodeTimeMs/presentationMs**: Timestamps in ms.
+- **streamType**: Stream type (see {@link Constants.VideoStreamType}).
 
 ## Utility Classes
 
@@ -1276,7 +1365,10 @@ Below are some of the key enumerations defined in this class. Refer to the `Cons
 - **`ErrorCodeType`**: Defines error codes returned by the SDK.
 - **`LogLevel`**: Defines logging levels.
 - **`EncryptionMode`**: Defines media stream encryption modes.
-- **`VideoStreamType`**: Defines video stream types (High, Low).
+- **`VideoStreamType`**: Defines video stream types (High, Low, and layered: layer_1 ~ layer_6).
+- **`VideoCodecType`**: Defines video codec types (NONE, VP8, H264, H265, GENERIC, GENERIC_H264, AV1, VP9, GENERIC_JPEG).
+- **`VideoFrameType`**: Defines video frame types (BLANK, KEY, DELTA, B, DROPPABLE, UNKNOW).
+- **`VideoOrientation`**: Defines video rotation (0, 90, 180, 270).
 - **`MediaRecorderContainerFormat`**: Defines recording file container formats (e.g., MP4).
 - **`MediaRecorderStreamType`**: Defines what content to record (Audio, Video, Both).
 - **`VideoSourceType`**: Defines the source of the video stream (Camera, Screen, etc.).
