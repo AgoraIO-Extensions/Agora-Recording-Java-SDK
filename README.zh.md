@@ -36,7 +36,7 @@
     - [开通服务](#开通服务)
     - [跑通 Maven 工程](#跑通-maven-工程)
       - [1. 配置密钥](#1-配置密钥)
-      - [2. 准备 so 库](#2-准备-so-库)
+      - [2. 配置 JAR 和 so 库](#2-配置-jar-和-so-库)
       - [3. 编译打包](#3-编译打包)
       - [4. 运行示例服务](#4-运行示例服务)
       - [5. RESTful API 录制控制](#5-restful-api-录制控制)
@@ -387,9 +387,25 @@ APP_ID=你的AppId
 TOKEN=你的Token
 ```
 
-#### 2. 准备 so 库
+#### 2. 配置 JAR 和 so 库
 
-确保 `libs/native/linux/x86_64/` 目录下包含所有必要的 so 文件（如 `libagora_rtc_sdk.so`、`librecording.so` 等）。
+- 配置 JAR（两种方式二选一）：
+  - 使用线上 Maven 版本：编辑 `Examples-Mvn/pom.xml`，按平台选择版本（x86_64 使用 `4.4.151`，arm64 使用 `4.4.151-aarch64`）：
+    ```xml
+    <dependency>
+        <groupId>io.agora.rtc</groupId>
+        <artifactId>linux-recording-java-sdk</artifactId>
+        <version>4.4.151</version>
+    </dependency>
+    <!-- arm64 平台请将版本替换为 4.4.151-aarch64 -->
+    ```
+  - 使用本地版本：在 `Examples-Mvn` 目录执行脚本将本地 JAR 安装到本地 Maven 仓库（脚本读取 `libs/agora-recording-sdk.jar` 及其 javadoc）：
+    ```sh
+    cd Examples-Mvn
+    ./build_install_local_maven.sh
+    ```
+
+- 准备 so 库：确保 `libs/native/linux/x86_64/`（或 `aarch64/`）目录下包含必要的 so 文件（如 `libagora_rtc_sdk.so`、`librecording.so` 等）。
 
 #### 3. 编译打包
 

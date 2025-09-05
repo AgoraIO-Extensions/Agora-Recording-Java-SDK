@@ -36,7 +36,7 @@
     - [Enable Service](#enable-service)
     - [Run the Maven Project](#run-the-maven-project)
       - [1. Configure Keys](#1-configure-keys)
-      - [2. Prepare .so Libraries](#2-prepare-so-libraries)
+      - [2. Configure JAR and .so Libraries](#2-configure-jar-and-so-libraries)
       - [3. Build the Project](#3-build-the-project)
       - [4. Run the Example Service](#4-run-the-example-service)
       - [5. RESTful API Recording Control](#5-restful-api-recording-control)
@@ -394,9 +394,25 @@ APP_ID=YourAppId
 TOKEN=YourToken
 ```
 
-#### 2. Prepare .so Libraries
+#### 2. Configure JAR and .so Libraries
 
-Ensure `libs/native/linux/x86_64/` contains all required `.so` files (e.g. `libagora_rtc_sdk.so`, `librecording.so`, etc.).
+- Configure JAR (choose one of the following):
+  - Use online Maven version: edit `Examples-Mvn/pom.xml` and choose version by platform (x86_64 uses `4.4.151`, arm64 uses `4.4.151-aarch64`):
+    ```xml
+    <dependency>
+        <groupId>io.agora.rtc</groupId>
+        <artifactId>linux-recording-java-sdk</artifactId>
+        <version>4.4.151</version>
+    </dependency>
+    <!-- For arm64 platform, replace with 4.4.151-aarch64 -->
+    ```
+  - Use local version: in the `Examples-Mvn` directory, run the script to install the local JAR into your local Maven repository (the script reads `libs/agora-recording-sdk.jar` and its javadoc):
+    ```sh
+    cd Examples-Mvn
+    ./build_install_local_maven.sh
+    ```
+
+- Prepare .so libraries: ensure `libs/native/linux/x86_64/` (or `aarch64/`) contains the required `.so` files (e.g. `libagora_rtc_sdk.so`, `librecording.so`, etc.).
 
 #### 3. Build the Project
 
