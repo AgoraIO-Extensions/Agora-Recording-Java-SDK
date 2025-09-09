@@ -413,13 +413,59 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                     if (io.agora.recording.utils.Utils.isNullOrEmpty(recorderConfig.getCapturePath())) {
                         return;
                     }
-                    int ylength = frame.getyBuffer().length;
-                    int ulength = frame.getuBuffer().length;
-                    int vlength = frame.getvBuffer().length;
-                    byte[] data = new byte[ylength + ulength + vlength];
-                    ByteBuffer buffer = ByteBuffer.wrap(data);
-                    buffer.put(frame.getyBuffer()).put(frame.getuBuffer()).put(frame.getvBuffer());
+                    // Calculate actual data size without padding
+                    int width = frame.getWidth();
+                    int height = frame.getHeight();
+                    int yStride = frame.getyStride();
+                    int uStride = frame.getuStride();
+                    int vStride = frame.getvStride();
 
+                    // YUV420P format: Y plane full size, U/V planes quarter size
+                    int yDataSize = width * height;
+                    int uvDataSize = (width / 2) * (height / 2);
+
+                    // Check if stride and buffer are valid
+                    if (yStride < width || uStride < (width / 2) || vStride < (width / 2)) {
+                        log.warn("[" + taskId + "] Invalid stride: yStride=" + yStride +
+                                ", uStride=" + uStride + ", vStride=" + vStride +
+                                ", width=" + width + ", height=" + height);
+                        return;
+                    }
+
+                    if (frame.getyBuffer().length < yStride * height ||
+                            frame.getuBuffer().length < uStride * (height / 2) ||
+                            frame.getvBuffer().length < vStride * (height / 2)) {
+                        log.warn("[" + taskId + "] YUV buffer size insufficient for stride data");
+                        return;
+                    }
+
+                    byte[] data = new byte[yDataSize + uvDataSize + uvDataSize];
+                    int dataOffset = 0;
+
+                    // Copy Y plane line by line to remove padding
+                    byte[] yBuffer = frame.getyBuffer();
+                    for (int row = 0; row < height; row++) {
+                        System.arraycopy(yBuffer, row * yStride, data, dataOffset, width);
+                        dataOffset += width;
+                    }
+
+                    // Copy U plane line by line to remove padding
+                    byte[] uBuffer = frame.getuBuffer();
+                    int uvWidth = width / 2;
+                    int uvHeight = height / 2;
+                    for (int row = 0; row < uvHeight; row++) {
+                        System.arraycopy(uBuffer, row * uStride, data, dataOffset, uvWidth);
+                        dataOffset += uvWidth;
+                    }
+
+                    // Copy V plane line by line to remove padding
+                    byte[] vBuffer = frame.getvBuffer();
+                    for (int row = 0; row < uvHeight; row++) {
+                        System.arraycopy(vBuffer, row * vStride, data, dataOffset, uvWidth);
+                        dataOffset += uvWidth;
+                    }
+
+                    // Standard YUV420P format (no padding), add original stride info for reference
                     String savePath = recorderConfig.getCapturePath() + channelNameInternal + "_"
                             + currentUserId + "_" + userId + "_w" + frame.getWidth() + "_h" + frame.getHeight()
                             + ".yuv";
