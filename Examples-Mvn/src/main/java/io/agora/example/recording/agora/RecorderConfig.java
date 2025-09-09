@@ -33,6 +33,7 @@ public class RecorderConfig {
     private List<WaterMark> waterMark;
     private Encryption encryption;
     private List<Rotation> rotation;
+    private StressTest stressTest;
 
     public RecorderConfig() {
         audio = new AudioConfig();
@@ -48,6 +49,7 @@ public class RecorderConfig {
         enableRecording = true;
         enableCapture = false;
         videoFrameCaptureType = 0;
+        stressTest = new StressTest();
     }
 
     public static class AudioConfig {
@@ -297,6 +299,65 @@ public class RecorderConfig {
         }
     }
 
+    public static class StressTest {
+        private boolean enable = false;
+        private int sleepTime = 1; // s
+        private int threadNum = 1;
+        private int testTime = 10; // s
+        private int oneTestTime = 3; // s
+
+        public boolean isEnable() {
+            return enable;
+        }
+
+        public void setEnable(boolean enable) {
+            this.enable = enable;
+        }
+
+        public int getSleepTime() {
+            return sleepTime;
+        }
+
+        public void setSleepTime(int sleepTime) {
+            this.sleepTime = sleepTime;
+        }
+
+        public int getThreadNum() {
+            return threadNum;
+        }
+
+        public void setThreadNum(int threadNum) {
+            this.threadNum = threadNum;
+        }
+
+        public int getTestTime() {
+            return testTime;
+        }
+
+        public void setTestTime(int testTime) {
+            this.testTime = testTime;
+        }
+
+        public int getOneTestTime() {
+            return oneTestTime;
+        }
+
+        public void setOneTestTime(int oneTestTime) {
+            this.oneTestTime = oneTestTime;
+        }
+
+        @Override
+        public String toString() {
+            return "StressTest{" +
+                    "enable=" + enable +
+                    ", sleepTime=" + sleepTime +
+                    ", threadNum=" + threadNum +
+                    ", testTime=" + testTime +
+                    ", oneTestTime=" + oneTestTime +
+                    '}';
+        }
+    }
+
     public String getAppId() {
         return appId;
     }
@@ -529,6 +590,14 @@ public class RecorderConfig {
         this.rotation = rotation;
     }
 
+    public StressTest getStressTest() {
+        return stressTest;
+    }
+
+    public void setStressTest(StressTest stressTest) {
+        this.stressTest = stressTest;
+    }
+
     @Override
     public String toString() {
         return "RecorderConfig{" +
@@ -561,6 +630,7 @@ public class RecorderConfig {
                 ", waterMark=" + waterMark +
                 ", encryption=" + encryption +
                 ", rotation=" + rotation +
+                ", stressTest=" + stressTest +
                 '}';
     }
 }

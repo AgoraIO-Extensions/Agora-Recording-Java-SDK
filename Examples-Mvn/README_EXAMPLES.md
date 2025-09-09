@@ -89,6 +89,8 @@ http://10.200.0.85:18080/api/recording/start?configFileName=capture_type_encoded
 
 http://10.200.0.85:18080/api/recording/start?configFileName=capture_type_yuv_frame_single_stream.json
 
+http://10.200.0.85:18080/api/recording/start?configFileName=stress_mix_stream_recorder_audio_video_water_marks.json
+
 http://10.200.0.85:18080/api/recording/stop?taskId=20250508145257826-aa646c12eaea42e0946d2e6d52f88f51
 
 http://10.200.0.85:18080/api/recording/destroy

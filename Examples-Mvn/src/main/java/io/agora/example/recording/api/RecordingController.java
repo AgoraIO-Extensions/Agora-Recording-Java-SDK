@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,6 +57,12 @@ public class RecordingController implements DisposableBean, ApplicationContextAw
     private final RecordingManager recordingManager;
     private final AgoraServiceInitializer agoraServiceInitializer;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ThreadPoolExecutor stressExecutorService = new ThreadPoolExecutor(
+            0,
+            Integer.MAX_VALUE,
+            1L,
+            TimeUnit.SECONDS,
+            new SynchronousQueue<>());
     private final Gson gson;
     private final Map<String, String> activeTaskIds = new ConcurrentHashMap<>();
 
@@ -364,31 +372,76 @@ public class RecordingController implements DisposableBean, ApplicationContextAw
             // via SSE if possible,
             // or the message clearly states "initiation started".
 
-            final String originalTaskId = taskId; // effectively final for lambda
-            executorService.submit(() -> {
-                try {
-                    log.info("Starting async recording execution for taskId: {} (from SSE path)",
-                            originalTaskId);
-                    recordingManager.startRecording(originalTaskId, config);
-                    activeTaskIds.put(
-                            originalTaskId, configFileName); // Now it's confirmed and active
-                    log.info("Recording successfully started for taskId: {} with config file: {}. "
-                            + "Active tasks: {}",
-                            originalTaskId, configFileName, activeTaskIds.size());
-                    // We cannot reliably send SSE event from here as the emitter might be closed if
-                    // the main SSE thread finished.
-                    // The success is implied by not seeing an error from the *initiation* step.
-                    // Client will see "Successfully initiated..." and then if an error specific to
-                    // this task happens async, it's harder to report back on THIS SseEmitter.
-                    // This is a limitation if startRecording itself is a fire-and-forget within an
-                    // executor.
-                } catch (Exception e) {
-                    log.error("Error during async recording for taskId: {} (from SSE path)",
-                            originalTaskId, e);
-                    // This error is hard to propagate back to the specific SseEmitter for *this*
-                    // user's request.
+            if (config.getStressTest().isEnable()) {
+                final long testStartTime = System.currentTimeMillis();
+                Object[] lock = new Object[config.getStressTest().getThreadNum()];
+                for (int i = 0; i < config.getStressTest().getThreadNum(); i++) {
+                    lock[i] = new Object();
                 }
-            });
+                for (int i = 0; i < config.getStressTest().getThreadNum(); i++) {
+                    final int threadIndex = i;
+                    stressExecutorService.submit(() -> {
+                        String channelName = config.getChannelName();
+                        if (config.getStressTest().getThreadNum() > 1) {
+                            channelName = channelName + "_" + threadIndex;
+                        }
+
+                        while (checkTestTime(testStartTime, config.getStressTest().getTestTime())) {
+                            log.info("threadIndex:" + threadIndex + " checkTestTime:"
+                                    + checkTestTime(testStartTime, config.getStressTest().getTestTime()));
+                            try {
+                                String stressTestTaskId = Utils.getTaskId();
+                                recordingManager.startRecording(stressTestTaskId, config,
+                                        channelName);
+                                synchronized (lock[threadIndex]) {
+                                    lock[threadIndex].wait(config.getStressTest().getOneTestTime() * 1000);
+                                }
+                                recordingManager.stopRecording(stressTestTaskId, false);
+                                Thread.sleep(config.getStressTest().getSleepTime() * 1000);
+                            } catch (Exception e) {
+                                log.error("Thread interrupted while waiting for testTaskExecutorService to complete");
+                            }
+                        }
+                    });
+                }
+
+                while (stressExecutorService.getActiveCount() > 1) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        log.error("Thread interrupted while waiting for stressExecutorService to complete");
+                    }
+                }
+
+                destroyApplication();
+            } else {
+                final String originalTaskId = taskId; // effectively final for lambda
+                executorService.submit(() -> {
+                    try {
+                        log.info("Starting async recording execution for taskId: {} (from SSE path)",
+                                originalTaskId);
+                        recordingManager.startRecording(originalTaskId, config);
+                        activeTaskIds.put(
+                                originalTaskId, configFileName); // Now it's confirmed and active
+                        log.info("Recording successfully started for taskId: {} with config file: {}. "
+                                + "Active tasks: {}",
+                                originalTaskId, configFileName, activeTaskIds.size());
+                        // We cannot reliably send SSE event from here as the emitter might be closed if
+                        // the main SSE thread finished.
+                        // The success is implied by not seeing an error from the *initiation* step.
+                        // Client will see "Successfully initiated..." and then if an error specific to
+                        // this task happens async, it's harder to report back on THIS SseEmitter.
+                        // This is a limitation if startRecording itself is a fire-and-forget within an
+                        // executor.
+                    } catch (Exception e) {
+                        log.error("Error during async recording for taskId: {} (from SSE path)",
+                                originalTaskId, e);
+                        // This error is hard to propagate back to the specific SseEmitter for *this*
+                        // user's request.
+                    }
+                });
+            }
 
             // activeTaskIds.put(taskId, configFileName); // This should happen upon actual
             // start, which is async.
@@ -733,6 +786,7 @@ public class RecordingController implements DisposableBean, ApplicationContextAw
         log.info("Current active tasks at destroy time: {}", activeTaskIds);
 
         executorService.shutdown();
+        stressExecutorService.shutdown();
         try {
             if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
                 log.warn(
@@ -744,10 +798,19 @@ public class RecordingController implements DisposableBean, ApplicationContextAw
             } else {
                 log.info("ExecutorService terminated successfully.");
             }
+            if (!stressExecutorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                log.warn(
+                        "stressExecutorService did not terminate within 60 seconds, forcing shutdown...");
+                stressExecutorService.shutdownNow();
+                if (!stressExecutorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    log.error("stressExecutorService did not terminate even after forced shutdown.");
+                }
+            }
         } catch (InterruptedException ie) {
             log.warn(
                     "Interrupted while waiting for ExecutorService termination, forcing shutdown...");
             executorService.shutdownNow();
+            stressExecutorService.shutdownNow();
             Thread.currentThread().interrupt();
         }
 
@@ -764,5 +827,14 @@ public class RecordingController implements DisposableBean, ApplicationContextAw
 
         AgoraServiceInitializer.destroy();
         log.info("AgoraServiceInitializer resources released successfully.");
+    }
+
+    private boolean checkTestTime(long testStartTime, int testTime) {
+        long currentTime = System.currentTimeMillis();
+        long testCostTime = currentTime - testStartTime;
+        if (testCostTime >= testTime * 1000) {
+            return false;
+        }
+        return true;
     }
 }
