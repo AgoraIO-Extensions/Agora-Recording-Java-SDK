@@ -75,6 +75,7 @@
     ],
     "stressTest": {
         "enable": true,
+        "enableSingleChannel": true,
         "sleepTime": 1,
         "threadNum": 2,
         "testTime": 10,

@@ -264,13 +264,13 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                     0, recorderConfig.getRecorderPath().lastIndexOf(".mp4"))
                     + "_" + channelNameInternal + "_"
                     + io.agora.recording.utils.Utils.formatTimestamp(
-                            System.currentTimeMillis(), "yyyyMMdd-HHmmss")
+                            System.currentTimeMillis(), "yyyyMMdd-HHmmssSSS")
                     + ".mp4";
         } else {
             resultFilePath = recorderConfig.getRecorderPath() + userId
                     + "_" + channelNameInternal + "_"
                     + io.agora.recording.utils.Utils.formatTimestamp(
-                            System.currentTimeMillis(), "yyyyMMdd-HHmmss")
+                            System.currentTimeMillis(), "yyyyMMdd-HHmmssSSS")
                     + ".mp4";
         }
         mediaRecorderConfiguration.setStoragePath(resultFilePath);
@@ -491,7 +491,7 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                                     + currentUserId + "_" + userId + "_"
 
                                     + io.agora.recording.utils.Utils.formatTimestamp(
-                                            System.currentTimeMillis(), "yyyyMMdd-HHmmss")
+                                            System.currentTimeMillis(), "yyyyMMdd-HHmmssSSS")
                                     + ".jpg";
                             singleExecutorService.submit(() -> Utils.saveDataToFile(savePath, imageBuffer, true));
                         }

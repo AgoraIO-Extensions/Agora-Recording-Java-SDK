@@ -382,7 +382,7 @@ public class RecordingController implements DisposableBean, ApplicationContextAw
                     final int threadIndex = i;
                     stressExecutorService.submit(() -> {
                         String channelName = config.getChannelName();
-                        if (config.getStressTest().getThreadNum() > 1) {
+                        if (!config.getStressTest().isEnableSingleChannel()) {
                             channelName = channelName + "_" + threadIndex;
                         }
 

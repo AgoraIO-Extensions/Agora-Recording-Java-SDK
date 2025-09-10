@@ -301,6 +301,7 @@ public class RecorderConfig {
 
     public static class StressTest {
         private boolean enable = false;
+        private boolean enableSingleChannel = false;
         private int sleepTime = 1; // s
         private int threadNum = 1;
         private int testTime = 10; // s
@@ -312,6 +313,14 @@ public class RecorderConfig {
 
         public void setEnable(boolean enable) {
             this.enable = enable;
+        }
+
+        public boolean isEnableSingleChannel() {
+            return enableSingleChannel;
+        }
+
+        public void setEnableSingleChannel(boolean enableSingleChannel) {
+            this.enableSingleChannel = enableSingleChannel;
         }
 
         public int getSleepTime() {
@@ -350,6 +359,7 @@ public class RecorderConfig {
         public String toString() {
             return "StressTest{" +
                     "enable=" + enable +
+                    ", enableSingleChannel=" + enableSingleChannel +
                     ", sleepTime=" + sleepTime +
                     ", threadNum=" + threadNum +
                     ", testTime=" + testTime +
