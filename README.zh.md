@@ -497,49 +497,56 @@ TOKEN=你的Token
 
 #### recorder_json.example 参数说明
 
-| 参数                         | 类型     | 说明                                                                                                                                                   |
-| ---------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| appId                        | String   | 项目 App ID（也可在 `.keys` 中配置优先覆盖）。                                                                                                         |
-| token                        | String   | 频道 Token；若未开启 Token 校验可留空（可在 `.keys` 中配置优先覆盖）。                                                                                 |
-| channelName                  | String   | 频道名，需与客户端一致。                                                                                                                               |
-| useStringUid                 | Boolean  | 是否使用字符串 UID。false 表示数字 UID。                                                                                                               |
-| useCloudProxy                | Boolean  | 是否启用云代理。                                                                                                                                       |
-| userId                       | String   | 录制端用户 ID；为 "0" 时由系统自动分配。                                                                                                               |
-| subAllAudio                  | Boolean  | 是否订阅所有音频；为 false 时使用 `subAudioUserList` 指定。                                                                                            |
-| subAudioUserList             | String[] | 需订阅音频的用户 ID 列表（`subAllAudio=false` 生效）。                                                                                                 |
-| subAllVideo                  | Boolean  | 是否订阅所有视频；为 false 时使用 `subVideoUserList` 指定。                                                                                            |
-| subVideoUserList             | String[] | 需订阅视频的用户 ID 列表（`subAllVideo=false` 生效）。                                                                                                 |
-| subStreamType                | String   | 订阅流类型：`high`（大流）、`low`（小流）。                                                                                                            |
-| enableRecording              | Boolean  | 是否进行 MP4 录制。false 时可仅进行截图。                                                                                                              |
-| enableCapture                | Boolean  | 是否启用截图能力。                                                                                                                                     |
-| videoFrameCaptureType        | Integer  | 截图类型：0=ENCODED（编码帧），1=YUV，2=JPG_FRAME（内存回调保存），3=JPG_FILE（SDK直存JPG）。对应 `Constants.VideoFrameType`/`VideoFrameCaptureType`。 |
-| isMix                        | Boolean  | 是否合流录制；false 为单流录制。                                                                                                                       |
-| backgroundColor              | Long     | 合流背景色（0xRRGGBB，需转 long）。`isMix=true` 时可用。                                                                                               |
-| backgroundImage              | String   | 合流背景图（PNG/JPG）。与 `backgroundColor` 同时设置时，背景图优先生效。                                                                               |
-| layoutMode                   | String   | 合流布局：`default`、`bestfit`、`vertical`。                                                                                                           |
-| maxResolutionUid             | String   | `vertical` 布局下显示最大分辨率的 UID。                                                                                                                |
-| recorderStreamType           | String   | 录制类型：`audio_only`、`video_only`、`both`。                                                                                                         |
-| recorderPath                 | String   | 输出路径：合流为文件路径；单流为目录（每 UID 生成独立 MP4）。需确保父目录存在。                                                                        |
-| capturePath                  | String   | 截图输出前缀或目录：JPG_FILE 为目录；其他类型为文件前缀。                                                                                              |
-| maxDuration                  | Integer  | 录制时长（秒）。到时自动停止。                                                                                                                         |
-| recoverFile                  | Boolean  | 是否同时写 h264/aac 以便异常后恢复 MP4（仅录制相关）。                                                                                                 |
-| audio.sampleRate             | Integer  | 音频采样率（Hz）。                                                                                                                                     |
-| audio.numOfChannels          | Integer  | 音频通道数。                                                                                                                                           |
-| video.width                  | Integer  | 视频宽度（像素）。                                                                                                                                     |
-| video.height                 | Integer  | 视频高度（像素）。                                                                                                                                     |
-| video.fps                    | Integer  | 视频帧率（fps）。                                                                                                                                      |
-| waterMark[].type             | String   | 水印类型：`litera`（字幕）、`time`（时间戳）、`picture`（图片）。                                                                                      |
-| waterMark[].litera           | String   | 字幕水印内容（type=litera）。                                                                                                                          |
-| waterMark[].fontFilePath     | String   | 字体文件路径（litera/time）。                                                                                                                          |
-| waterMark[].fontSize         | Integer  | 字体大小。                                                                                                                                             |
-| waterMark[].x/y/width/height | Integer  | 水印矩形区域位置与尺寸。                                                                                                                               |
-| waterMark[].zorder           | Integer  | 水印图层顺序。                                                                                                                                         |
-| waterMark[].imgUrl           | String   | 图片水印路径（type=picture）。                                                                                                                         |
-| encryption.mode              | String   | 加密类型：`AES_128_XTS`、`AES_128_ECB`、`AES_256_XTS`、`SM4_128_ECB`、`AES_128_GCM`、`AES_256_GCM`、`AES_128_GCM2`、`AES_256_GCM2`。                   |
-| encryption.key               | String   | 加密密钥。                                                                                                                                             |
-| encryption.salt              | String   | 加密盐，32 字符（部分模式需要/可选）。                                                                                                                 |
-| rotation[].uid               | String   | 需旋转视频的 UID。                                                                                                                                     |
-| rotation[].degree            | Integer  | 旋转角度：0、90、180、270。                                                                                                                            |
+| 参数                           | 类型     | 说明                                                                                                                                                   |
+| ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| appId                          | String   | 项目 App ID（也可在 `.keys` 中配置优先覆盖）。                                                                                                         |
+| token                          | String   | 频道 Token；若未开启 Token 校验可留空（可在 `.keys` 中配置优先覆盖）。                                                                                 |
+| channelName                    | String   | 频道名，需与客户端一致。                                                                                                                               |
+| useStringUid                   | Boolean  | 是否使用字符串 UID。false 表示数字 UID。                                                                                                               |
+| useCloudProxy                  | Boolean  | 是否启用云代理。                                                                                                                                       |
+| userId                         | String   | 录制端用户 ID；为 "0" 时由系统自动分配。                                                                                                               |
+| subAllAudio                    | Boolean  | 是否订阅所有音频；为 false 时使用 `subAudioUserList` 指定。                                                                                            |
+| subAudioUserList               | String[] | 需订阅音频的用户 ID 列表（`subAllAudio=false` 生效）。                                                                                                 |
+| subAllVideo                    | Boolean  | 是否订阅所有视频；为 false 时使用 `subVideoUserList` 指定。                                                                                            |
+| subVideoUserList               | String[] | 需订阅视频的用户 ID 列表（`subAllVideo=false` 生效）。                                                                                                 |
+| subStreamType                  | String   | 订阅流类型：`high`（大流）、`low`（小流）。                                                                                                            |
+| enableRecording                | Boolean  | 是否进行 MP4 录制。false 时可仅进行截图。                                                                                                              |
+| enableCapture                  | Boolean  | 是否启用截图能力。                                                                                                                                     |
+| videoFrameCaptureType          | Integer  | 截图类型：0=ENCODED（编码帧），1=YUV，2=JPG_FRAME（内存回调保存），3=JPG_FILE（SDK直存JPG）。对应 `Constants.VideoFrameType`/`VideoFrameCaptureType`。 |
+| jpgCaptureIntervalInSec        | Integer  | JPG 截图间隔时间（秒，默认：5）。仅当 `videoFrameCaptureType=3`（JPG_FILE）时生效。                                                                    |
+| isMix                          | Boolean  | 是否合流录制；false 为单流录制。                                                                                                                       |
+| backgroundColor                | Long     | 合流背景色（0xRRGGBB，需转 long）。`isMix=true` 时可用。                                                                                               |
+| backgroundImage                | String   | 合流背景图（PNG/JPG）。与 `backgroundColor` 同时设置时，背景图优先生效。                                                                               |
+| layoutMode                     | String   | 合流布局：`default`、`bestfit`、`vertical`。                                                                                                           |
+| maxResolutionUid               | String   | `vertical` 布局下显示最大分辨率的 UID。                                                                                                                |
+| recorderStreamType             | String   | 录制类型：`audio_only`、`video_only`、`both`。                                                                                                         |
+| recorderPath                   | String   | 输出路径：合流为文件路径；单流为目录（每 UID 生成独立 MP4）。需确保父目录存在。                                                                        |
+| capturePath                    | String   | 截图输出前缀或目录：JPG_FILE 为目录；其他类型为文件前缀。                                                                                              |
+| maxDuration                    | Integer  | 录制时长（秒）。到时自动停止。                                                                                                                         |
+| recoverFile                    | Boolean  | 是否同时写 h264/aac 以便异常后恢复 MP4（仅录制相关）。                                                                                                 |
+| audio.sampleRate               | Integer  | 音频采样率（Hz）。                                                                                                                                     |
+| audio.numOfChannels            | Integer  | 音频通道数。                                                                                                                                           |
+| video.width                    | Integer  | 视频宽度（像素）。                                                                                                                                     |
+| video.height                   | Integer  | 视频高度（像素）。                                                                                                                                     |
+| video.fps                      | Integer  | 视频帧率（fps）。                                                                                                                                      |
+| waterMark[].type               | String   | 水印类型：`litera`（字幕）、`time`（时间戳）、`picture`（图片）。                                                                                      |
+| waterMark[].litera             | String   | 字幕水印内容（type=litera）。                                                                                                                          |
+| waterMark[].fontFilePath       | String   | 字体文件路径（litera/time）。                                                                                                                          |
+| waterMark[].fontSize           | Integer  | 字体大小。                                                                                                                                             |
+| waterMark[].x/y/width/height   | Integer  | 水印矩形区域位置与尺寸。                                                                                                                               |
+| waterMark[].zorder             | Integer  | 水印图层顺序。                                                                                                                                         |
+| waterMark[].imgUrl             | String   | 图片水印路径（type=picture）。                                                                                                                         |
+| encryption.mode                | String   | 加密类型：`AES_128_XTS`、`AES_128_ECB`、`AES_256_XTS`、`SM4_128_ECB`、`AES_128_GCM`、`AES_256_GCM`、`AES_128_GCM2`、`AES_256_GCM2`。                   |
+| encryption.key                 | String   | 加密密钥。                                                                                                                                             |
+| encryption.salt                | String   | 加密盐，32 字符（部分模式需要/可选）。                                                                                                                 |
+| rotation[].uid                 | String   | 需旋转视频的 UID。                                                                                                                                     |
+| rotation[].degree              | Integer  | 旋转角度：0、90、180、270。                                                                                                                            |
+| stressTest.enable              | Boolean  | 是否启用压力测试模式（默认：false）。                                                                                                                  |
+| stressTest.enableSingleChannel | Boolean  | 压力测试中是否所有线程使用单一频道（默认：false）。为 false 时，每个线程使用独立频道。                                                                 |
+| stressTest.threadNum           | Integer  | 压力测试并发线程数（默认：1）。                                                                                                                        |
+| stressTest.testTime            | Integer  | 压力测试总时长，单位秒（默认：10）。                                                                                                                   |
+| stressTest.oneTestTime         | Integer  | 单次录制会话时长，单位秒（默认：3）。                                                                                                                  |
+| stressTest.sleepTime           | Integer  | 录制会话间隔时间，单位秒（默认：1）。                                                                                                                  |
 
 ### 调用 API 录制
 

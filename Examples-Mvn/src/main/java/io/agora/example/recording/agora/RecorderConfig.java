@@ -18,6 +18,7 @@ public class RecorderConfig {
     private boolean enableRecording;
     private boolean enableCapture;
     private int videoFrameCaptureType;
+    private int jpgCaptureIntervalInSec;
     private boolean isMix;
     private long backgroundColor;
     private String backgroundImage;
@@ -49,6 +50,7 @@ public class RecorderConfig {
         enableRecording = true;
         enableCapture = false;
         videoFrameCaptureType = 0;
+        jpgCaptureIntervalInSec = 5;
         stressTest = new StressTest();
     }
 
@@ -480,6 +482,14 @@ public class RecorderConfig {
         this.videoFrameCaptureType = videoFrameCaptureType;
     }
 
+    public int getJpgCaptureIntervalInSec() {
+        return jpgCaptureIntervalInSec;
+    }
+
+    public void setJpgCaptureIntervalInSec(int jpgCaptureIntervalInSec) {
+        this.jpgCaptureIntervalInSec = jpgCaptureIntervalInSec;
+    }
+
     public boolean isMix() {
         return isMix;
     }
@@ -625,6 +635,7 @@ public class RecorderConfig {
                 ", enableRecording=" + enableRecording +
                 ", enableCapture=" + enableCapture +
                 ", videoFrameCaptureType=" + videoFrameCaptureType +
+                ", jpgCaptureIntervalInSec=" + jpgCaptureIntervalInSec +
                 ", isMix=" + isMix +
                 ", backgroundColor=" + backgroundColor +
                 ", backgroundImage='" + backgroundImage + '\'' +

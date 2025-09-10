@@ -504,49 +504,56 @@ After startup, enter `1` in the terminal to stop and exit.
 
 #### recorder_json.example Parameter Reference
 
-| Parameter                    | Type     | Description                                                                                                                                                     |
-| ---------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| appId                        | String   | Project App ID (can also be specified in `.keys`, which has priority).                                                                                          |
-| token                        | String   | Channel Token; can be empty if token authentication is disabled (can also be in `.keys`, which has priority).                                                   |
-| channelName                  | String   | Channel name, must match the client.                                                                                                                            |
-| useStringUid                 | Boolean  | Whether to use string UID. `false` means numeric UID.                                                                                                           |
-| useCloudProxy                | Boolean  | Whether to enable cloud proxy.                                                                                                                                  |
-| userId                       | String   | Recorder user ID; when set to "0" it will be assigned automatically.                                                                                            |
-| subAllAudio                  | Boolean  | Subscribe to all audio; when `false`, use `subAudioUserList`.                                                                                                   |
-| subAudioUserList             | String[] | List of user IDs to subscribe audio from (effective when `subAllAudio=false`).                                                                                  |
-| subAllVideo                  | Boolean  | Subscribe to all video; when `false`, use `subVideoUserList`.                                                                                                   |
-| subVideoUserList             | String[] | List of user IDs to subscribe video from (effective when `subAllVideo=false`).                                                                                  |
-| subStreamType                | String   | Stream type: `high` (high stream) or `low` (low stream).                                                                                                        |
-| enableRecording              | Boolean  | Whether to record MP4. When `false`, you can snapshot only.                                                                                                     |
-| enableCapture                | Boolean  | Whether to enable snapshot capability.                                                                                                                          |
-| videoFrameCaptureType        | Integer  | Snapshot type: 0=ENCODED, 1=YUV, 2=JPG_FRAME (memory callback & save), 3=JPG_FILE (SDK writes JPG). Maps to `Constants.VideoFrameType`/`VideoFrameCaptureType`. |
-| isMix                        | Boolean  | Whether to use mixed recording; `false` means single-stream.                                                                                                    |
-| backgroundColor              | Long     | Mixed background color (0xRRGGBB as long). Effective when `isMix=true`.                                                                                         |
-| backgroundImage              | String   | Mixed background image (PNG/JPG). Takes precedence over `backgroundColor` when both are set.                                                                    |
-| layoutMode                   | String   | Mixed layout: `default`, `bestfit`, `vertical`.                                                                                                                 |
-| maxResolutionUid             | String   | UID displayed at maximum resolution in `vertical` layout.                                                                                                       |
-| recorderStreamType           | String   | Recording type: `audio_only`, `video_only`, `both`.                                                                                                             |
-| recorderPath                 | String   | Output path: for mixed it's a file path; for single it's a directory (each UID generates a separate MP4). Ensure parent directories exist.                      |
-| capturePath                  | String   | Snapshot output prefix or directory: for JPG_FILE it's a directory; for others it's a file prefix.                                                              |
-| maxDuration                  | Integer  | Recording duration (seconds). Stops automatically when reached.                                                                                                 |
-| recoverFile                  | Boolean  | Whether to write h264/aac simultaneously to allow MP4 recovery after crashes (recording-related).                                                               |
-| audio.sampleRate             | Integer  | Audio sample rate (Hz).                                                                                                                                         |
-| audio.numOfChannels          | Integer  | Number of audio channels.                                                                                                                                       |
-| video.width                  | Integer  | Video width (pixels).                                                                                                                                           |
-| video.height                 | Integer  | Video height (pixels).                                                                                                                                          |
-| video.fps                    | Integer  | Video frame rate (fps).                                                                                                                                         |
-| waterMark[].type             | String   | Watermark type: `litera` (text), `time` (timestamp), `picture` (image).                                                                                         |
-| waterMark[].litera           | String   | Text watermark content (when type=litera).                                                                                                                      |
-| waterMark[].fontFilePath     | String   | Font file path (for litera/time).                                                                                                                               |
-| waterMark[].fontSize         | Integer  | Font size.                                                                                                                                                      |
-| waterMark[].x/y/width/height | Integer  | Watermark rectangle position and size.                                                                                                                          |
-| waterMark[].zorder           | Integer  | Watermark layer order.                                                                                                                                          |
-| waterMark[].imgUrl           | String   | Image watermark path (when type=picture).                                                                                                                       |
-| encryption.mode              | String   | Encryption type: `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                      |
-| encryption.key               | String   | Encryption key.                                                                                                                                                 |
-| encryption.salt              | String   | Encryption salt (32 characters; required by some modes).                                                                                                        |
-| rotation[].uid               | String   | UID whose video requires rotation.                                                                                                                              |
-| rotation[].degree            | Integer  | Rotation angle: 0, 90, 180, 270.                                                                                                                                |
+| Parameter                      | Type     | Description                                                                                                                                                     |
+| ------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| appId                          | String   | Project App ID (can also be specified in `.keys`, which has priority).                                                                                          |
+| token                          | String   | Channel Token; can be empty if token authentication is disabled (can also be in `.keys`, which has priority).                                                   |
+| channelName                    | String   | Channel name, must match the client.                                                                                                                            |
+| useStringUid                   | Boolean  | Whether to use string UID. `false` means numeric UID.                                                                                                           |
+| useCloudProxy                  | Boolean  | Whether to enable cloud proxy.                                                                                                                                  |
+| userId                         | String   | Recorder user ID; when set to "0" it will be assigned automatically.                                                                                            |
+| subAllAudio                    | Boolean  | Subscribe to all audio; when `false`, use `subAudioUserList`.                                                                                                   |
+| subAudioUserList               | String[] | List of user IDs to subscribe audio from (effective when `subAllAudio=false`).                                                                                  |
+| subAllVideo                    | Boolean  | Subscribe to all video; when `false`, use `subVideoUserList`.                                                                                                   |
+| subVideoUserList               | String[] | List of user IDs to subscribe video from (effective when `subAllVideo=false`).                                                                                  |
+| subStreamType                  | String   | Stream type: `high` (high stream) or `low` (low stream).                                                                                                        |
+| enableRecording                | Boolean  | Whether to record MP4. When `false`, you can snapshot only.                                                                                                     |
+| enableCapture                  | Boolean  | Whether to enable snapshot capability.                                                                                                                          |
+| videoFrameCaptureType          | Integer  | Snapshot type: 0=ENCODED, 1=YUV, 2=JPG_FRAME (memory callback & save), 3=JPG_FILE (SDK writes JPG). Maps to `Constants.VideoFrameType`/`VideoFrameCaptureType`. |
+| jpgCaptureIntervalInSec        | Integer  | JPG capture interval in seconds (default: 5). Only effective when `videoFrameCaptureType=3` (JPG_FILE).                                                         |
+| isMix                          | Boolean  | Whether to use mixed recording; `false` means single-stream.                                                                                                    |
+| backgroundColor                | Long     | Mixed background color (0xRRGGBB as long). Effective when `isMix=true`.                                                                                         |
+| backgroundImage                | String   | Mixed background image (PNG/JPG). Takes precedence over `backgroundColor` when both are set.                                                                    |
+| layoutMode                     | String   | Mixed layout: `default`, `bestfit`, `vertical`.                                                                                                                 |
+| maxResolutionUid               | String   | UID displayed at maximum resolution in `vertical` layout.                                                                                                       |
+| recorderStreamType             | String   | Recording type: `audio_only`, `video_only`, `both`.                                                                                                             |
+| recorderPath                   | String   | Output path: for mixed it's a file path; for single it's a directory (each UID generates a separate MP4). Ensure parent directories exist.                      |
+| capturePath                    | String   | Snapshot output prefix or directory: for JPG_FILE it's a directory; for others it's a file prefix.                                                              |
+| maxDuration                    | Integer  | Recording duration (seconds). Stops automatically when reached.                                                                                                 |
+| recoverFile                    | Boolean  | Whether to write h264/aac simultaneously to allow MP4 recovery after crashes (recording-related).                                                               |
+| audio.sampleRate               | Integer  | Audio sample rate (Hz).                                                                                                                                         |
+| audio.numOfChannels            | Integer  | Number of audio channels.                                                                                                                                       |
+| video.width                    | Integer  | Video width (pixels).                                                                                                                                           |
+| video.height                   | Integer  | Video height (pixels).                                                                                                                                          |
+| video.fps                      | Integer  | Video frame rate (fps).                                                                                                                                         |
+| waterMark[].type               | String   | Watermark type: `litera` (text), `time` (timestamp), `picture` (image).                                                                                         |
+| waterMark[].litera             | String   | Text watermark content (when type=litera).                                                                                                                      |
+| waterMark[].fontFilePath       | String   | Font file path (for litera/time).                                                                                                                               |
+| waterMark[].fontSize           | Integer  | Font size.                                                                                                                                                      |
+| waterMark[].x/y/width/height   | Integer  | Watermark rectangle position and size.                                                                                                                          |
+| waterMark[].zorder             | Integer  | Watermark layer order.                                                                                                                                          |
+| waterMark[].imgUrl             | String   | Image watermark path (when type=picture).                                                                                                                       |
+| encryption.mode                | String   | Encryption type: `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                      |
+| encryption.key                 | String   | Encryption key.                                                                                                                                                 |
+| encryption.salt                | String   | Encryption salt (32 characters; required by some modes).                                                                                                        |
+| rotation[].uid                 | String   | UID whose video requires rotation.                                                                                                                              |
+| rotation[].degree              | Integer  | Rotation angle: 0, 90, 180, 270.                                                                                                                                |
+| stressTest.enable              | Boolean  | Whether to enable stress test mode (default: false).                                                                                                            |
+| stressTest.enableSingleChannel | Boolean  | Whether to use single channel for all threads in stress test (default: false). When false, each thread uses a separate channel.                                 |
+| stressTest.threadNum           | Integer  | Number of concurrent threads for stress test (default: 1).                                                                                                      |
+| stressTest.testTime            | Integer  | Total stress test duration in seconds (default: 10).                                                                                                            |
+| stressTest.oneTestTime         | Integer  | Duration of each recording session in seconds (default: 3).                                                                                                     |
+| stressTest.sleepTime           | Integer  | Sleep interval between recording sessions in seconds (default: 1).                                                                                              |
 
 ### Recording via API
 

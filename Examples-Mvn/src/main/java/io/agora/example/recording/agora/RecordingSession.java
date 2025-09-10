@@ -262,13 +262,13 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         if (io.agora.recording.utils.Utils.isNullOrEmpty(userId)) {
             resultFilePath = recorderConfig.getRecorderPath().substring(
                     0, recorderConfig.getRecorderPath().lastIndexOf(".mp4"))
-                    + "_" + channelNameInternal + "_"
+                    + "_" + channelNameInternal + "_" + currentUserId + "_"
                     + io.agora.recording.utils.Utils.formatTimestamp(
                             System.currentTimeMillis(), "yyyyMMdd-HHmmssSSS")
                     + ".mp4";
         } else {
             resultFilePath = recorderConfig.getRecorderPath() + userId
-                    + "_" + channelNameInternal + "_"
+                    + "_" + channelNameInternal + "_" + currentUserId + "_"
                     + io.agora.recording.utils.Utils.formatTimestamp(
                             System.currentTimeMillis(), "yyyyMMdd-HHmmssSSS")
                     + ".mp4";
@@ -397,9 +397,11 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                             Constants.VideoFrameCaptureType.fromInt(recorderConfig.getVideoFrameCaptureType()));
             if (recorderConfig.getVideoFrameCaptureType() == Constants.VideoFrameCaptureType.VIDEO_FORMAT_JPG_FILE_TYPE
                     .getValue()) {
+                String jpgCapturePath = recorderConfig.getCapturePath() + currentUserId + "/";
+                checkRecordingPath(jpgCapturePath);
                 recorderVideoFrameCaptureConfig
-                        .setJpgFileStorePath(recorderConfig.getCapturePath());
-                recorderVideoFrameCaptureConfig.setJpgCaptureIntervalInSec(5);
+                        .setJpgFileStorePath(jpgCapturePath);
+                recorderVideoFrameCaptureConfig.setJpgCaptureIntervalInSec(recorderConfig.getJpgCaptureIntervalInSec());
             }
             recorderVideoFrameCaptureConfig.setObserver(new IRecorderVideoFrameObserver() {
                 @Override
