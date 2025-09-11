@@ -80,14 +80,9 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
         }
 
         agoraMediaRtcRecorder = agoraService.createMediaRtcRecorder();
-        boolean recordEncodedOnly = false;
-        if (recorderConfig.isEnableCapture() && (recorderConfig
-                .getVideoFrameCaptureType() == Constants.VideoFrameCaptureType.VIDEO_FORMAT_ENCODED_FRAME_TYPE
-                        .getValue())) {
-            recordEncodedOnly = true;
-        }
-        log.info("[" + taskId + "]joinChannel recordEncodedOnly:" + recordEncodedOnly);
-        agoraMediaRtcRecorder.initialize(agoraService, recorderConfig.isMix(), recordEncodedOnly);
+        agoraMediaRtcRecorder.initialize(agoraService, recorderConfig.isMix(),
+                recorderConfig.isRecordEncodedOnly());
+        log.info("[" + taskId + "]joinChannel initialize isRecordEncodedOnly:" + recorderConfig.isRecordEncodedOnly());
         agoraMediaRtcRecorder.registerRecorderEventHandler(this);
         // agoraMediaRtcRecorder.setAudioVolumeIndicationParameters(500);
 
@@ -121,8 +116,9 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
             }
         }
         VideoSubscriptionOptions options = new VideoSubscriptionOptions();
-        options.setEncodedFrameOnly(false);
+        options.setEncodedFrameOnly(recorderConfig.isSubscribeEncodedFrameOnly());
         options.setType(Utils.convertToVideoStreamType(recorderConfig.getSubStreamType()));
+        log.info("[" + taskId + "]subscribeVideo options:" + options);
         if (recorderConfig.isSubAllVideo()) {
             agoraMediaRtcRecorder.subscribeAllVideo(options);
         } else {
@@ -689,10 +685,6 @@ public class RecordingSession implements IAgoraMediaRtcRecorderEventHandler {
                 + userId + " state:" + state + " reason:" + reason + " fileName:" + fileName);
         recorderState = state;
         if (state == Constants.RecorderState.RECORDER_STATE_START) {
-            if (!new File(fileName).exists()) {
-                log.info("[" + taskId + "]onRecorderStateChanged fileName:" + fileName + " not exists");
-                System.exit(1);
-            }
             resultFilePath = fileName;
         }
     }

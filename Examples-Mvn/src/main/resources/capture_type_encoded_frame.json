@@ -18,6 +18,7 @@
     "enableCapture": true,
     "videoFrameCaptureType": 0,
     "isMix": true,
+    "subscribeEncodedFrameOnly": true,
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",
     "recorderStreamType": "both",

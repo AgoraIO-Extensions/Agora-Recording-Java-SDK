@@ -20,6 +20,8 @@ public class RecorderConfig {
     private int videoFrameCaptureType;
     private int jpgCaptureIntervalInSec;
     private boolean isMix;
+    private boolean recordEncodedOnly;
+    private boolean subscribeEncodedFrameOnly;
     private long backgroundColor;
     private String backgroundImage;
     private String layoutMode;
@@ -52,6 +54,8 @@ public class RecorderConfig {
         videoFrameCaptureType = 0;
         jpgCaptureIntervalInSec = 5;
         stressTest = new StressTest();
+        recordEncodedOnly = false;
+        subscribeEncodedFrameOnly = false;
     }
 
     public static class AudioConfig {
@@ -498,6 +502,22 @@ public class RecorderConfig {
         this.isMix = isMix;
     }
 
+    public boolean isRecordEncodedOnly() {
+        return recordEncodedOnly;
+    }
+
+    public void setRecordEncodedOnly(boolean recordEncodedOnly) {
+        this.recordEncodedOnly = recordEncodedOnly;
+    }
+
+    public boolean isSubscribeEncodedFrameOnly() {
+        return subscribeEncodedFrameOnly;
+    }
+
+    public void setSubscribeEncodedFrameOnly(boolean subscribeEncodedFrameOnly) {
+        this.subscribeEncodedFrameOnly = subscribeEncodedFrameOnly;
+    }
+
     public long getBackgroundColor() {
         return backgroundColor;
     }
@@ -637,6 +657,8 @@ public class RecorderConfig {
                 ", videoFrameCaptureType=" + videoFrameCaptureType +
                 ", jpgCaptureIntervalInSec=" + jpgCaptureIntervalInSec +
                 ", isMix=" + isMix +
+                ", recordEncodedOnly=" + recordEncodedOnly +
+                ", subscribeEncodedFrameOnly=" + subscribeEncodedFrameOnly +
                 ", backgroundColor=" + backgroundColor +
                 ", backgroundImage='" + backgroundImage + '\'' +
                 ", layoutMode='" + layoutMode + '\'' +

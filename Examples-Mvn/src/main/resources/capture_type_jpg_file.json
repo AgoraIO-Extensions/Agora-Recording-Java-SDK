@@ -17,7 +17,7 @@
     "enableRecording": false,
     "enableCapture": true,
     "videoFrameCaptureType": 3,
-    "jpgCaptureIntervalInSec": 10,
+    "jpgCaptureIntervalInSec": 5,
     "isMix": true,
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",

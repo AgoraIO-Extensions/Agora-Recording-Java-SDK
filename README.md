@@ -40,7 +40,12 @@
       - [3. Build the Project](#3-build-the-project)
       - [4. Run the Example Service](#4-run-the-example-service)
       - [5. RESTful API Recording Control](#5-restful-api-recording-control)
-      - [6. Troubleshooting](#6-troubleshooting)
+      - [6. recordEncodedOnly and subscribeEncodedFrameOnly](#6-recordencodedonly-and-subscribeencodedframeonly)
+        - [Parameter Description](#parameter-description)
+        - [Four Combination Modes Reference](#four-combination-modes-reference)
+        - [Code Usage Examples](#code-usage-examples)
+        - [Usage Scenario Recommendations](#usage-scenario-recommendations)
+      - [7. Troubleshooting](#7-troubleshooting)
     - [Recording via Command Line (Examples-Mvn)](#recording-via-command-line-examples-mvn)
       - [Prerequisites](#prerequisites)
       - [Run Command](#run-command)
@@ -451,7 +456,102 @@ In `Examples-Mvn`:
 
 > Place recording config files in `Examples-Mvn/src/main/resources/`.
 
-#### 6. Troubleshooting
+#### 6. recordEncodedOnly and subscribeEncodedFrameOnly
+
+These two parameters control the recording file writing method and video stream subscription processing respectively:
+
+- **recordEncodedOnly**: Controls whether to write encoded data directly to MP4 file
+- **subscribeEncodedFrameOnly**: Controls whether to decode the subscribed video stream
+
+##### Parameter Description
+
+| Parameter                 | Value | Meaning                     | Description                                                                                                      |
+| ------------------------- | ----- | --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| recordEncodedOnly         | true  | Write encoded data to MP4   | Write H.264/H.265 encoded data directly to MP4 file without decoding, high performance but no watermark support  |
+| recordEncodedOnly         | false | Decode then re-encode write | Decode first then re-encode to write MP4, supports watermark overlay but consumes more CPU resources             |
+| subscribeEncodedFrameOnly | true  | Subscribe without decoding  | Subscribe without decoding video stream, get encoded data directly, suitable for encoded frame capture           |
+| subscribeEncodedFrameOnly | false | Subscribe with decoding     | Decode video stream during subscription, get YUV raw data, suitable for scenarios requiring raw video processing |
+
+##### Four Combination Modes Reference
+
+| recordEncodedOnly | subscribeEncodedFrameOnly | Mode Description     | Features                                                     | Use Cases                                                                                                             |
+| ----------------- | ------------------------- | -------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| false             | false                     | **Standard Mode**    | Subscribe with decoding + Decode then re-encode recording    | Standard recording scenarios requiring watermarks, video processing, YUV capture                                      |
+| false             | true                      | **Hybrid Mode**      | Subscribe without decoding + Decode then re-encode recording | Scenarios requiring watermark functionality while performing encoded frame capture                                    |
+| true              | false                     | **Performance Mode** | Subscribe with decoding + Write encoded data directly        | High-performance recording, supports YUV processing but no watermarks                                                 |
+| true              | true                      | **Speed Mode**       | Subscribe without decoding + Write encoded data directly     | Highest performance with lowest CPU consumption, supports only encoded frame capture, no watermarks or YUV processing |
+
+##### Code Usage Examples
+
+**1. Setting recordEncodedOnly (when initializing recorder)**
+
+```java
+// Create recorder
+AgoraMediaRtcRecorder agoraMediaRtcRecorder = agoraService.createMediaRtcRecorder();
+
+// Method 1: Use default value (recordEncodedOnly = false)
+boolean enableMix = false; // Whether to enable mixed recording
+agoraMediaRtcRecorder.initialize(agoraService, enableMix);
+
+// Method 2: Explicitly set recordEncodedOnly
+boolean enableMix = false; // Whether to enable mixed recording
+boolean recordEncodedOnly = true; // Record encoded frames only for better performance
+agoraMediaRtcRecorder.initialize(agoraService, enableMix, recordEncodedOnly);
+```
+
+**2. Setting subscribeEncodedFrameOnly (when subscribing video)**
+
+```java
+// Create video subscription options
+VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+
+// Set whether to subscribe encoded frames only
+boolean subscribeEncodedFrameOnly = true; // Subscribe encoded frames only for encoded frame capture
+options.setEncodedFrameOnly(subscribeEncodedFrameOnly);
+options.setType(VideoStreamType.VIDEO_STREAM_HIGH);
+
+// Subscribe video
+if (subscribeAllVideo) {
+    agoraMediaRtcRecorder.subscribeAllVideo(options);
+} else {
+    agoraMediaRtcRecorder.subscribeVideo("USER_ID", options);
+}
+```
+
+**3. Configuration in JSON file**
+
+Set these parameters in JSON configuration file:
+
+```json
+{
+    "recordEncodedOnly": true,              // Record encoded frames only
+    "subscribeEncodedFrameOnly": true,      // Subscribe encoded frames only
+    "videoFrameCaptureType": 0,             // 0=ENCODED (encoded frame capture)
+    "enableRecording": true,
+    "enableCapture": true
+}
+```
+
+##### Usage Scenario Recommendations
+
+- **Standard Recording**: `recordEncodedOnly=false` + `subscribeEncodedFrameOnly=false`
+  - Supports watermarks, video processing, YUV capture and other complete features
+  - Higher CPU consumption, suitable for scenarios requiring full functionality
+
+- **Encoded Frame Capture + Watermark Recording**: `recordEncodedOnly=false` + `subscribeEncodedFrameOnly=true`
+  - Supports both watermark recording and encoded frame capture
+  - Balances performance and functionality requirements
+
+- **High-Performance Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=false`
+  - High recording performance, supports YUV processing but no watermarks
+  - Suitable for scenarios requiring YUV data processing with high recording performance demands
+
+- **Speed Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=true`
+  - Highest performance with lowest CPU consumption
+  - Supports only encoded frame capture, no watermarks or YUV processing
+  - Suitable for large-scale concurrent recording scenarios
+
+#### 7. Troubleshooting
 
 - If the service fails to start, check `.so` paths, `.keys` content, and port usage.
 - If there is no recording output, ensure there are active users in the channel and that AppId/Token/channel name are correct.
@@ -522,6 +622,8 @@ After startup, enter `1` in the terminal to stop and exit.
 | videoFrameCaptureType          | Integer  | Snapshot type: 0=ENCODED, 1=YUV, 2=JPG_FRAME (memory callback & save), 3=JPG_FILE (SDK writes JPG). Maps to `Constants.VideoFrameType`/`VideoFrameCaptureType`. |
 | jpgCaptureIntervalInSec        | Integer  | JPG capture interval in seconds (default: 5). Only effective when `videoFrameCaptureType=3` (JPG_FILE).                                                         |
 | isMix                          | Boolean  | Whether to use mixed recording; `false` means single-stream.                                                                                                    |
+| recordEncodedOnly              | Boolean  | Whether to record encoded frames only. When `true`, H.264/H.265 bitstream is written directly to MP4 without decoding (default: false).                         |
+| subscribeEncodedFrameOnly      | Boolean  | Whether to subscribe encoded frames only. When `true`, only encoded frames are subscribed without decoding (default: false).                                    |
 | backgroundColor                | Long     | Mixed background color (0xRRGGBB as long). Effective when `isMix=true`.                                                                                         |
 | backgroundImage                | String   | Mixed background image (PNG/JPG). Takes precedence over `backgroundColor` when both are set.                                                                    |
 | layoutMode                     | String   | Mixed layout: `default`, `bestfit`, `vertical`.                                                                                                                 |
@@ -804,13 +906,15 @@ if (ret != 0) {
 // agoraMediaRtcRecorder.enableRecorderVideoFrameCapture(false, capCfg);
 ```
 
-> Note: For encoded frame snapshots (ENCODED), use the initialize overload with `recordEncodedOnly=true`, otherwise you may not achieve pure bitstream writing. Watermarks are not supported in this mode.
+> Note: For encoded frame capture (ENCODED), the following settings are required:
+> 1. Set `setEncodedFrameOnly(true)` in video subscription options, which is necessary for encoded frame capture
 
 ```java
-// Initialization example: third parameter is recordEncodedOnly
-boolean enableMix = false;
-agoraMediaRtcRecorder.initialize(agoraService, enableMix, /* recordEncodedOnly = */ true);
-// Watermarks are not supported with recordEncodedOnly=true
+// Set video subscription options to support encoded frame capture
+VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+boolean encodedFrameOnly = true; // Set to true to enable encoded frame capture
+options.setEncodedFrameOnly(encodedFrameOnly);
+options.setType(Utils.convertToVideoStreamType(subStreamType));
 ```
 
 ## API Reference
@@ -825,7 +929,7 @@ See [API-reference.md](API-reference.md) for detailed SDK APIs.
 
 - Removed: `AgoraMediaComponentFactory` class. Create recorder via `AgoraService#createMediaRtcRecorder()`.
 - Added: `AgoraMediaRtcRecorder#enableRecorderVideoFrameCapture(boolean, RecorderVideoFrameCaptureConfig)` to support ENCODED/YUV/JPG/JPG_FILE snapshots.
-- Added: `AgoraMediaRtcRecorder#initialize(AgoraService, boolean, boolean recordEncodedOnly)`; with `recordEncodedOnly=true`, video is not decoded and H.264 bitstream is written directly (no watermarks, no YUV/JPG callbacks).
+- Added: `AgoraMediaRtcRecorder#initialize(AgoraService, boolean, boolean recordEncodedOnly)`; with `recordEncodedOnly=true`, video is not decoded and H.264 or H.265 bitstream is written directly to MP4 file.
 - Added: `IRecorderVideoFrameObserver` callbacks: `onYuvFrameCaptured`, `onEncodedFrameReceived`, `onJPGFileSaved`.
 - Added: `RecorderVideoFrameCaptureConfig` fields `videoFrameType`, `jpgFileStorePath`, `jpgCaptureIntervalInSec`, `observer`.
 - Added: `Constants` enums `VideoCodecType`, `VideoFrameType`, `VideoOrientation`.

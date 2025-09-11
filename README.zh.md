@@ -40,7 +40,12 @@
       - [3. 编译打包](#3-编译打包)
       - [4. 运行示例服务](#4-运行示例服务)
       - [5. RESTful API 录制控制](#5-restful-api-录制控制)
-      - [6. 常见问题](#6-常见问题)
+      - [6. recordEncodedOnly 和 subscribeEncodedFrameOnly](#6-recordencodedonly-和-subscribeencodedframeonly)
+        - [参数含义说明](#参数含义说明)
+        - [四种组合模式对照表](#四种组合模式对照表)
+        - [代码用法示例](#代码用法示例)
+        - [使用场景建议](#使用场景建议)
+      - [7. 常见问题](#7-常见问题)
     - [使用命令行录制（Examples-Mvn）](#使用命令行录制examples-mvn)
       - [前提条件](#前提条件)
       - [运行命令](#运行命令)
@@ -444,7 +449,103 @@ TOKEN=你的Token
 
 > 录制配置文件需放在 `Examples-Mvn/src/main/resources/` 目录下。
 
-#### 6. 常见问题
+#### 6. recordEncodedOnly 和 subscribeEncodedFrameOnly
+
+这两个参数分别控制录制文件的写入方式和订阅视频流的处理方式：
+
+- **recordEncodedOnly**：控制录制文件是否直接将编码数据写入 MP4 文件
+- **subscribeEncodedFrameOnly**：控制订阅的视频流是否进行解码处理
+
+##### 参数含义说明
+
+| 参数                      | 值    | 含义                | 说明                                                                      |
+| ------------------------- | ----- | ------------------- | ------------------------------------------------------------------------- |
+| recordEncodedOnly         | true  | 编码数据直接写入MP4 | 将 H.264/H.265 编码数据直接写入 MP4 文件，不解码，性能高但无法添加水印    |
+| recordEncodedOnly         | false | 解码后重新编码写入  | 先解码再重新编码写入 MP4，支持水印叠加，但消耗更多 CPU 资源               |
+| subscribeEncodedFrameOnly | true  | 订阅流不解码        | 订阅时不对视频流进行解码，直接获取编码数据，适用于编码帧截图              |
+| subscribeEncodedFrameOnly | false | 订阅流解码          | 订阅时对视频流进行解码，可获取 YUV 原始数据，适用于需要处理原始视频的场景 |
+
+##### 四种组合模式对照表
+
+| recordEncodedOnly | subscribeEncodedFrameOnly | 模式说明     | 特点                              | 适用场景                                          |
+| ----------------- | ------------------------- | ------------ | --------------------------------- | ------------------------------------------------- |
+| false             | false                     | **标准模式** | 订阅流解码 + 解码后重新编码录制   | 需要水印、视频处理、YUV截图的标准录制场景         |
+| false             | true                      | **混合模式** | 订阅流不解码 + 解码后重新编码录制 | 需要水印功能，同时进行编码帧截图的场景            |
+| true              | false                     | **性能模式** | 订阅流解码 + 编码数据直接写入     | 高性能录制，需要YUV处理但不需要水印               |
+| true              | true                      | **极速模式** | 订阅流不解码 + 编码数据直接写入   | 最高性能录制，仅需编码帧截图，不支持水印和YUV处理 |
+
+##### 代码用法示例
+
+**1. 设置 recordEncodedOnly（初始化录制器时）**
+
+```java
+// 创建录制器
+AgoraMediaRtcRecorder agoraMediaRtcRecorder = agoraService.createMediaRtcRecorder();
+
+// 方式一：使用默认值（recordEncodedOnly = false）
+boolean enableMix = false; // 是否合流
+agoraMediaRtcRecorder.initialize(agoraService, enableMix);
+
+// 方式二：明确设置 recordEncodedOnly
+boolean enableMix = false; // 是否合流
+boolean recordEncodedOnly = true; // 仅录制编码帧，提高性能
+agoraMediaRtcRecorder.initialize(agoraService, enableMix, recordEncodedOnly);
+```
+
+**2. 设置 subscribeEncodedFrameOnly（订阅视频时）**
+
+```java
+// 创建视频订阅选项
+VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+
+// 设置是否仅订阅编码帧
+boolean subscribeEncodedFrameOnly = true; // 仅订阅编码帧，用于编码帧截图
+options.setEncodedFrameOnly(subscribeEncodedFrameOnly);
+options.setType(VideoStreamType.VIDEO_STREAM_HIGH);
+
+// 订阅视频
+if (需要订阅所有视频) {
+    agoraMediaRtcRecorder.subscribeAllVideo(options);
+} else {
+    agoraMediaRtcRecorder.subscribeVideo("用户ID", options);
+}
+```
+
+**3. 配置文件中的设置**
+
+在 JSON 配置文件中设置这两个参数：
+
+```json
+{
+    "recordEncodedOnly": true,              // 仅录制编码帧
+    "subscribeEncodedFrameOnly": true,      // 仅订阅编码帧
+    "videoFrameCaptureType": 0,             // 0=ENCODED（编码帧截图）
+    "enableRecording": true,
+    "enableCapture": true
+}
+```
+
+##### 使用场景建议
+
+- **标准录制场景**：`recordEncodedOnly=false` + `subscribeEncodedFrameOnly=false`
+  - 支持水印、视频处理、YUV截图等完整功能
+  - CPU消耗较高，适合功能完整性要求高的场景
+
+- **编码帧截图 + 水印录制**：`recordEncodedOnly=false` + `subscribeEncodedFrameOnly=true`
+  - 既能添加水印录制，又能进行编码帧截图
+  - 平衡性能和功能需求
+
+- **高性能录制**：`recordEncodedOnly=true` + `subscribeEncodedFrameOnly=false`
+  - 录制性能高，支持YUV处理，但不支持水印
+  - 适合需要YUV数据处理但对录制性能要求高的场景
+
+- **极速录制**：`recordEncodedOnly=true` + `subscribeEncodedFrameOnly=true`
+  - 最高性能，最低CPU消耗
+  - 仅支持编码帧截图，不支持水印和YUV处理
+  - 适合大规模并发录制场景
+
+
+#### 7. 常见问题
 
 - 若服务无法启动，请检查 so 文件路径、.keys 文件内容及端口占用。
 - 录制无输出时，请检查频道内有无活跃用户、AppId/Token/频道名是否正确。
@@ -515,6 +616,8 @@ TOKEN=你的Token
 | videoFrameCaptureType          | Integer  | 截图类型：0=ENCODED（编码帧），1=YUV，2=JPG_FRAME（内存回调保存），3=JPG_FILE（SDK直存JPG）。对应 `Constants.VideoFrameType`/`VideoFrameCaptureType`。 |
 | jpgCaptureIntervalInSec        | Integer  | JPG 截图间隔时间（秒，默认：5）。仅当 `videoFrameCaptureType=3`（JPG_FILE）时生效。                                                                    |
 | isMix                          | Boolean  | 是否合流录制；false 为单流录制。                                                                                                                       |
+| recordEncodedOnly              | Boolean  | 是否仅录制编码帧。为 true 时，录制时直接将 H.264/H.265 码流写入 MP4 文件，不进行解码（默认：false）。                                                  |
+| subscribeEncodedFrameOnly      | Boolean  | 是否仅订阅编码帧。为 true 时，订阅时仅订阅编码帧，不进行解码（默认：false）。                                                                          |
 | backgroundColor                | Long     | 合流背景色（0xRRGGBB，需转 long）。`isMix=true` 时可用。                                                                                               |
 | backgroundImage                | String   | 合流背景图（PNG/JPG）。与 `backgroundColor` 同时设置时，背景图优先生效。                                                                               |
 | layoutMode                     | String   | 合流布局：`default`、`bestfit`、`vertical`。                                                                                                           |
@@ -802,13 +905,15 @@ if (ret != 0) {
 // agoraMediaRtcRecorder.enableRecorderVideoFrameCapture(false, capCfg);
 ```
 
-> 注意：若进行“编码帧截图”（ENCODED），需要使用带 `recordEncodedOnly` 的初始化方法并传入 `true`，否则可能无法达到“仅编码直写”的效果，且在该模式下无法添加水印。
+> 注意：若进行"编码帧截图"（ENCODED），需要进行以下设置：
+> 1. 在视频订阅选项中设置 `setEncodedFrameOnly(true)`，这是截屏编码帧的必要条件
 
 ```java
-// 初始化示例：第三个参数为 recordEncodedOnly
-boolean enableMix = false; // 是否合流
-agoraMediaRtcRecorder.initialize(agoraService, enableMix, /* recordEncodedOnly = */ true);
-// 该模式下不支持水印（包括合流水印和 JPG/JPG_FRAME 叠加水印）
+// 设置视频订阅选项以支持编码帧截图
+VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+boolean encodedFrameOnly = true; // 设置为 true 才能截屏编码帧
+options.setEncodedFrameOnly(encodedFrameOnly);
+options.setType(Utils.convertToVideoStreamType(subStreamType));
 ```
 
 
@@ -824,7 +929,7 @@ agoraMediaRtcRecorder.initialize(agoraService, enableMix, /* recordEncodedOnly =
 
 - **移除**：移除`AgoraMediaComponentFactory` 类，录制器创建通过 `AgoraService#createMediaRtcRecorder()` 方法创建。
 - **新增**：`AgoraMediaRtcRecorder` 类新增 `enableRecorderVideoFrameCapture(boolean, RecorderVideoFrameCaptureConfig)` 方法，支持 ENCODED/YUV/JPG/JPG_FILE 帧捕获。
-- **新增**：`AgoraMediaRtcRecorder` 类重载 `initialize(AgoraService, boolean, boolean recordEncodedOnly)` 方法；当 `recordEncodedOnly=true` 时，不解码直写 H.264（不支持水印及 YUV/JPG 回调）。
+- **新增**：`AgoraMediaRtcRecorder` 类重载 `initialize(AgoraService, boolean, boolean recordEncodedOnly)` 方法；当 `recordEncodedOnly=true` 时，不解码直写 H.264 / H.265 码流到MP4文件。
 - **新增**：`IRecorderVideoFrameObserver` 回调：`onYuvFrameCaptured`、`onEncodedFrameReceived`、`onJPGFileSaved`。
 - **新增**：`RecorderVideoFrameCaptureConfig` 增加 `videoFrameType`、`jpgFileStorePath`、`jpgCaptureIntervalInSec`、`observer` 配置项。
 - **新增**：`Constants` 增加 `VideoCodecType`、`VideoFrameType`、`VideoOrientation` 枚举。

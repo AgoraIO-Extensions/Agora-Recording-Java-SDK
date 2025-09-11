@@ -15,6 +15,8 @@
     "videoFrameCaptureType": 0, // 截图类型，0为编码帧，1为YUV帧，2为JPG帧，3为JPG文件
     "jpgCaptureIntervalInSec": 5, // JPG文件截图间隔，单位秒,默认5秒，只有当videoFrameCaptureType为3时有效
     "isMix":true,             // 是否合流录制
+    "recordEncodedOnly": false, // 是否只录制编码帧，如果为true，则录制的时候直接把H264或者H265的bitstream写入mp4文件，不进行解码，默认false
+    "subscribeEncodedFrameOnly": false, // 是否只订阅编码帧，如果为true，则订阅的时候只订阅编码帧，不进行解码，默认false
     "backgroundColor": 0,     // 合流录制设置背景颜色，uint32_t变量中设置 RGB 颜色，通常使用 32 位颜色格式（0xRRGGBB）RR：红色（8 位，0-255）,GG：绿色（8 位，0-255）,BB：蓝色（8 位，0-255），需要转为long类型的值
     "backgroundImage": "1.jpg",  // 合流录制设置背景图片，当同时设置了背景颜色和背景图片，背景图片生效。图片支持png和jpg
     "layoutMode":"bestfit",      // 合流录制布局，支持 default（默认布局）， bestfit（自适应布局）， vertical（垂直布局）
