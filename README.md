@@ -465,21 +465,21 @@ These two parameters control the recording file writing method and video stream 
 
 ##### Parameter Description
 
-| Parameter                 | Value | Meaning                     | Description                                                                                                      |
-| ------------------------- | ----- | --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| recordEncodedOnly         | true  | Write encoded data to MP4   | Write H.264/H.265 encoded data directly to MP4 file without decoding, high performance but no watermark support  |
-| recordEncodedOnly         | false | Decode then re-encode write | Decode first then re-encode to write MP4, supports watermark overlay but consumes more CPU resources             |
-| subscribeEncodedFrameOnly | true  | Subscribe without decoding  | Subscribe without decoding video stream, get encoded data directly, suitable for encoded frame capture           |
-| subscribeEncodedFrameOnly | false | Subscribe with decoding     | Decode video stream during subscription, get YUV raw data, suitable for scenarios requiring raw video processing |
+| Parameter                 | Value | Meaning                     | Description                                                                                                                         |
+| ------------------------- | ----- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| recordEncodedOnly         | true  | Write encoded data to MP4   | Write H.264/H.265 encoded data directly to MP4 file without decoding, high performance but no watermark support, single-stream only |
+| recordEncodedOnly         | false | Decode then re-encode write | Decode first then re-encode to write MP4, supports watermark overlay and mixed-stream recording but consumes more CPU resources     |
+| subscribeEncodedFrameOnly | true  | Subscribe without decoding  | Subscribe without decoding video stream, get encoded data directly, suitable for encoded frame capture                              |
+| subscribeEncodedFrameOnly | false | Subscribe with decoding     | Decode video stream during subscription, get YUV raw data, suitable for scenarios requiring raw video processing                    |
 
 ##### Four Combination Modes Reference
 
-| recordEncodedOnly | subscribeEncodedFrameOnly | Mode Description     | Features                                                     | Use Cases                                                                                                             |
-| ----------------- | ------------------------- | -------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| false             | false                     | **Standard Mode**    | Subscribe with decoding + Decode then re-encode recording    | Standard recording scenarios requiring watermarks, video processing, YUV capture                                      |
-| false             | true                      | **Hybrid Mode**      | Subscribe without decoding + Decode then re-encode recording | Scenarios requiring watermark functionality while performing encoded frame capture                                    |
-| true              | false                     | **Performance Mode** | Subscribe with decoding + Write encoded data directly        | High-performance recording, supports YUV processing but no watermarks                                                 |
-| true              | true                      | **Speed Mode**       | Subscribe without decoding + Write encoded data directly     | Highest performance with lowest CPU consumption, supports only encoded frame capture, no watermarks or YUV processing |
+| recordEncodedOnly | subscribeEncodedFrameOnly | Mode Description     | Features                                                  | Use Cases                                                                                                                       |
+| ----------------- | ------------------------- | -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| false             | false                     | **Standard Mode**    | Subscribe with decoding + Decode then re-encode recording | Standard recording scenarios requiring watermarks, mixed-stream recording, video processing, YUV capture                        |
+| false             | true                      | **❌ Not Feasible**   | Subscribe without decoding, no YUV data for recording     | This combination is not feasible: no decoded data available for re-encoding recording                                           |
+| true              | false                     | **Performance Mode** | Subscribe with decoding + Write encoded data directly     | High-performance single-stream recording, supports YUV processing but no watermarks or mixed-stream recording                   |
+| true              | true                      | **Speed Mode**       | Subscribe without decoding + Write encoded data directly  | Highest performance single-stream recording, supports only encoded frame capture, no watermarks, mixed-stream or YUV processing |
 
 ##### Code Usage Examples
 
@@ -534,22 +534,26 @@ Set these parameters in JSON configuration file:
 
 ##### Usage Scenario Recommendations
 
+**✅ Feasible Combinations:**
+
 - **Standard Recording**: `recordEncodedOnly=false` + `subscribeEncodedFrameOnly=false`
-  - Supports watermarks, video processing, YUV capture and other complete features
+  - Supports watermarks, mixed-stream recording, video processing, YUV capture and other complete features
   - Higher CPU consumption, suitable for scenarios requiring full functionality
 
-- **Encoded Frame Capture + Watermark Recording**: `recordEncodedOnly=false` + `subscribeEncodedFrameOnly=true`
-  - Supports both watermark recording and encoded frame capture
-  - Balances performance and functionality requirements
+- **High-Performance Single-Stream Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=false`
+  - High recording performance, supports YUV processing but only single-stream recording, no watermarks or mixed-stream
+  - Suitable for scenarios requiring YUV data processing with high recording performance demands for single streams
 
-- **High-Performance Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=false`
-  - High recording performance, supports YUV processing but no watermarks
-  - Suitable for scenarios requiring YUV data processing with high recording performance demands
-
-- **Speed Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=true`
+- **Speed Single-Stream Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=true`
   - Highest performance with lowest CPU consumption
-  - Supports only encoded frame capture, no watermarks or YUV processing
-  - Suitable for large-scale concurrent recording scenarios
+  - Supports only single-stream recording and encoded frame capture, no watermarks, mixed-stream or YUV processing
+  - Suitable for large-scale concurrent single-stream recording scenarios
+
+**❌ Not Feasible Combination:**
+
+- **`recordEncodedOnly=false` + `subscribeEncodedFrameOnly=true`**
+  - This combination is logically contradictory: subscribing without decoding provides no YUV data for re-encoding recording
+  - For encoded frame capture functionality, use combinations with `recordEncodedOnly=true`
 
 #### 7. Troubleshooting
 
