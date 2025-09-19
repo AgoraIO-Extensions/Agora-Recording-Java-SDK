@@ -63,7 +63,7 @@
       - [Snapshot Feature (API Example)](#snapshot-feature-api-example)
   - [API Reference](#api-reference)
   - [Changelog](#changelog)
-    - [v4.4.151 / v4.4.151-aarch64 (2025-09-04)](#v44151--v44151-aarch64-2025-09-04)
+    - [v4.4.151.1 / v4.4.151-aarch64 (2025-09-04)](#v441511--v44151-aarch64-2025-09-04)
       - [API Changes](#api-changes)
     - [v4.4.150.5 (2025-06-30)](#v441505-2025-06-30)
       - [API Changes](#api-changes-1)
@@ -89,7 +89,7 @@
 
 ## Introduction
 
-The Agora Recording Java SDK (v4.4.151) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
+The Agora Recording Java SDK (v4.4.151.1) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
 
 ## Development Environment Requirements
 
@@ -126,7 +126,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.151</version>
+    <version>4.4.151.1</version>
 </dependency>
 ```
 
@@ -144,11 +144,11 @@ The required bandwidth depends on the number of channels to be recorded simultan
 
 #### x86_64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.151-x86_64-869516-6f3284e71a-20250904_152151](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151-x86_64-869516-6f3284e71a-20250904_152151.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.151.1-x86_64-891308-28c706d74a-20250919_142050](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151.1-x86_64-891308-28c706d74a-20250919_142050.zip)
 
 #### arm64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-869533-8256baf788-20250904_155630](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-869533-8256baf788-20250904_155630.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-891319-952e64402b-20250919_140753](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-891319-952e64402b-20250919_140753.zip)
 
 ## Integrating the SDK
 
@@ -167,7 +167,7 @@ Add the following dependency to your project's `pom.xml` file:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.151</version>
+    <version>4.4.151.1</version>
 </dependency>
 
 <!-- arm64 Platform -->
@@ -209,7 +209,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.151 \
+  -Dversion=4.4.151.1 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -221,7 +221,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.151 \
+  -Dversion=4.4.151.1 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -233,7 +233,7 @@ After installation, add the dependency in `pom.xml`:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.151</version>
+    <version>4.4.151.1</version>
 </dependency>
 ```
 
@@ -282,7 +282,7 @@ The `.so` files are contained within the `agora-recording-sdk.jar` or `linux-rec
    jar xvf agora-recording-sdk.jar
 
    # If using Maven integration, the JAR file is in the Maven cache, e.g.:
-   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.151/linux-recording-java-sdk-4.4.151.jar
+   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.151.1/linux-recording-java-sdk-4.4.151.1.jar
    ```
 
 3. After extraction, a `native/linux/x86_64` subdirectory (or `aarch64` for ARM) will be generated in the `libs` directory, containing the required `.so` files:
@@ -402,12 +402,12 @@ TOKEN=YourToken
 #### 2. Configure JAR and .so Libraries
 
 - Configure JAR (choose one of the following):
-  - Use online Maven version: edit `Examples-Mvn/pom.xml` and choose version by platform (x86_64 uses `4.4.151`, arm64 uses `4.4.151-aarch64`):
+  - Use online Maven version: edit `Examples-Mvn/pom.xml` and choose version by platform (x86_64 uses `4.4.151.1`, arm64 uses `4.4.151-aarch64`):
     ```xml
     <dependency>
         <groupId>io.agora.rtc</groupId>
         <artifactId>linux-recording-java-sdk</artifactId>
-        <version>4.4.151</version>
+        <version>4.4.151.1</version>
     </dependency>
     <!-- For arm64 platform, replace with 4.4.151-aarch64 -->
     ```
@@ -927,7 +927,7 @@ See [API-reference.md](API-reference.md) for detailed SDK APIs.
 
 ## Changelog
 
-### v4.4.151 / v4.4.151-aarch64 (2025-09-04)
+### v4.4.151.1 / v4.4.151-aarch64 (2025-09-04)
 
 #### API Changes
 

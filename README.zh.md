@@ -63,7 +63,7 @@
       - [截图功能（API 示例）](#截图功能api-示例)
   - [API 参考](#api-参考)
   - [更新日志](#更新日志)
-    - [v4.4.151 / v4.4.151-aarch64(2025-09-04)](#v44151--v44151-aarch642025-09-04)
+    - [v4.4.151.1 / v4.4.151-aarch64(2025-09-04)](#v441511--v44151-aarch642025-09-04)
       - [API 变更](#api-变更)
     - [v4.4.150.5（2025-06-30）](#v4415052025-06-30)
       - [API 变更](#api-变更-1)
@@ -89,7 +89,7 @@
 
 ## 简介
 
-Agora Recording Java SDK (v4.4.151) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
+Agora Recording Java SDK (v4.4.151.1) 为您提供了强大的实时音视频录制能力，可无缝集成到 Linux 服务器端的 Java 应用程序中。借助此 SDK，您的服务器可以作为一个哑客户端加入 Agora 频道，实时拉取、订阅和录制频道内的音视频流。录制文件可用于内容存档、审核、分析或其他业务相关的高级功能。
 
 ## 开发环境要求
 
@@ -126,7 +126,7 @@ Agora Recording Java SDK (v4.4.151) 为您提供了强大的实时音视频录�
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.151</version>
+    <version>4.4.151.1</version>
 </dependency>
 ```
 
@@ -144,11 +144,11 @@ Agora Recording Java SDK (v4.4.151) 为您提供了强大的实时音视频录�
 
 #### x86_64 平台
 
-[Agora-Linux-Recording-Java-SDK-v4.4.151-x86_64-869516-6f3284e71a-20250904_152151](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151-x86_64-869516-6f3284e71a-20250904_152151.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.151.1-x86_64-891308-28c706d74a-20250919_142050](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151.1-x86_64-891308-28c706d74a-20250919_142050.zip)
 
 #### arm64 平台
 
-[Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-869533-8256baf788-20250904_155630](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-869533-8256baf788-20250904_155630.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-891319-952e64402b-20250919_140753](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-891319-952e64402b-20250919_140753.zip)
 
 ## 集成 SDK
 
@@ -167,7 +167,7 @@ Maven 集成是最简单的方式，可以自动管理 Java 依赖关系。
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.151</version>
+    <version>4.4.151.1</version>
 </dependency>
 
 <!-- arm64 平台 -->
@@ -209,7 +209,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.151 \
+  -Dversion=4.4.151.1 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -221,7 +221,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.151 \
+  -Dversion=4.4.151.1 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -233,7 +233,7 @@ mvn install:install-file \
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.151</version>
+    <version>4.4.151.1</version>
 </dependency>
 ```
 
@@ -282,7 +282,7 @@ Agora Linux Recording Java SDK 依赖于底层的 C++ 原生库（`.so` 文件�
    jar xvf agora-recording-sdk.jar
 
    # 如果使用 Maven 集成方式，JAR 文件在 Maven 缓存中，例如：
-   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.151/linux-recording-java-sdk-4.4.151.jar
+   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.151.1/linux-recording-java-sdk-4.4.151.1.jar
    ```
 
 3. 提取后，`libs` 目录下会生成 `native/linux/x86_64` 子目录，其中包含所需的 `.so` 文件：
@@ -395,12 +395,12 @@ TOKEN=你的Token
 #### 2. 配置 JAR 和 so 库
 
 - 配置 JAR（两种方式二选一）：
-  - 使用线上 Maven 版本：编辑 `Examples-Mvn/pom.xml`，按平台选择版本（x86_64 使用 `4.4.151`，arm64 使用 `4.4.151-aarch64`）：
+  - 使用线上 Maven 版本：编辑 `Examples-Mvn/pom.xml`，按平台选择版本（x86_64 使用 `4.4.151.1`，arm64 使用 `4.4.151-aarch64`）：
     ```xml
     <dependency>
         <groupId>io.agora.rtc</groupId>
         <artifactId>linux-recording-java-sdk</artifactId>
-        <version>4.4.151</version>
+        <version>4.4.151.1</version>
     </dependency>
     <!-- arm64 平台请将版本替换为 4.4.151-aarch64 -->
     ```
@@ -927,7 +927,7 @@ options.setType(Utils.convertToVideoStreamType(subStreamType));
 
 ## 更新日志
 
-### v4.4.151 / v4.4.151-aarch64(2025-09-04)
+### v4.4.151.1 / v4.4.151-aarch64(2025-09-04)
 
 #### API 变更
 
