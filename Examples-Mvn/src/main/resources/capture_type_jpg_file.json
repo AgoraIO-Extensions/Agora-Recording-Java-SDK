@@ -14,13 +14,15 @@
         "123"
     ],
     "subStreamType": "high",
-    "enableRecording": true,
-    "enableCapture": false,
+    "enableRecording": false,
+    "enableCapture": true,
+    "videoFrameCaptureType": 3,
+    "jpgCaptureIntervalInSec": 5,
     "isMix": true,
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",
-    "recorderStreamType": "video_only",
-    "recorderPath": "recorder_result/mix/mix_video.mp4",
+    "recorderStreamType": "both",
+    "capturePath": "recorder_result/capture/jpg_file/",
     "audio": {
         "sampleRate": 16000,
         "numOfChannels": 1

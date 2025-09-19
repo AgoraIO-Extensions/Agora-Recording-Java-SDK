@@ -14,11 +14,13 @@
         "123"
     ],
     "subStreamType": "high",
+    "enableRecording": true,
+    "enableCapture": false,
     "isMix": true,
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",
     "recorderStreamType": "audio_only",
-    "recorderPath": "recorder_mix_audio.mp4",
+    "recorderPath": "recorder_result/mix/mix_audio.mp4",
     "audio": {
         "sampleRate": 16000,
         "numOfChannels": 1

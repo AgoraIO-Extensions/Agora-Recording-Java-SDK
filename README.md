@@ -34,58 +34,62 @@
       - [3.2 Configuring Load Paths](#32-configuring-load-paths)
   - [Quick Start](#quick-start)
     - [Enable Service](#enable-service)
-    - [Recording via Command Line](#recording-via-command-line)
+    - [Run the Maven Project](#run-the-maven-project)
+      - [1. Configure Keys](#1-configure-keys)
+      - [2. Configure JAR and .so Libraries](#2-configure-jar-and-so-libraries)
+      - [3. Build the Project](#3-build-the-project)
+      - [4. Run the Example Service](#4-run-the-example-service)
+      - [5. RESTful API Recording Control](#5-restful-api-recording-control)
+      - [6. recordEncodedOnly and subscribeEncodedFrameOnly](#6-recordencodedonly-and-subscribeencodedframeonly)
+        - [Parameter Description](#parameter-description)
+        - [Four Combination Modes Reference](#four-combination-modes-reference)
+        - [Code Usage Examples](#code-usage-examples)
+        - [Usage Scenario Recommendations](#usage-scenario-recommendations)
+      - [7. Troubleshooting](#7-troubleshooting)
+    - [Recording via Command Line (Examples-Mvn)](#recording-via-command-line-examples-mvn)
       - [Prerequisites](#prerequisites)
-      - [Compile Example Project](#compile-example-project)
-      - [Configure Recording Parameters](#configure-recording-parameters)
-      - [Start Recording](#start-recording)
-      - [Common Test Scripts](#common-test-scripts)
-      - [Stop Recording](#stop-recording)
-      - [Recording Output Files](#recording-output-files)
-      - [Troubleshooting Common Issues](#troubleshooting-common-issues)
-    - [Recording via API Call](#recording-via-api-call)
+      - [Run Command](#run-command)
+      - [Config Files and Meanings (located in `Examples-Mvn/src/main/resources/`)](#config-files-and-meanings-located-in-examples-mvnsrcmainresources)
+      - [recorder\_json.example Parameter Reference](#recorder_jsonexample-parameter-reference)
+    - [Recording via API](#recording-via-api)
       - [Prerequisites](#prerequisites-1)
-      - [Implementing Recording via API Call](#implementing-recording-via-api-call)
+      - [Implement Recording via API](#implement-recording-via-api)
         - [Initialize Service](#initialize-service)
         - [Join Channel](#join-channel)
         - [Configure and Start Recording](#configure-and-start-recording)
-        - [Handling Recording Events](#handling-recording-events)
-        - [Stop Recording](#stop-recording-1)
+        - [Recording Event Handling](#recording-event-handling)
+        - [Stop Recording](#stop-recording)
         - [Getting Recorded Files](#getting-recorded-files)
-    - [Run the Maven Example Project](#run-the-maven-example-project)
-      - [1. Build the Project](#1-build-the-project)
-      - [2. Configure Keys](#2-configure-keys)
-      - [3. Prepare .so Libraries](#3-prepare-so-libraries)
-      - [4. Run the Example Service](#4-run-the-example-service)
-      - [5. Start/Stop Recording via API](#5-startstop-recording-via-api)
-      - [6. Troubleshooting](#6-troubleshooting)
+      - [Snapshot Feature (API Example)](#snapshot-feature-api-example)
   - [API Reference](#api-reference)
   - [Changelog](#changelog)
-    - [v4.4.150.5 (2025-06-30)](#v441505-2025-06-30)
+    - [v4.4.151.1 / v4.4.151-aarch64 (2025-09-04)](#v441511--v44151-aarch64-2025-09-04)
       - [API Changes](#api-changes)
+    - [v4.4.150.5 (2025-06-30)](#v441505-2025-06-30)
+      - [API Changes](#api-changes-1)
       - [Improvements \& Bug Fixes](#improvements--bug-fixes)
     - [v4.4.150.4 (2025-06-11)](#v441504-2025-06-11)
-      - [API Changes](#api-changes-1)
+      - [API Changes](#api-changes-2)
       - [Improvements \& Bug Fixes](#improvements--bug-fixes-1)
     - [v4.4.150.3 (2025-05-20)](#v441503-2025-05-20)
-      - [API Changes](#api-changes-2)
-    - [v4.4.150.2 (2025-05-09)](#v441502-2025-05-09)
       - [API Changes](#api-changes-3)
+    - [v4.4.150.2 (2025-05-09)](#v441502-2025-05-09)
+      - [API Changes](#api-changes-4)
       - [Improvements \& Optimizations](#improvements--optimizations)
     - [v4.4.150.1 (2025-03-28)](#v441501-2025-03-28)
-      - [API Changes](#api-changes-4)
+      - [API Changes](#api-changes-5)
       - [Improvements \& Optimizations](#improvements--optimizations-1)
     - [v4.4.150-aarch64 (2025-02-24)](#v44150-aarch64-2025-02-24)
-      - [API Changes](#api-changes-5)
+      - [API Changes](#api-changes-6)
       - [Improvements \& Optimizations](#improvements--optimizations-2)
     - [v4.4.150 (2025-01-21)](#v44150-2025-01-21)
-      - [API Changes](#api-changes-6)
+      - [API Changes](#api-changes-7)
       - [Improvements \& Optimizations](#improvements--optimizations-3)
   - [Other References](#other-references)
 
 ## Introduction
 
-The Agora Recording Java SDK (v4.4.150.5) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
+The Agora Recording Java SDK (v4.4.151.1) provides powerful real-time audio and video recording capabilities that can be seamlessly integrated into Java applications on Linux servers. With this SDK, your server can join an Agora channel as a dummy client to pull, subscribe to, and record audio and video streams within the channel in real-time. The recorded files can be used for content archiving, moderation, analysis, or other business-related advanced features.
 
 ## Development Environment Requirements
 
@@ -122,7 +126,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.5</version>
+    <version>4.4.151.1</version>
 </dependency>
 ```
 
@@ -132,7 +136,7 @@ The required bandwidth depends on the number of channels to be recorded simultan
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.5-aarch64</version>
+    <version>4.4.151-aarch64</version>
 </dependency>
 ```
 
@@ -140,11 +144,11 @@ The required bandwidth depends on the number of channels to be recorded simultan
 
 #### x86_64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.5-x86_64-762876-ee62852ef2-20250630_105128](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.5-x86_64-762876-ee62852ef2-20250630_105128.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.151.1-x86_64-891308-28c706d74a-20250919_142050](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151.1-x86_64-891308-28c706d74a-20250919_142050.zip)
 
 #### arm64 Platform
 
-[Agora-Linux-Recording-Java-SDK-v4.4.150.5-aarch64-762913-03b1b3da07-20250630_115505](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.150.5-aarch64-762913-03b1b3da07-20250630_115505.zip)
+[Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-891319-952e64402b-20250919_140753](https://download.agora.io/sdk/release/Agora-Linux-Recording-Java-SDK-v4.4.151-aarch64-891319-952e64402b-20250919_140753.zip)
 
 ## Integrating the SDK
 
@@ -163,14 +167,14 @@ Add the following dependency to your project's `pom.xml` file:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.5</version>
+    <version>4.4.151.1</version>
 </dependency>
 
 <!-- arm64 Platform -->
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.5-aarch64</version>
+    <version>4.4.151-aarch64</version>
 </dependency>
 ```
 
@@ -205,7 +209,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.5 \
+  -Dversion=4.4.151.1 \
   -Dpackaging=jar \
   -DgeneratePom=true
 ```
@@ -217,7 +221,7 @@ mvn install:install-file \
   -Dfile=sdk/agora-recording-sdk.jar \
   -DgroupId=io.agora.rtc \
   -DartifactId=linux-recording-java-sdk \
-  -Dversion=4.4.150.5 \
+  -Dversion=4.4.151.1 \
   -Dpackaging=jar \
   -DgeneratePom=true \
   -Djavadoc=sdk/agora-recording-sdk-javadoc.jar
@@ -229,7 +233,7 @@ After installation, add the dependency in `pom.xml`:
 <dependency>
     <groupId>io.agora.rtc</groupId>
     <artifactId>linux-recording-java-sdk</artifactId>
-    <version>4.4.150.5</version>
+    <version>4.4.151.1</version>
 </dependency>
 ```
 
@@ -278,7 +282,7 @@ The `.so` files are contained within the `agora-recording-sdk.jar` or `linux-rec
    jar xvf agora-recording-sdk.jar
 
    # If using Maven integration, the JAR file is in the Maven cache, e.g.:
-   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.150.5/linux-recording-java-sdk-4.4.150.5.jar
+   # jar xvf ~/.m2/repository/io/agora/rtc/linux-recording-java-sdk/4.4.151.1/linux-recording-java-sdk-4.4.151.1.jar
    ```
 
 3. After extraction, a `native/linux/x86_64` subdirectory (or `aarch64` for ARM) will be generated in the `libs` directory, containing the required `.so` files:
@@ -380,527 +384,63 @@ java -Djava.library.path=$LIB_PATH -cp "$CLASSPATH" $MAIN_CLASS
 
 ### Enable Service
 
-Refer to [Enable Service on the official website](https://docs.agora.io/en/recording/java/get-started/enable-service) (Link might need update based on documentation structure).
+Refer to [Enable Service on the official website](https://docs.agora.io/en/recording/java/get-started/enable-service)
 
-### Recording via Command Line
+### Run the Maven Project
 
-#### Prerequisites
+The SDK provides a Spring Boot-based Maven example project for quick verification and secondary development. Steps to run `Examples-Mvn`:
 
-Before starting, ensure you have completed the environment preparation and SDK integration steps.
+#### 1. Configure Keys
 
-> **Note**: When the recording SDK joins a channel, it acts as a dummy client. Therefore, it needs to join the same channel using the same App ID and channel profile as the Agora RTC SDK clients.
+Create a `.keys` file under `Examples-Mvn` (replace with your values):
 
-#### Compile Example Project
+```
+APP_ID=YourAppId
+TOKEN=YourToken
+```
 
-Execute the build script in the `Examples-Cmd` directory:
+#### 2. Configure JAR and .so Libraries
+
+- Configure JAR (choose one of the following):
+  - Use online Maven version: edit `Examples-Mvn/pom.xml` and choose version by platform (x86_64 uses `4.4.151.1`, arm64 uses `4.4.151-aarch64`):
+    ```xml
+    <dependency>
+        <groupId>io.agora.rtc</groupId>
+        <artifactId>linux-recording-java-sdk</artifactId>
+        <version>4.4.151.1</version>
+    </dependency>
+    <!-- For arm64 platform, replace with 4.4.151-aarch64 -->
+    ```
+  - Use local version: in the `Examples-Mvn` directory, run the script to install the local JAR into your local Maven repository (the script reads `libs/agora-recording-sdk.jar` and its javadoc):
+    ```sh
+    cd Examples-Mvn
+    ./build_install_local_maven.sh
+    ```
+
+- Prepare .so libraries: ensure `libs/native/linux/x86_64/` (or `aarch64/`) contains the required `.so` files (e.g. `libagora_rtc_sdk.so`, `librecording.so`, etc.).
+
+#### 3. Build the Project
+
+In `Examples-Mvn`:
 
 ```sh
-cd Examples-Cmd
 ./build.sh
 ```
 
-#### Configure Recording Parameters
-
-Recording parameters are configured using JSON format, located in the `Examples-Cmd/config` directory.
-
-1. View the configuration example:
-
-   ```sh
-   cat config/recorder_json.example
-   ```
-
-2. Create or modify your own configuration file, e.g., `config/my_recorder.json`, ensuring the JSON format is correct.
-
-3. Full Parameter Description:
-
-   | Parameter                | Type     | Description                                                                                                                                             |
-   | ------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | appId                    | String   | The App ID of the project, must be consistent with the App ID in the RTC SDK.                                                                           |
-   | token                    | String   | The channel Token. Required if the channel has security mode enabled.                                                                                   |
-   | channelName              | String   | The channel name, must be consistent with the channel name in the RTC SDK.                                                                              |
-   | useStringUid             | Boolean  | Whether to use string user IDs.                                                                                                                         |
-   | useCloudProxy            | Boolean  | Whether to use the cloud proxy service.                                                                                                                 |
-   | userId                   | String   | The user ID for the recorder client.                                                                                                                    |
-   | subAllAudio              | Boolean  | Whether to subscribe to all audio streams. If false, specify user IDs in `subAudioUserList`.                                                            |
-   | subAudioUserList         | String[] | List of user IDs to subscribe to audio from, effective only when `subAllAudio` is false.                                                                |
-   | subAllVideo              | Boolean  | Whether to subscribe to all video streams. If false, specify user IDs in `subVideoUserList`.                                                            |
-   | subVideoUserList         | String[] | List of user IDs to subscribe to video from, effective only when `subAllVideo` is false.                                                                |
-   | subStreamType            | String   | The type of stream to subscribe to, supports `high` (high-resolution) and `low` (low-resolution).                                                       |
-   | isMix                    | Boolean  | Whether to perform mixed-stream recording.                                                                                                              |
-   | backgroundColor          | Long     | Background color for mixed-stream recording. Use RGB format (0xRRGGBB), converted to a long value. E.g., Red=0xFF0000, Green=0x00FF00, Blue=0x0000FF.   |
-   | backgroundImage          | String   | Path to the background image for mixed-stream recording, supports PNG and JPG. Takes precedence over `backgroundColor` if both are set.                 |
-   | layoutMode               | String   | Layout mode for mixed-stream recording, supports `default`, `bestfit`, `vertical`.                                                                      |
-   | maxResolutionUid         | String   | In `vertical` layout, sets the user ID whose video is displayed at the maximum resolution.                                                              |
-   | recorderStreamType       | String   | Recording type, supports `audio_only`, `video_only`, `both`.                                                                                            |
-   | recorderPath             | String   | Recording file path. For mixed-stream, it's the filename; for single-stream, it's the directory where MP4 files named after each user ID will be saved. |
-   | maxDuration              | Integer  | Recording duration in seconds.                                                                                                                          |
-   | recoverFile              | Boolean  | Whether to write separate h264 and aac files during recording, allowing MP4 recovery if the program crashes.                                            |
-   | audio                    | Object   | Audio settings.                                                                                                                                         |
-   | audio.sampleRate         | Integer  | Audio sample rate (Hz).                                                                                                                                 |
-   | audio.numOfChannels      | Integer  | Number of audio channels.                                                                                                                               |
-   | video                    | Object   | Video settings.                                                                                                                                         |
-   | video.width              | Integer  | Video width (pixels).                                                                                                                                   |
-   | video.height             | Integer  | Video height (pixels).                                                                                                                                  |
-   | video.fps                | Integer  | Video frame rate (fps).                                                                                                                                 |
-   | waterMark                | Object[] | Watermark settings.                                                                                                                                     |
-   | waterMark[].type         | String   | Watermark type, supports `litera` (text), `time` (timestamp), `picture`.                                                                                |
-   | waterMark[].litera       | String   | Text content, effective only when type is `litera`.                                                                                                     |
-   | waterMark[].fontFilePath | String   | Font file path.                                                                                                                                         |
-   | waterMark[].fontSize     | Integer  | Font size.                                                                                                                                              |
-   | waterMark[].x            | Integer  | Watermark X coordinate.                                                                                                                                 |
-   | waterMark[].y            | Integer  | Watermark Y coordinate.                                                                                                                                 |
-   | waterMark[].width        | Integer  | Watermark width.                                                                                                                                        |
-   | waterMark[].height       | Integer  | Watermark height.                                                                                                                                       |
-   | waterMark[].zorder       | Integer  | Watermark layer order (z-index).                                                                                                                        |
-   | waterMark[].imgUrl       | String   | Image watermark URL, effective only when type is `picture`.                                                                                             |
-   | encryption               | Object   | Media stream encryption settings.                                                                                                                       |
-   | encryption.mode          | String   | Encryption type, supports `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.     |
-   | encryption.key           | String   | Encryption key.                                                                                                                                         |
-   | encryption.salt          | String   | Encryption salt, a 32-byte value (often represented as a string).                                                                                       |
-   | rotation                 | Object[] | Video rotation settings.                                                                                                                                |
-   | rotation[].uid           | String   | User ID whose video needs rotation.                                                                                                                     |
-   | rotation[].degree        | Integer  | Rotation angle, supports 0, 90, 180, 270.                                                                                                               |
-
-   > **Important Notes**:
-   >
-   > - Before executing recording, ensure `appId` and `token` (if applicable) are correctly filled in the JSON.
-   > - `appId` and `channelName` must exactly match those used by the RTC SDK clients.
-   > - In single-stream recording mode, `recorderPath` specifies a directory path. You must manually ensure this directory exists before starting the recording (e.g., if `"recorderPath": "recorder_result/"`, ensure `Examples-Cmd/recorder_result/` exists).
-   > - Ensure the JSON format is correct; do not miss commas, quotes, etc.
-
-#### Start Recording
-
-1. Create the output directory for single-stream recording (if using):
-
-   ```sh
-   mkdir -p Examples-Cmd/recorder_result
-   ```
-
-2. Choose and run the corresponding test script:
-
-   ```sh
-   cd Examples-Cmd
-   ./script/TestCaseName.sh
-   ```
-
-   You can modify the scripts or their corresponding JSON configuration files to customize the recording behavior.
-
-#### Common Test Scripts
-
-The `Examples-Cmd/script` directory provides several preset test scripts:
-
-| Script Name                                      | Description                                                                 |
-| ------------------------------------------------ | --------------------------------------------------------------------------- |
-| MixStreamRecordingAudioVideo.sh                  | Mixed-stream recording of audio and video.                                  |
-| MixStreamRecordingAudio.sh                       | Mixed-stream recording of audio only.                                       |
-| MixStreamRecordingVideo.sh                       | Mixed-stream recording of video only.                                       |
-| MixStreamRecordingAudioVideoWatermarks.sh        | Mixed-stream recording of audio/video with watermarks.                      |
-| MixStreamRecordingAudioVideoWatermarksBg.sh      | Mixed-stream recording of audio/video with watermarks and background.       |
-| MixStreamRecordingAudioVideoWatermarksRecover.sh | Mixed-stream recording of audio/video with watermarks and recovery enabled. |
-| MixStreamRecordingAudioVideoEncryption.sh        | Mixed-stream recording of audio/video with encryption enabled.              |
-| MixStreamRecordingAudioVideoStringUid.sh         | Mixed-stream recording of audio/video using string UIDs.                    |
-| SingleStreamRecordingAudioVideo.sh               | Single-stream recording of audio and video.                                 |
-| SingleStreamRecordingAudio.sh                    | Single-stream recording of audio only.                                      |
-| SingleStreamRecordingVideo.sh                    | Single-stream recording of video only.                                      |
-| SingleStreamRecordingAudioVideoWatermarks.sh     | Single-stream recording of audio/video with watermarks.                     |
-
-Choose a suitable script or create custom recording configurations based on these examples. Each script corresponds to a configuration file with the same name in the `config` directory.
-
-#### Stop Recording
-
-- **Start Recording**: Recording starts automatically when the script is executed.
-- **Stop Recording**: Enter `1` in the command line and press Enter. The program will stop recording and exit.
-
-#### Recording Output Files
-
-- **Single-Stream Recording**: Generates multiple MP4 files in the `Examples-Cmd/recorder_result/` directory (or as specified by `recorderPath`), named after the UIDs of each user (e.g., `uid_123456_timestamp.mp4`).
-- **Mixed-Stream Recording**: Generates a single MP4 file in the `Examples-Cmd` directory (or as specified by `recorderPath`), with the filename specified in the JSON configuration.
-
-#### Troubleshooting Common Issues
-
-- If no recording file is output, check if the AppID, Token, and channel name are correct.
-- Ensure there are active users sending media streams in the channel.
-- Check the log files for detailed error messages. Logs are typically located in the `Examples-Cmd/logs/` directory.
-
-> **Tip**: For more advanced configuration options and detailed parameter descriptions, refer to the comments in the `Examples-Cmd/config/recorder_json.example` file.
-
-### Recording via API Call
-
-#### Prerequisites
-
-Before starting, ensure you have completed the environment preparation and SDK integration steps, including configuring the JAR and corresponding platform's `.so` files.
-
-#### Implementing Recording via API Call
-
-The following example code, based on the actual example project in the `Examples-Cmd` directory, demonstrates how to use the Recording SDK API for recording.
-
-##### Initialize Service
-
-```java
-import io.agora.recording.AgoraMediaRtcRecorder;
-import io.agora.recording.AgoraMediaComponentFactory;
-import io.agora.recording.AgoraParameter;
-import io.agora.recording.AgoraService;
-import io.agora.recording.AgoraServiceConfiguration;
-import io.agora.recording.Constants;
-import io.agora.recording.EncryptionConfig;
-import io.agora.recording.IAgoraMediaRtcRecorderEventHandler;
-import io.agora.recording.MediaRecorderConfiguration;
-import io.agora.recording.RecorderInfo;
-import io.agora.recording.RemoteAudioStatistics;
-import io.agora.recording.RemoteVideoStatistics;
-import io.agora.recording.SpeakVolumeInfo;
-import io.agora.recording.VideoMixingLayout;
-import io.agora.recording.VideoSubscriptionOptions;
-import io.agora.recording.WatermarkConfig;
-
-// Create AgoraService instance
-AgoraService agoraService = new AgoraService();
-
-// Configure local proxy. This configuration must be set before initialize.
-LocalAccessPointConfiguration localAccessPointConfig = new LocalAccessPointConfiguration();
-localAccessPointConfig.setMode(Constants.LocalProxyMode.LocalOnly);
-localAccessPointConfig.setDomainList(new String[] { "" });
-localAccessPointConfig.setIpList(new String[] { "10.xx.xx.xx" });
-localAccessPointConfig.setDomainListSize(1);
-localAccessPointConfig.setIpListSize(1);
-localAccessPointConfig.setVerifyDomainName("ap.xxx.agora.local");
-int setGlobalLocalAccessPointRet = agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
-
-// Create and configure the service configuration object
-AgoraServiceConfiguration config = new AgoraServiceConfiguration();
-config.setEnableAudioDevice(false);    // Whether to enable audio device (usually set to false for recording)
-config.setEnableAudioProcessor(true);  // Enable audio processing
-config.setEnableVideo(true);           // Enable video functionality
-config.setAppId("YOUR_APPID");         // Set your App ID
-config.setUseStringUid(false);         // Whether to use string UID
-agoraService.initialize(config);       // Initialize the service
-
-// Optional: Set cloud proxy
-AgoraParameter parameter = agoraService.getAgoraParameter();
-if (parameter != null) {
-    // Example: Enable cloud proxy (check AgoraParameter documentation for specific keys)
-    // parameter.setBool("rtc.enable_proxy", true);
-    // parameter.setString("rtc.proxy_server", "your.proxy.server:port");
-}
-```
-
-##### Join Channel
-
-```java
-// Create media component factory
-AgoraMediaComponentFactory factory = agoraService.createAgoraMediaComponentFactory();
-
-// Create and initialize the recorder
-AgoraMediaRtcRecorder agoraMediaRtcRecorder = factory.createMediaRtcRecorder();
-// The second parameter indicates whether to enable mixed-stream recording: true=mixed, false=single
-boolean enableMix = false; // Example: Single-stream recording
-agoraMediaRtcRecorder.initialize(agoraService, enableMix);
-
-// Create and register the event handler
-// Replace AgoraMediaRtcRecorderEventHandler with your actual implementation
-IAgoraMediaRtcRecorderEventHandler handler = new AgoraMediaRtcRecorderEventHandler();
-agoraMediaRtcRecorder.registerRecorderEventHandler(handler);
-
-// Join the channel
-int joinResult = agoraMediaRtcRecorder.joinChannel(
-    "YOUR_TOKEN",        // Channel Token, can be null if token validation is not enabled
-    "YOUR_CHANNEL_NAME", // Channel name
-    "0"                  // User ID, if set to "0", the system will automatically assign one
-);
-if (joinResult != 0) {
-    System.err.println("Failed to join channel, error code: " + joinResult);
-    // Handle error appropriately
-}
-```
-
-##### Configure and Start Recording
-
-```java
-// Subscribe to audio streams
-boolean subscribeAllAudio = true; // Example: Subscribe to all audio
-if (subscribeAllAudio) {
-    agoraMediaRtcRecorder.subscribeAllAudio();
-} else {
-    // Only subscribe to specific users' audio
-    agoraMediaRtcRecorder.subscribeAudio("USER_ID_TO_SUBSCRIBE");
-}
-
-// Subscribe to video streams
-boolean subscribeAllVideo = true; // Example: Subscribe to all video
-VideoSubscriptionOptions options = new VideoSubscriptionOptions();
-options.setEncodedFrameOnly(false);
-options.setType(Constants.VideoStreamType.VIDEO_STREAM_HIGH); // Optional: VIDEO_STREAM_LOW
-if (subscribeAllVideo) {
-    agoraMediaRtcRecorder.subscribeAllVideo(options);
-} else {
-    // Only subscribe to specific users' video
-    agoraMediaRtcRecorder.subscribeVideo("USER_ID_TO_SUBSCRIBE", options);
-}
-
-// Configure mixed-stream layout (only needed in mixed-stream mode)
-if (enableMix) {
-    VideoMixingLayout layout = new VideoMixingLayout();
-    layout.setCanvasWidth(1280);
-    layout.setCanvasHeight(720);
-    layout.setBackgroundColor(0x000000); // Black background
-    // Add user layouts... (See VideoMixingLayout and UserMixerLayout in API reference)
-    agoraMediaRtcRecorder.setVideoMixingLayout(layout);
-}
-
-// Configure recording parameters
-MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
-mediaRecorderConfiguration.setWidth(640);       // Set recording video width
-mediaRecorderConfiguration.setHeight(480);      // Set recording video height
-mediaRecorderConfiguration.setFps(15);          // Set recording frame rate
-mediaRecorderConfiguration.setMaxDurationMs(60 * 60 * 1000); // Max recording duration (e.g., 1 hour) in milliseconds
-// IMPORTANT: Ensure the directory exists and is writable
-mediaRecorderConfiguration.setStoragePath(enableMix ? "/path/to/save/mixed_recording.mp4" : "/path/to/save/single_stream_dir/"); // Recording file save path/directory
-
-int configResult = 0;
-if (enableMix) {
-    // Configure mixed-stream recording
-    configResult = agoraMediaRtcRecorder.setRecorderConfig(mediaRecorderConfiguration);
-} else {
-    // Configure single-stream recording (can be called multiple times for different users)
-    // Typically called within event handlers like onUserJoined or onFirstRemoteVideoDecoded
-    // configResult = agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, "USER_ID");
-    // NOTE: For single-stream, setRecorderConfigByUid should be called before startSingleRecordingByUid for each user.
-}
-if (configResult != 0) {
-     System.err.println("Failed to set recorder config, error code: " + configResult);
-     // Handle error
-}
-
-// Add watermark (Optional)
-// WatermarkConfig[] watermarks = new WatermarkConfig[1];
-// watermarks[0] = new WatermarkConfig();
-// // Configure watermark parameters... (See WatermarkConfig in API reference)
-// if (enableMix) {
-//     agoraMediaRtcRecorder.enableAndUpdateVideoWatermarks(watermarks);
-// } else {
-//     agoraMediaRtcRecorder.enableAndUpdateVideoWatermarksByUid(watermarks, "USER_ID");
-// }
-
-// Enable encryption (Optional)
-boolean enableEncryption = false; // Example: Encryption disabled
-if (enableEncryption) {
-    EncryptionConfig encryptionConfig = new EncryptionConfig();
-    encryptionConfig.setEncryptionMode(Constants.EncryptionMode.AES_128_GCM); // Set encryption mode
-    encryptionConfig.setEncryptionKey("YOUR_ENCRYPTION_KEY");
-    // encryptionConfig.setEncryptionKdfSalt(...); // Set salt if using GCM2 modes
-    agoraMediaRtcRecorder.enableEncryption(true, encryptionConfig);
-}
-
-// Start recording
-int startResult = 0;
-if (enableMix) {
-    startResult = agoraMediaRtcRecorder.startRecording();
-} else {
-    // Start single-stream recording (typically called within event handlers)
-    // startResult = agoraMediaRtcRecorder.startSingleRecordingByUid("USER_ID");
-}
- if (startResult != 0) {
-     System.err.println("Failed to start recording, error code: " + startResult);
-     // Handle error
- }
-```
-
-##### Handling Recording Events
-
-```java
-// Example Implementation of the EventHandler
-public static class AgoraMediaRtcRecorderEventHandler implements IAgoraMediaRtcRecorderEventHandler {
-
-    private AgoraMediaRtcRecorder recorder; // Keep a reference if needed
-    private boolean isMixMode;
-
-    // Constructor or setter to pass the recorder instance and mode
-    public AgoraMediaRtcRecorderEventHandler(AgoraMediaRtcRecorder recorder, boolean isMixMode) {
-        this.recorder = recorder;
-        this.isMixMode = isMixMode;
-    }
-     public AgoraMediaRtcRecorderEventHandler() {
-        // Default constructor if reference is not needed or set later
-    }
-
-
-    @Override
-    public void onConnected(String channelId, String userId) {
-         System.out.println("Recorder connected to channel: " + channelId + " with user ID: " + userId);
-         // Connection successful, ready for operations
-    }
-
-     @Override
-    public void onDisconnected(String channelId, String userId, Constants.ConnectionChangedReasonType reason) {
-         System.out.println("Recorder disconnected. Reason: " + reason);
-    }
-
-    @Override
-    public void onUserJoined(String channelId, String userId) {
-        System.out.println("Remote user joined: " + userId);
-        if (!isMixMode) {
-            // In single-stream mode, configure and potentially start recording for the new user
-             new Thread(() -> {
-                MediaRecorderConfiguration config = new MediaRecorderConfiguration();
-                // Configure parameters specific to this user if needed
-                config.setWidth(640);
-                config.setHeight(480);
-                config.setFps(15);
-                 // Ensure the directory exists!
-                config.setStoragePath("/path/to/save/single_stream_dir/"); // Directory for single stream files
-                 // ... other configurations ...
-
-                int configUidResult = recorder.setRecorderConfigByUid(config, userId);
-                 if (configUidResult == 0) {
-                     // Optionally wait for first frame decoded, or start immediately if configured
-                     // int startUidResult = recorder.startSingleRecordingByUid(userId);
-                     // System.out.println("Attempted to start single recording for " + userId + ", result: " + startUidResult);
-                 } else {
-                     System.err.println("Failed to set recorder config for user " + userId + ", error: " + configUidResult);
-                 }
-             }).start();
-        } else {
-             // In mixed-stream mode, maybe update the layout
-            // updateMixingLayout();
-        }
-    }
-
-     @Override
-     public void onUserLeft(String channelId, String userId, Constants.UserOfflineReasonType reason) {
-         System.out.println("Remote user left: " + userId + ", reason: " + reason);
-         if (!isMixMode) {
-             // Stop single-stream recording for the user who left
-             int stopUidResult = recorder.stopSingleRecordingByUid(userId);
-             System.out.println("Stopped single recording for user " + userId + ", result: " + stopUidResult);
-         } else {
-             // In mixed-stream mode, maybe update the layout
-             // updateMixingLayout();
-         }
-     }
-
-    @Override
-    public void onFirstRemoteAudioFrame(String channelId, String userId, int elapsed) {
-         System.out.println("First remote audio frame received from user: " + userId);
-         // If auto-start wasn't used, can start single audio recording here
-    }
-
-    @Override
-    public void onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed) {
-        System.out.println("First remote video decoded from user: " + userId + " [" + width + "x" + height + "]");
-        if (!isMixMode) {
-            // Good place to start single-stream recording if setRecorderConfigByUid was successful
-             new Thread(() -> {
-                 int startUidResult = recorder.startSingleRecordingByUid(userId);
-                 System.out.println("Started single recording for user " + userId + " after first video frame, result: " + startUidResult);
-             }).start();
-        }
-    }
-
-    @Override
-    public void onRecorderStateChanged(String channelId, String userId, Constants.RecorderState state,
-            Constants.RecorderReasonCode reason, String fileName) {
-        System.out.println("Recorder state changed for user " + (userId != null ? userId : "N/A (Mixed)") +
-                           ": State=" + state + ", Reason=" + reason + ", File=" + fileName);
-        // Handle state changes, e.g., RECORDER_STATE_ERROR might require action
-    }
-
-     @Override
-     public void onRecorderInfoUpdated(String channelId, String userId, RecorderInfo info) {
-         System.out.println("Recorder info updated for user " + (userId != null ? userId : "N/A (Mixed)") +
-                            ": FileName=" + info.getFileName() + ", Duration=" + info.getDurationMs() + "ms, Size=" + info.getFileSize() + " bytes");
-     }
-
-     @Override
-     public void onEncryptionError(String channelId, Constants.EncryptionErrorType errorType) {
-         System.err.println("Encryption error occurred: " + errorType);
-     }
-
-    // Implement other necessary event handling methods...
-    // e.g., onConnectionLost, onReconnected, onUserVideoStateChanged, etc.
-}
-```
-
-##### Stop Recording
-
-```java
-// Unsubscribe from streams (optional but good practice)
-agoraMediaRtcRecorder.unsubscribeAllAudio();
-agoraMediaRtcRecorder.unsubscribeAllVideo();
-
-// Stop recording
-if (enableMix) {
-    agoraMediaRtcRecorder.stopRecording();
-} else {
-    // Stop single-stream recording for all users being recorded
-    // You'll need to keep track of which users are being recorded
-    // Example: Assuming you have a list of user IDs called 'recordingUserIds'
-    // for (String userId : recordingUserIds) {
-    //     agoraMediaRtcRecorder.stopSingleRecordingByUid(userId);
-    // }
-}
-
-// Unregister the event handler
-agoraMediaRtcRecorder.unregisterRecorderEventHandler(handler);
-
-// Leave the channel and release recorder resources
-agoraMediaRtcRecorder.leaveChannel();
-agoraMediaRtcRecorder.release();
-
-// Release the service
-agoraService.release();
-```
-
-##### Getting Recorded Files
-
-Recorded files will be saved in different locations based on the recording type:
-
-- **Single-Stream Recording**: Generates MP4 files in the directory specified by `storagePath` in `MediaRecorderConfiguration` (when calling `setRecorderConfigByUid`). Filenames typically start with the UID, e.g., `uid_123456_timestamp.mp4`.
-- **Mixed-Stream Recording**: Generates a single MP4 file at the path specified by `storagePath` in `MediaRecorderConfiguration` (when calling `setRecorderConfig`).
-
-In practical applications, it is recommended to set a unique file path for each recording session, possibly using the channel name, timestamp, etc., as part of the filename to avoid overwriting files.
-
-For more recording options and advanced features, please refer to the API documentation for the `MediaRecorderConfiguration` class.
-
-### Run the Maven Example Project
-
-The SDK provides a Spring Boot-based Maven example project for quick verification and secondary development. Below are the basic steps to run the `Examples-Mvn` project:
-
-#### 1. Build the Project
-
-Navigate to the `Examples-Mvn` directory and run:
-
-```sh
-mvn clean package
-```
-
-After a successful build, `agora-example.jar` will be generated in the `target/` directory.
-
-#### 2. Configure Keys
-
-Create a `.keys` file in the `Examples-Mvn` directory with the following content (replace with your actual values):
-
-```
-APP_ID=YOUR_APPID
-TOKEN=YOUR_TOKEN
-```
-
-#### 3. Prepare .so Libraries
-
-Ensure the `libs/native/linux/x86_64/` directory contains all required `.so` files (such as `libagora_rtc_sdk.so`, `librecording.so`, etc.).
+After building, `target/agora-example.jar` will be generated.
 
 #### 4. Run the Example Service
 
-In the `Examples-Mvn` directory, execute:
+In `Examples-Mvn`:
 
 ```sh
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=18080 -jar target/agora-example.jar
+./build.sh start
 ```
 
-- This command starts the Spring Boot service on port 18080.
-- To change the port, modify the `-Dserver.port` parameter.
+- This starts the Spring Boot service on port 18080.
+- To change the port, modify `-Dserver.port`.
 
-#### 5. Start/Stop Recording via API
+#### 5. RESTful API Recording Control
 
 - Start recording:
 
@@ -914,18 +454,489 @@ LD_LIBRARY_PATH="$LD_LIBRARY_PATH:libs/native/linux/x86_64" java -Dserver.port=1
   http://<server_ip>:18080/api/recording/stop?taskId=<task_id>
   ```
 
-> The recording config file should be placed in the `Examples-Mvn/src/main/resources/` directory.
+> Place recording config files in `Examples-Mvn/src/main/resources/`.
 
-#### 6. Troubleshooting
+#### 6. recordEncodedOnly and subscribeEncodedFrameOnly
 
-- If the service fails to start, check the `.so` file path, `.keys` file content, and port usage.
+These two parameters control the recording file writing method and video stream subscription processing respectively:
+
+- **recordEncodedOnly**: Controls whether to write encoded data directly to MP4 file
+- **subscribeEncodedFrameOnly**: Controls whether to decode the subscribed video stream
+
+##### Parameter Description
+
+| Parameter                 | Value | Meaning                     | Description                                                                                                                         |
+| ------------------------- | ----- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| recordEncodedOnly         | true  | Write encoded data to MP4   | Write H.264/H.265 encoded data directly to MP4 file without decoding, high performance but no watermark support, single-stream only |
+| recordEncodedOnly         | false | Decode then re-encode write | Decode first then re-encode to write MP4, supports watermark overlay and mixed-stream recording but consumes more CPU resources     |
+| subscribeEncodedFrameOnly | true  | Subscribe without decoding  | Subscribe without decoding video stream, get encoded data directly, suitable for encoded frame capture                              |
+| subscribeEncodedFrameOnly | false | Subscribe with decoding     | Decode video stream during subscription, get YUV raw data, suitable for scenarios requiring raw video processing                    |
+
+##### Four Combination Modes Reference
+
+| recordEncodedOnly | subscribeEncodedFrameOnly | Mode Description     | Features                                                  | Use Cases                                                                                                                       |
+| ----------------- | ------------------------- | -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| false             | false                     | **Standard Mode**    | Subscribe with decoding + Decode then re-encode recording | Standard recording scenarios requiring watermarks, mixed-stream recording, video processing, YUV capture                        |
+| false             | true                      | **❌ Not Feasible**   | Subscribe without decoding, no YUV data for recording     | This combination is not feasible: no decoded data available for re-encoding recording                                           |
+| true              | false                     | **Performance Mode** | Subscribe with decoding + Write encoded data directly     | High-performance single-stream recording, supports YUV processing but no watermarks or mixed-stream recording                   |
+| true              | true                      | **Speed Mode**       | Subscribe without decoding + Write encoded data directly  | Highest performance single-stream recording, supports only encoded frame capture, no watermarks, mixed-stream or YUV processing |
+
+##### Code Usage Examples
+
+**1. Setting recordEncodedOnly (when initializing recorder)**
+
+```java
+// Create recorder
+AgoraMediaRtcRecorder agoraMediaRtcRecorder = agoraService.createMediaRtcRecorder();
+
+// Method 1: Use default value (recordEncodedOnly = false)
+boolean enableMix = false; // Whether to enable mixed recording
+agoraMediaRtcRecorder.initialize(agoraService, enableMix);
+
+// Method 2: Explicitly set recordEncodedOnly
+boolean enableMix = false; // Whether to enable mixed recording
+boolean recordEncodedOnly = true; // Record encoded frames only for better performance
+agoraMediaRtcRecorder.initialize(agoraService, enableMix, recordEncodedOnly);
+```
+
+**2. Setting subscribeEncodedFrameOnly (when subscribing video)**
+
+```java
+// Create video subscription options
+VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+
+// Set whether to subscribe encoded frames only
+boolean subscribeEncodedFrameOnly = true; // Subscribe encoded frames only for encoded frame capture
+options.setEncodedFrameOnly(subscribeEncodedFrameOnly);
+options.setType(VideoStreamType.VIDEO_STREAM_HIGH);
+
+// Subscribe video
+if (subscribeAllVideo) {
+    agoraMediaRtcRecorder.subscribeAllVideo(options);
+} else {
+    agoraMediaRtcRecorder.subscribeVideo("USER_ID", options);
+}
+```
+
+**3. Configuration in JSON file**
+
+Set these parameters in JSON configuration file:
+
+```json
+{
+    "recordEncodedOnly": true,              // Record encoded frames only
+    "subscribeEncodedFrameOnly": true,      // Subscribe encoded frames only
+    "videoFrameCaptureType": 0,             // 0=ENCODED (encoded frame capture)
+    "enableRecording": true,
+    "enableCapture": true
+}
+```
+
+##### Usage Scenario Recommendations
+
+**✅ Feasible Combinations:**
+
+- **Standard Recording**: `recordEncodedOnly=false` + `subscribeEncodedFrameOnly=false`
+  - Supports watermarks, mixed-stream recording, video processing, YUV capture and other complete features
+  - Higher CPU consumption, suitable for scenarios requiring full functionality
+
+- **High-Performance Single-Stream Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=false`
+  - High recording performance, supports YUV processing but only single-stream recording, no watermarks or mixed-stream
+  - Suitable for scenarios requiring YUV data processing with high recording performance demands for single streams
+
+- **Speed Single-Stream Recording**: `recordEncodedOnly=true` + `subscribeEncodedFrameOnly=true`
+  - Highest performance with lowest CPU consumption
+  - Supports only single-stream recording and encoded frame capture, no watermarks, mixed-stream or YUV processing
+  - Suitable for large-scale concurrent single-stream recording scenarios
+
+**❌ Not Feasible Combination:**
+
+- **`recordEncodedOnly=false` + `subscribeEncodedFrameOnly=true`**
+  - This combination is logically contradictory: subscribing without decoding provides no YUV data for re-encoding recording
+  - For encoded frame capture functionality, use combinations with `recordEncodedOnly=true`
+
+#### 7. Troubleshooting
+
+- If the service fails to start, check `.so` paths, `.keys` content, and port usage.
 - If there is no recording output, ensure there are active users in the channel and that AppId/Token/channel name are correct.
+
+### Recording via Command Line (Examples-Mvn)
+
+#### Prerequisites
+
+Ensure SDK integration, `.keys` configuration, and `.so` libraries are prepared (see “Run the Maven Project”).
+
+#### Run Command
+
+In `Examples-Mvn`:
+
+```sh
+./build.sh cli <configFileName>
+# Example:
+./build.sh cli capture_type_encoded_frame_mix_stream.json
+```
+
+After startup, enter `1` in the terminal to stop and exit.
+
+#### Config Files and Meanings (located in `Examples-Mvn/src/main/resources/`)
+
+- Mixed-stream Recording:
+  - `mix_stream_recorder_audio_video.json`: mixed recording (audio + video)
+  - `mix_stream_recorder_audio.json`: mixed, audio only
+  - `mix_stream_recorder_video.json`: mixed, video only
+  - `mix_stream_recorder_audio_video_encryption.json`: mixed, with encryption
+  - `mix_stream_recorder_audio_video_string_uid.json`: mixed, with string UID
+  - `mix_stream_recorder_audio_video_water_marks.json`: mixed, with watermarks
+  - `mix_stream_recorder_audio_video_water_marks_bg.json`: mixed, watermarks + background
+  - `mix_stream_recorder_audio_video_water_marks_recover.json`: mixed, write h264/aac to allow MP4 recovery
+
+- Single-stream Recording:
+  - `single_stream_recorder_audio_video.json`: single, audio + video
+  - `single_stream_recorder_audio.json`: single, audio only
+  - `single_stream_recorder_video.json`: single, video only
+  - `single_stream_recorder_audio_video_water_marks.json`: single, with watermarks
+
+- Snapshot Feature Examples:
+  - `capture_type_encoded_frame_mix_stream.json`: mixed recording + encoded frame snapshots (H.264, etc.), outputs MP4 and snapshot data; `videoFrameCaptureType=ENCODED`, `isMix=true`.
+  - `capture_type_yuv_frame_single_stream.json`: single recording + YUV frame snapshots, outputs single MP4 and YUV snapshots; `videoFrameCaptureType=YUV`, `isMix=false`.
+  - `capture_type_encoded_frame.json`: encoded frame snapshots only (no recording), mixed; `videoFrameCaptureType=ENCODED`, `enableRecording=false`.
+  - `capture_type_yuv_frame.json`: YUV frame snapshots only (no recording), mixed; `videoFrameCaptureType=YUV`, `enableRecording=false`.
+  - `capture_type_jpg_frame.json`: JPG frame snapshots (memory callback and save), mixed; `videoFrameCaptureType=JPG_FRAME`, `enableRecording=false`.
+  - `capture_type_jpg_file.json`: JPG files written directly by SDK, mixed; `videoFrameCaptureType=JPG_FILE`, `enableRecording=false`.
+
+> Tip: `recorderPath` is the MP4 output path (file for mixed, for single it is the per-uid file prefix). `capturePath` is the snapshot output prefix or directory. See `Constants.VideoFrameCaptureType` for enum values.
+
+#### recorder_json.example Parameter Reference
+
+| Parameter                      | Type     | Description                                                                                                                                                     |
+| ------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| appId                          | String   | Project App ID (can also be specified in `.keys`, which has priority).                                                                                          |
+| token                          | String   | Channel Token; can be empty if token authentication is disabled (can also be in `.keys`, which has priority).                                                   |
+| channelName                    | String   | Channel name, must match the client.                                                                                                                            |
+| useStringUid                   | Boolean  | Whether to use string UID. `false` means numeric UID.                                                                                                           |
+| useCloudProxy                  | Boolean  | Whether to enable cloud proxy.                                                                                                                                  |
+| userId                         | String   | Recorder user ID; when set to "0" it will be assigned automatically.                                                                                            |
+| subAllAudio                    | Boolean  | Subscribe to all audio; when `false`, use `subAudioUserList`.                                                                                                   |
+| subAudioUserList               | String[] | List of user IDs to subscribe audio from (effective when `subAllAudio=false`).                                                                                  |
+| subAllVideo                    | Boolean  | Subscribe to all video; when `false`, use `subVideoUserList`.                                                                                                   |
+| subVideoUserList               | String[] | List of user IDs to subscribe video from (effective when `subAllVideo=false`).                                                                                  |
+| subStreamType                  | String   | Stream type: `high` (high stream) or `low` (low stream).                                                                                                        |
+| enableRecording                | Boolean  | Whether to record MP4. When `false`, you can snapshot only.                                                                                                     |
+| enableCapture                  | Boolean  | Whether to enable snapshot capability.                                                                                                                          |
+| videoFrameCaptureType          | Integer  | Snapshot type: 0=ENCODED, 1=YUV, 2=JPG_FRAME (memory callback & save), 3=JPG_FILE (SDK writes JPG). Maps to `Constants.VideoFrameType`/`VideoFrameCaptureType`. |
+| jpgCaptureIntervalInSec        | Integer  | JPG capture interval in seconds (default: 5). Only effective when `videoFrameCaptureType=3` (JPG_FILE).                                                         |
+| isMix                          | Boolean  | Whether to use mixed recording; `false` means single-stream.                                                                                                    |
+| recordEncodedOnly              | Boolean  | Whether to record encoded frames only. When `true`, H.264/H.265 bitstream is written directly to MP4 without decoding (default: false).                         |
+| subscribeEncodedFrameOnly      | Boolean  | Whether to subscribe encoded frames only. When `true`, only encoded frames are subscribed without decoding (default: false).                                    |
+| backgroundColor                | Long     | Mixed background color (0xRRGGBB as long). Effective when `isMix=true`.                                                                                         |
+| backgroundImage                | String   | Mixed background image (PNG/JPG). Takes precedence over `backgroundColor` when both are set.                                                                    |
+| layoutMode                     | String   | Mixed layout: `default`, `bestfit`, `vertical`.                                                                                                                 |
+| maxResolutionUid               | String   | UID displayed at maximum resolution in `vertical` layout.                                                                                                       |
+| recorderStreamType             | String   | Recording type: `audio_only`, `video_only`, `both`.                                                                                                             |
+| recorderPath                   | String   | Output path: for mixed it's a file path; for single it's a directory (each UID generates a separate MP4). Ensure parent directories exist.                      |
+| capturePath                    | String   | Snapshot output prefix or directory: for JPG_FILE it's a directory; for others it's a file prefix.                                                              |
+| maxDuration                    | Integer  | Recording duration (seconds). Stops automatically when reached.                                                                                                 |
+| recoverFile                    | Boolean  | Whether to write h264/aac simultaneously to allow MP4 recovery after crashes (recording-related).                                                               |
+| audio.sampleRate               | Integer  | Audio sample rate (Hz).                                                                                                                                         |
+| audio.numOfChannels            | Integer  | Number of audio channels.                                                                                                                                       |
+| video.width                    | Integer  | Video width (pixels).                                                                                                                                           |
+| video.height                   | Integer  | Video height (pixels).                                                                                                                                          |
+| video.fps                      | Integer  | Video frame rate (fps).                                                                                                                                         |
+| waterMark[].type               | String   | Watermark type: `litera` (text), `time` (timestamp), `picture` (image).                                                                                         |
+| waterMark[].litera             | String   | Text watermark content (when type=litera).                                                                                                                      |
+| waterMark[].fontFilePath       | String   | Font file path (for litera/time).                                                                                                                               |
+| waterMark[].fontSize           | Integer  | Font size.                                                                                                                                                      |
+| waterMark[].x/y/width/height   | Integer  | Watermark rectangle position and size.                                                                                                                          |
+| waterMark[].zorder             | Integer  | Watermark layer order.                                                                                                                                          |
+| waterMark[].imgUrl             | String   | Image watermark path (when type=picture).                                                                                                                       |
+| encryption.mode                | String   | Encryption type: `AES_128_XTS`, `AES_128_ECB`, `AES_256_XTS`, `SM4_128_ECB`, `AES_128_GCM`, `AES_256_GCM`, `AES_128_GCM2`, `AES_256_GCM2`.                      |
+| encryption.key                 | String   | Encryption key.                                                                                                                                                 |
+| encryption.salt                | String   | Encryption salt (32 characters; required by some modes).                                                                                                        |
+| rotation[].uid                 | String   | UID whose video requires rotation.                                                                                                                              |
+| rotation[].degree              | Integer  | Rotation angle: 0, 90, 180, 270.                                                                                                                                |
+| stressTest.enable              | Boolean  | Whether to enable stress test mode (default: false).                                                                                                            |
+| stressTest.enableSingleChannel | Boolean  | Whether to use single channel for all threads in stress test (default: false). When false, each thread uses a separate channel.                                 |
+| stressTest.threadNum           | Integer  | Number of concurrent threads for stress test (default: 1).                                                                                                      |
+| stressTest.testTime            | Integer  | Total stress test duration in seconds (default: 10).                                                                                                            |
+| stressTest.oneTestTime         | Integer  | Duration of each recording session in seconds (default: 3).                                                                                                     |
+| stressTest.sleepTime           | Integer  | Sleep interval between recording sessions in seconds (default: 1).                                                                                              |
+
+### Recording via API
+
+#### Prerequisites
+
+Before starting, ensure SDK environment and integration are complete, including the JAR and `.so` libraries.
+
+#### Implement Recording via API
+
+The following example comes from the actual `Examples-Mvn` project and shows how to use the Recording SDK through API calls.
+
+##### Initialize Service
+
+```java
+// Create AgoraService instance
+AgoraService agoraService = new AgoraService();
+
+// Configure local access point (must be set before initialize)
+LocalAccessPointConfiguration localAccessPointConfig = new LocalAccessPointConfiguration();
+localAccessPointConfig.setMode(Constants.LocalProxyMode.LocalOnly);
+localAccessPointConfig.setIpList(new String[] { "10.xx.xx.xx" });
+localAccessPointConfig.setIpListSize(1);
+localAccessPointConfig.setVerifyDomainName("ap.xxx.agora.local");
+int setGlobalLocalAccessPointRet = agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
+
+// Create and configure service
+AgoraServiceConfiguration config = new AgoraServiceConfiguration();
+config.setEnableAudioDevice(false);
+config.setEnableAudioProcessor(true);
+config.setEnableVideo(true);
+config.setAppId("YOUR_APPID");
+config.setUseStringUid(false);
+agoraService.initialize(config);
+
+// Optional: set cloud proxy
+AgoraParameter parameter = agoraService.getAgoraParameter();
+if (parameter != null) {
+    parameter.setBool("rtc.enable_proxy", true);
+}
+```
+
+##### Join Channel
+
+```java
+// Create and initialize recorder
+AgoraMediaRtcRecorder agoraMediaRtcRecorder = agoraService.createMediaRtcRecorder();
+// The second parameter indicates whether to enable mixed recording: true=mixed, false=single
+agoraMediaRtcRecorder.initialize(agoraService, false);
+
+// Create and register event handler
+IAgoraMediaRtcRecorderEventHandler handler = new AgoraMediaRtcRecorderEventHandler();
+agoraMediaRtcRecorder.registerRecorderEventHandler(handler);
+
+// Join channel
+agoraMediaRtcRecorder.joinChannel(
+    "YOUR_TOKEN",     // Channel token; can be null if not enforced
+    "YOUR_CHANNEL",   // Channel name
+    "0"               // User ID; "0" lets the system assign one
+);
+```
+
+##### Configure and Start Recording
+
+```java
+// Subscribe audio
+if (subscribeAllAudio) {
+    agoraMediaRtcRecorder.subscribeAllAudio();
+} else {
+    agoraMediaRtcRecorder.subscribeAudio("USER_ID");
+}
+
+// Subscribe video
+VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+options.setEncodedFrameOnly(false);
+options.setType(VideoStreamType.VIDEO_STREAM_HIGH);
+if (subscribeAllVideo) {
+    agoraMediaRtcRecorder.subscribeAllVideo(options);
+} else {
+    agoraMediaRtcRecorder.subscribeVideo("USER_ID", options);
+}
+
+// Mixed layout (only when mixed is enabled)
+if (enableMix) {
+    VideoMixingLayout layout = new VideoMixingLayout();
+    // configure ...
+    agoraMediaRtcRecorder.setVideoMixingLayout(layout);
+}
+
+// Recorder configuration
+MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
+mediaRecorderConfiguration.setWidth(640);
+mediaRecorderConfiguration.setHeight(480);
+mediaRecorderConfiguration.setFps(15);
+mediaRecorderConfiguration.setMaxDurationMs(60 * 60 * 1000);
+mediaRecorderConfiguration.setStoragePath("/path/to/save/recording.mp4");
+
+// Mixed
+agoraMediaRtcRecorder.setRecorderConfig(mediaRecorderConfiguration);
+
+// Or single (uncomment if needed)
+// agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, "USER_ID");
+
+// Watermark (optional)
+WatermarkConfig[] watermarks = new WatermarkConfig[1];
+watermarks[0] = new WatermarkConfig();
+// configure ...
+agoraMediaRtcRecorder.enableAndUpdateVideoWatermarks(watermarks);
+
+// Encryption (optional)
+if (enableEncryption) {
+    EncryptionConfig encryptionConfig = new EncryptionConfig();
+    encryptionConfig.setEncryptionMode(EncryptionMode.AES_128_GCM);
+    encryptionConfig.setEncryptionKey("YOUR_ENCRYPTION_KEY");
+    agoraMediaRtcRecorder.enableEncryption(true, encryptionConfig);
+}
+
+// Start
+if (enableMix) {
+    agoraMediaRtcRecorder.startRecording();
+} else {
+    agoraMediaRtcRecorder.startSingleRecordingByUid("USER_ID");
+}
+```
+
+##### Recording Event Handling
+
+```java
+public static class AgoraMediaRtcRecorderEventHandler implements IAgoraMediaRtcRecorderEventHandler {
+    @Override
+    public void onFirstRemoteAudioDecoded(String channelId, String userId, int elapsed) {
+        // Start single audio recording here when first remote audio is decoded
+        new Thread() {
+            @Override
+            public void run() {
+                MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
+                // configure ...
+                agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
+                agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
+            }
+        }.start();
+    }
+
+    @Override
+    public void onFirstRemoteVideoDecoded(String channelId, String userId, int width, int height, int elapsed) {
+        // Update mixed layout or start single video recording
+        new Thread() {
+            @Override
+            public void run() {
+                if (enableMix) {
+                    VideoMixingLayout layout = new VideoMixingLayout();
+                    // configure ...
+                    agoraMediaRtcRecorder.setVideoMixingLayout(layout);
+                } else {
+                    MediaRecorderConfiguration mediaRecorderConfiguration = new MediaRecorderConfiguration();
+                    // configure ...
+                    agoraMediaRtcRecorder.setRecorderConfigByUid(mediaRecorderConfiguration, userId);
+                    agoraMediaRtcRecorder.startSingleRecordingByUid(userId);
+                }
+            }
+        }.start();
+    }
+
+    @Override
+    public void onRecorderStateChanged(String channelId, String userId, Constants.RecorderState state,
+            Constants.RecorderReasonCode reason, String fileName) {
+        // Observe state changes
+    }
+
+    // Other events ...
+}
+```
+
+##### Stop Recording
+
+```java
+// Unsubscribe
+agoraMediaRtcRecorder.unsubscribeAllAudio();
+agoraMediaRtcRecorder.unsubscribeAllVideo();
+
+// Stop
+if (enableMix) {
+    agoraMediaRtcRecorder.stopRecording();
+} else {
+    agoraMediaRtcRecorder.stopSingleRecordingByUid("USER_ID");
+}
+
+// Unregister handler
+agoraMediaRtcRecorder.unregisterRecorderEventHandler(handler);
+
+// Leave and release
+agoraMediaRtcRecorder.leaveChannel();
+agoraMediaRtcRecorder.release();
+
+// Release service
+agoraService.release();
+```
+
+##### Getting Recorded Files
+
+Recorded files are saved depending on recording type:
+
+- Single-stream: MP4 files in the directory under `Examples-Mvn`, e.g. `recorder_result/single/recorder_audio_video_uid_123456_timestamp.mp4`.
+
+- Mixed-stream: a single MP4 in the path specified by `MediaRecorderConfiguration#storagePath`, e.g. `recorder_result/mix/mix_audio_video_water_marks_timestamp.mp4`.
+
+It is recommended to set a unique file path per session (channel name, timestamp, etc.) to avoid overwriting.
+
+More options are available in the `MediaRecorderConfiguration` API.
+
+#### Snapshot Feature (API Example)
+
+```java
+// 1) Implement snapshot observer
+public static class MySnapshotObserver implements io.agora.recording.IRecorderVideoFrameObserver {
+    @Override
+    public void onYuvFrameCaptured(String channelId, String userId, io.agora.recording.VideoFrame frame) {
+        System.out.println("YUV frame: " + frame.getWidth() + "x" + frame.getHeight() + ", uid=" + userId);
+        // TODO: handle YUV data
+    }
+
+    @Override
+    public void onEncodedFrameReceived(String channelId, String userId, byte[] imageBuffer,
+                                       io.agora.recording.EncodedVideoFrameInfo info) {
+        System.out.println("Encoded frame: type=" + info.getFrameType() + ", codec=" + info.getCodecType()
+                + ", uid=" + userId + ", size=" + (imageBuffer != null ? imageBuffer.length : 0));
+        // TODO: persist .h264 / .jpg buffer, or post-process
+    }
+
+    @Override
+    public void onJPGFileSaved(String channelId, String userId, String filename) {
+        System.out.println("JPG saved: " + filename + ", uid=" + userId);
+    }
+}
+
+// 2) Build capture config and enable
+io.agora.recording.RecorderVideoFrameCaptureConfig capCfg = new io.agora.recording.RecorderVideoFrameCaptureConfig();
+capCfg.setObserver(new MySnapshotObserver());
+capCfg.setVideoFrameType(io.agora.recording.Constants.VideoFrameType.VIDEO_FRAME_TYPE_ENCODED); // ENCODED/YUV/JPG/JPG_FILE
+capCfg.setJpgFileStorePath("/path/to/snapshots/"); // JPG_FILE mode only
+capCfg.setJpgCaptureIntervalInSec(5); // interval (sec) for JPG/JPG_FILE modes
+
+int ret = agoraMediaRtcRecorder.enableRecorderVideoFrameCapture(true, capCfg);
+if (ret != 0) {
+    System.err.println("enableRecorderVideoFrameCapture failed: " + ret);
+}
+
+// 3) Disable when needed
+// agoraMediaRtcRecorder.enableRecorderVideoFrameCapture(false, capCfg);
+```
+
+> Note: For encoded frame capture (ENCODED), the following settings are required:
+> 1. Set `setEncodedFrameOnly(true)` in video subscription options, which is necessary for encoded frame capture
+
+```java
+// Set video subscription options to support encoded frame capture
+VideoSubscriptionOptions options = new VideoSubscriptionOptions();
+boolean encodedFrameOnly = true; // Set to true to enable encoded frame capture
+options.setEncodedFrameOnly(encodedFrameOnly);
+options.setType(Utils.convertToVideoStreamType(subStreamType));
+```
 
 ## API Reference
 
-For detailed descriptions of the SDK APIs, please refer to the [API-reference.md](API-reference.md) document, each class and method provides detailed parameter descriptions and return value explanations.
+See [API-reference.md](API-reference.md) for detailed SDK APIs.
 
 ## Changelog
+
+### v4.4.151.1 / v4.4.151-aarch64 (2025-09-04)
+
+#### API Changes
+
+- Removed: `AgoraMediaComponentFactory` class. Create recorder via `AgoraService#createMediaRtcRecorder()`.
+- Added: `AgoraMediaRtcRecorder#enableRecorderVideoFrameCapture(boolean, RecorderVideoFrameCaptureConfig)` to support ENCODED/YUV/JPG/JPG_FILE snapshots.
+- Added: `AgoraMediaRtcRecorder#initialize(AgoraService, boolean, boolean recordEncodedOnly)`; with `recordEncodedOnly=true`, video is not decoded and H.264 or H.265 bitstream is written directly to MP4 file.
+- Added: `IRecorderVideoFrameObserver` callbacks: `onYuvFrameCaptured`, `onEncodedFrameReceived`, `onJPGFileSaved`.
+- Added: `RecorderVideoFrameCaptureConfig` fields `videoFrameType`, `jpgFileStorePath`, `jpgCaptureIntervalInSec`, `observer`.
+- Added: `Constants` enums `VideoCodecType`, `VideoFrameType`, `VideoOrientation`.
 
 ### v4.4.150.5 (2025-06-30)
 

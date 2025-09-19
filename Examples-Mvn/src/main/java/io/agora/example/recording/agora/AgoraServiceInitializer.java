@@ -1,6 +1,5 @@
 package io.agora.example.recording.agora;
 
-import io.agora.recording.AgoraMediaComponentFactory;
 import io.agora.recording.AgoraParameter;
 import io.agora.recording.AgoraService;
 import io.agora.recording.AgoraServiceConfiguration;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AgoraServiceInitializer {
     private static AgoraService agoraService;
-    private static AgoraMediaComponentFactory factory;
 
     public static void initService(RecorderConfig recorderConfig) {
         if (recorderConfig == null) {
@@ -26,9 +24,7 @@ public class AgoraServiceInitializer {
             // LocalAccessPointConfiguration localAccessPointConfig = new
             // LocalAccessPointConfiguration();
             // localAccessPointConfig.setMode(Constants.LocalProxyMode.LocalOnly);
-            // localAccessPointConfig.setDomainList(new String[] { "" });
             // localAccessPointConfig.setIpList(new String[] { "10.xx.xx.xx" });
-            // localAccessPointConfig.setDomainListSize(1);
             // localAccessPointConfig.setIpListSize(1);
             // localAccessPointConfig.setVerifyDomainName("ap.xxx.agora.local");
             // int setGlobalLocalAccessPointRet =
@@ -62,44 +58,30 @@ public class AgoraServiceInitializer {
                     parameter.setBool("che.media_recorder_recover_files", true);
                 }
             }
-            initData();
+            initData(recorderConfig);
             log.info("AgoraService initialized");
-        }
-
-        if (factory == null) {
-            factory = agoraService.createAgoraMediaComponentFactory();
-            if (null == factory) {
-                log.info("Failed to create createAgoraMediaComponentFactory");
-                return;
-            }
         }
     }
 
-    private static void initData() {
-        File testDataOutFile = new File("recorder_result/");
-        if (!testDataOutFile.exists()) {
-            testDataOutFile.mkdirs();
+    private static void initData(RecorderConfig recorderConfig) {
+        if (recorderConfig == null) {
+            log.info("recorderConfig is null");
+            return;
         }
+
     }
 
     public static void destroy() {
         log.info("destroy");
-        if (null == agoraService || null == factory) {
+        if (null == agoraService) {
             log.info("destroy agoraService is null");
             return;
         }
-        factory.release();
         agoraService.release();
-
-        factory = null;
         agoraService = null;
     }
 
     public static AgoraService getAgoraService() {
         return agoraService;
-    }
-
-    public static AgoraMediaComponentFactory getFactory() {
-        return factory;
     }
 }

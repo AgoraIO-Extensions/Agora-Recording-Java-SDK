@@ -16,11 +16,11 @@
     "subStreamType": "high",
     "enableRecording": true,
     "enableCapture": false,
-    "isMix": false,
+    "isMix": true,
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",
     "recorderStreamType": "both",
-    "recorderPath": "recorder_result/single/recorder_audio_video_water_marks_",
+    "recorderPath": "recorder_result/mix/mix_audio_video_water_marks.mp4",
     "audio": {
         "sampleRate": 16000,
         "numOfChannels": 1
@@ -72,5 +72,13 @@
             "uid": "123",
             "degree": 90
         }
-    ]
+    ],
+    "stressTest": {
+        "enable": true,
+        "enableSingleChannel": true,
+        "sleepTime": 1,
+        "threadNum": 2,
+        "testTime": 10,
+        "oneTestTime": 5
+    }
 }

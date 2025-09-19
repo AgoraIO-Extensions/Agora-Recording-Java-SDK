@@ -15,12 +15,14 @@
     ],
     "subStreamType": "high",
     "enableRecording": true,
-    "enableCapture": false,
-    "isMix": false,
+    "enableCapture": true,
+    "videoFrameCaptureType": 2,
+    "isMix": true,
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",
     "recorderStreamType": "both",
-    "recorderPath": "recorder_result/single/recorder_audio_video_water_marks_",
+    "capturePath": "recorder_result/capture/jpg_frame_mix_stream/",
+    "recorderPath": "recorder_result/mix/capture_type_jpg_frame_mix_stream.mp4",
     "audio": {
         "sampleRate": 16000,
         "numOfChannels": 1

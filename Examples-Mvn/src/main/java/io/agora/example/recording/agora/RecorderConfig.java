@@ -15,13 +15,20 @@ public class RecorderConfig {
     private boolean subAllVideo;
     private List<String> subVideoUserList;
     private String subStreamType;
+    private boolean enableRecording;
+    private boolean enableCapture;
+    private int videoFrameCaptureType;
+    private int jpgCaptureIntervalInSec;
     private boolean isMix;
+    private boolean recordEncodedOnly;
+    private boolean subscribeEncodedFrameOnly;
     private long backgroundColor;
     private String backgroundImage;
     private String layoutMode;
     private String maxResolutionUid;
     private String recorderStreamType;
     private String recorderPath;
+    private String capturePath;
     private int maxDuration;
     private boolean recoverFile;
     private AudioConfig audio;
@@ -29,6 +36,7 @@ public class RecorderConfig {
     private List<WaterMark> waterMark;
     private Encryption encryption;
     private List<Rotation> rotation;
+    private StressTest stressTest;
 
     public RecorderConfig() {
         audio = new AudioConfig();
@@ -38,8 +46,16 @@ public class RecorderConfig {
         waterMark = new ArrayList<>();
         encryption = new Encryption();
         rotation = new ArrayList<>();
+        capturePath = "";
         maxDuration = 120;
         recoverFile = false;
+        enableRecording = true;
+        enableCapture = false;
+        videoFrameCaptureType = 0;
+        jpgCaptureIntervalInSec = 5;
+        stressTest = new StressTest();
+        recordEncodedOnly = false;
+        subscribeEncodedFrameOnly = false;
     }
 
     public static class AudioConfig {
@@ -289,6 +305,75 @@ public class RecorderConfig {
         }
     }
 
+    public static class StressTest {
+        private boolean enable = false;
+        private boolean enableSingleChannel = false;
+        private int sleepTime = 1; // s
+        private int threadNum = 1;
+        private int testTime = 10; // s
+        private int oneTestTime = 3; // s
+
+        public boolean isEnable() {
+            return enable;
+        }
+
+        public void setEnable(boolean enable) {
+            this.enable = enable;
+        }
+
+        public boolean isEnableSingleChannel() {
+            return enableSingleChannel;
+        }
+
+        public void setEnableSingleChannel(boolean enableSingleChannel) {
+            this.enableSingleChannel = enableSingleChannel;
+        }
+
+        public int getSleepTime() {
+            return sleepTime;
+        }
+
+        public void setSleepTime(int sleepTime) {
+            this.sleepTime = sleepTime;
+        }
+
+        public int getThreadNum() {
+            return threadNum;
+        }
+
+        public void setThreadNum(int threadNum) {
+            this.threadNum = threadNum;
+        }
+
+        public int getTestTime() {
+            return testTime;
+        }
+
+        public void setTestTime(int testTime) {
+            this.testTime = testTime;
+        }
+
+        public int getOneTestTime() {
+            return oneTestTime;
+        }
+
+        public void setOneTestTime(int oneTestTime) {
+            this.oneTestTime = oneTestTime;
+        }
+
+        @Override
+        public String toString() {
+            return "StressTest{" +
+                    "enable=" + enable +
+                    ", enableSingleChannel=" + enableSingleChannel +
+                    ", sleepTime=" + sleepTime +
+                    ", threadNum=" + threadNum +
+                    ", testTime=" + testTime +
+                    ", oneTestTime=" + oneTestTime +
+                    '}';
+        }
+    }
+
     public String getAppId() {
         return appId;
     }
@@ -377,12 +462,60 @@ public class RecorderConfig {
         this.subStreamType = subStreamType;
     }
 
+    public boolean isEnableRecording() {
+        return enableRecording;
+    }
+
+    public void setEnableRecording(boolean enableRecording) {
+        this.enableRecording = enableRecording;
+    }
+
+    public boolean isEnableCapture() {
+        return enableCapture;
+    }
+
+    public void setEnableCapture(boolean enableCapture) {
+        this.enableCapture = enableCapture;
+    }
+
+    public int getVideoFrameCaptureType() {
+        return videoFrameCaptureType;
+    }
+
+    public void setVideoFrameCaptureType(int videoFrameCaptureType) {
+        this.videoFrameCaptureType = videoFrameCaptureType;
+    }
+
+    public int getJpgCaptureIntervalInSec() {
+        return jpgCaptureIntervalInSec;
+    }
+
+    public void setJpgCaptureIntervalInSec(int jpgCaptureIntervalInSec) {
+        this.jpgCaptureIntervalInSec = jpgCaptureIntervalInSec;
+    }
+
     public boolean isMix() {
         return isMix;
     }
 
     public void setIsMix(boolean isMix) {
         this.isMix = isMix;
+    }
+
+    public boolean isRecordEncodedOnly() {
+        return recordEncodedOnly;
+    }
+
+    public void setRecordEncodedOnly(boolean recordEncodedOnly) {
+        this.recordEncodedOnly = recordEncodedOnly;
+    }
+
+    public boolean isSubscribeEncodedFrameOnly() {
+        return subscribeEncodedFrameOnly;
+    }
+
+    public void setSubscribeEncodedFrameOnly(boolean subscribeEncodedFrameOnly) {
+        this.subscribeEncodedFrameOnly = subscribeEncodedFrameOnly;
     }
 
     public long getBackgroundColor() {
@@ -431,6 +564,14 @@ public class RecorderConfig {
 
     public void setRecorderPath(String recorderPath) {
         this.recorderPath = recorderPath;
+    }
+
+    public String getCapturePath() {
+        return capturePath;
+    }
+
+    public void setCapturePath(String capturePath) {
+        this.capturePath = capturePath;
     }
 
     public int getMaxDuration() {
@@ -489,6 +630,14 @@ public class RecorderConfig {
         this.rotation = rotation;
     }
 
+    public StressTest getStressTest() {
+        return stressTest;
+    }
+
+    public void setStressTest(StressTest stressTest) {
+        this.stressTest = stressTest;
+    }
+
     @Override
     public String toString() {
         return "RecorderConfig{" +
@@ -503,13 +652,20 @@ public class RecorderConfig {
                 ", subAllVideo=" + subAllVideo +
                 ", subVideoUserList=" + subVideoUserList +
                 ", subStreamType='" + subStreamType + '\'' +
+                ", enableRecording=" + enableRecording +
+                ", enableCapture=" + enableCapture +
+                ", videoFrameCaptureType=" + videoFrameCaptureType +
+                ", jpgCaptureIntervalInSec=" + jpgCaptureIntervalInSec +
                 ", isMix=" + isMix +
+                ", recordEncodedOnly=" + recordEncodedOnly +
+                ", subscribeEncodedFrameOnly=" + subscribeEncodedFrameOnly +
                 ", backgroundColor=" + backgroundColor +
                 ", backgroundImage='" + backgroundImage + '\'' +
                 ", layoutMode='" + layoutMode + '\'' +
                 ", maxResolutionUid='" + maxResolutionUid + '\'' +
                 ", recorderStreamType='" + recorderStreamType + '\'' +
                 ", recorderPath='" + recorderPath + '\'' +
+                ", capturePath='" + capturePath + '\'' +
                 ", maxDuration=" + maxDuration +
                 ", recoverFile=" + recoverFile +
                 ", audio=" + audio +
@@ -517,6 +673,7 @@ public class RecorderConfig {
                 ", waterMark=" + waterMark +
                 ", encryption=" + encryption +
                 ", rotation=" + rotation +
+                ", stressTest=" + stressTest +
                 '}';
     }
 }

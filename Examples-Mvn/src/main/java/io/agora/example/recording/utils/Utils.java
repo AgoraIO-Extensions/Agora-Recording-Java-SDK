@@ -4,7 +4,10 @@ import io.agora.recording.Constants;
 import io.agora.recording.Constants.MediaRecorderStreamType;
 import io.agora.recording.Constants.VideoStreamType;
 import io.agora.recording.Constants.WatermarkSourceType;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -20,8 +23,7 @@ public class Utils {
 
     static {
         ZONE_ID = ZoneId.systemDefault();
-        DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZONE_ID);
+        DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZONE_ID);
     }
 
     public static String getCurrentTime() {
@@ -29,15 +31,14 @@ public class Utils {
     }
 
     public static String getTaskId() {
-        String currentTime =
-            getCurrentTime().replace(" ", "").replace("-", "").replace(":", "").replace(".", "");
+        String currentTime = getCurrentTime().replace(" ", "").replace("-", "").replace(":", "").replace(".", "");
         String uuid = UUID.randomUUID().toString().replace("-", "");
         return currentTime + "-" + uuid;
     }
 
     public static String[] readAppIdAndToken(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
-            return new String[] {"", ""};
+            return new String[] { "", "" };
         }
 
         String appId = "";
@@ -77,14 +78,14 @@ public class Utils {
             }
 
             if (!foundAppId || appId.isEmpty()) {
-                return new String[] {"", ""};
+                return new String[] { "", "" };
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return new String[] {appId, token};
+        return new String[] { appId, token };
     }
 
     public static VideoStreamType convertToVideoStreamType(String type) {
@@ -121,12 +122,12 @@ public class Utils {
 
     public static boolean recorderIsVideo(MediaRecorderStreamType type) {
         return type == MediaRecorderStreamType.STREAM_TYPE_VIDEO
-            || type == MediaRecorderStreamType.STREAM_TYPE_BOTH;
+                || type == MediaRecorderStreamType.STREAM_TYPE_BOTH;
     }
 
     public static boolean recorderIsAudio(MediaRecorderStreamType type) {
         return type == MediaRecorderStreamType.STREAM_TYPE_AUDIO
-            || type == MediaRecorderStreamType.STREAM_TYPE_BOTH;
+                || type == MediaRecorderStreamType.STREAM_TYPE_BOTH;
     }
 
     public static Constants.EncryptionMode convertToEncryptionMode(String mode) {
@@ -171,5 +172,24 @@ public class Utils {
             default:
                 return WatermarkSourceType.PICTURE;
         }
+    }
+
+    public static void saveDataToFile(String savePath, byte[] data, boolean isAppend) {
+        try {
+            Files.write(Paths.get(savePath), data, StandardOpenOption.CREATE,
+                    isAppend ? StandardOpenOption.APPEND : StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String readFile(String filePath) {
+        try {
+            byte[] bytes = Files.readAllBytes(Paths.get(filePath));
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

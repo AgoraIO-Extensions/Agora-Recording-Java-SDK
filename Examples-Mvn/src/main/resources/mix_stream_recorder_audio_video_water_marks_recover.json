@@ -14,11 +14,13 @@
         "123"
     ],
     "subStreamType": "high",
+    "enableRecording": true,
+    "enableCapture": false,
     "isMix": true,
     "layoutMode": "bestfit",
     "maxResolutionUid": "123",
     "recorderStreamType": "both",
-    "recorderPath": "recorder_mix_audio_video_water_marks_recover.mp4",
+    "recorderPath": "recorder_result/mix/mix_audio_video_water_marks_recover.mp4",
     "recoverFile": true,
     "audio": {
         "sampleRate": 16000,

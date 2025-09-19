@@ -6,11 +6,11 @@
 
 - [核心类](#core-classes)
   - [AgoraService](#agoraservice)
-  - [AgoraMediaComponentFactory](#agoramediacomponentfactory)
   - [AgoraMediaRtcRecorder](#agoramediartcrecorder)
   - [AgoraParameter](#agoraparameter)
 - [观察者接口](#observer-interfaces)
   - [IAgoraMediaRtcRecorderEventHandler](#iagoramediartcrecordereventhandler)
+  - [IRecorderVideoFrameObserver](#irecordervideoframeobserver)
 - [数据结构](#data-structures)
   - [AgoraServiceConfiguration](#agoraserviceconfiguration)
   - [MediaRecorderConfiguration](#mediarecorderconfiguration)
@@ -33,6 +33,9 @@
   - [AdvancedConfigInfo](#advancedconfiginfo)
   - [LogUploadServerInfo](#loguploadserverinfo)
   - [LocalAccessPointConfiguration](#localaccesspointconfiguration)
+  - [RecorderVideoFrameCaptureConfig](#recordervideoframecaptureconfig)
+  - [VideoFrame](#videoframe)
+  - [EncodedVideoFrameInfo](#encodedvideoframeinfo)
 - [实用工具类](#utility-classes)
   - [Constants](#constants)
   - [Utils](#utils)
@@ -63,14 +66,6 @@
 - `< 0`: 失败，具体错误码可能包括：
   - `ERR_INVALID_ARGUMENT (-2)`: 如果 `AgoraServiceConfiguration` 中的 `context` 未提供 (仅限 Android)。
   - `ERR_INIT_NET_ENGINE (-?)`: 如果网络引擎无法初始化 (例如，防火墙阻止)。
-
-##### `AgoraMediaComponentFactory createAgoraMediaComponentFactory()`
-
-创建并返回一个用于创建媒体组件的 `AgoraMediaComponentFactory` 对象。
-
-**返回值**:
-
-- 返回一个 `AgoraMediaComponentFactory` 实例
 
 ##### `AgoraParameter getAgoraParameter()`
 
@@ -139,40 +134,13 @@
 - `0`: 方法调用成功。
 - `< 0`: 方法调用失败。
 
-### AgoraMediaComponentFactory
-
-`AgoraMediaComponentFactory` 类是用于创建 Agora 媒体组件的工厂类。该类提供创建媒体录制组件实例的功能。
-
-#### 主要方法
-
-##### `AgoraMediaRtcRecorder createMediaRtcRecorder()`
-
-创建一个新的 `AgoraMediaRtcRecorder` 实例。
-
-**返回值**:
-
-- 一个新的 `AgoraMediaRtcRecorder` 实例
-
-**异常**:
-
-- `RuntimeException`: 如果原生录制器创建失败。
-
-##### `int release()`
-
-释放与工厂关联的本地资源。
-
-**返回值**:
-
-- `0`: 成功
-- `< 0`: 失败
-
 ### AgoraMediaRtcRecorder
 
 `AgoraMediaRtcRecorder` 类提供录制 Agora RTC 媒体流的功能。该类允许录制来自 Agora RTC 频道的音频和视频流，并提供流混合、加密和选择性订阅的选项。
 
 #### 主要方法
 
-##### `int initialize(AgoraService service, boolean enableMix)`
+##### `int initialize(AgoraService service, boolean enableMix, boolean recordEncodedOnly)`
 
 使用指定的服务和混合设置初始化录制器。
 
@@ -180,11 +148,18 @@
 
 - `service`: 一个 Agora 服务实例，必须在调用此方法之前初始化。
 - `enableMix`: 是否启用流混合。
+- `recordEncodedOnly`: 仅录制编码视频（当 `enableMix=false` 时生效）：
+  - `true`: 不解码接收的视频，直接将 H.264 码流写入容器（不支持水印）。
+  - `false`: 先解码为 YUV 再转码为 H.264 写入容器（支持水印）。
 
 **返回值**:
 
 - `0`: 初始化成功。
 - `< 0`: 初始化失败。
+
+##### `int initialize(AgoraService service, boolean enableMix)`
+
+兼容旧版的重载，等价于调用 `initialize(service, enableMix, false)`。
 
 ##### `int joinChannel(String token, String channelName, String userId)`
 
@@ -510,6 +485,31 @@ Token 在一段时间后会过期。当 `IAgoraMediaRtcRecorderEventHandler#onEr
 
 - `0`: 方法调用成功。
 - `< 0`: 方法调用失败 (例如，如果 Token 为 null 或空)。
+
+##### `int enableRecorderVideoFrameCapture(boolean enable, RecorderVideoFrameCaptureConfig config)`
+
+启用/关闭录制器视频帧捕获。
+
+启用后，将按照 `Constants.VideoFrameCaptureType` 将帧回调给观察者：
+
+- `VIDEO_FORMAT_ENCODED_FRAME_TYPE`
+- `VIDEO_FORMAT_YUV_FRAME_TYPE`
+- `VIDEO_FORMAT_JPG_FRAME_TYPE`
+- `VIDEO_FORMAT_JPG_FILE_TYPE`
+
+当使用 `VIDEO_FORMAT_JPG_FILE_TYPE` 时，需要在 `config` 中设置 `jpgFileStorePath` 与 `jpgCaptureIntervalInSec`。
+
+注意：如需通过观察者接收 YUV 或 JPG 帧，初始化时必须将 `recordEncodedOnly` 设为 `false`。
+
+**参数**：
+
+- `enable`: `true` 开启，`false` 关闭。
+- `config`: 捕获配置；为 `null` 时使用默认值。
+
+**返回值**：
+
+- `0`: 成功。
+- `< 0`: 失败。
 
 ##### `int release()`
 
@@ -865,6 +865,18 @@ Token 在一段时间后会过期。当 `IAgoraMediaRtcRecorderEventHandler#onEr
 - `userId`: 发送音频流的远程用户 ID。
 - `elapsed`: 从本地用户调用 `joinChannel` 到此事件发生所经过的时间（毫秒）。
 
+##### `default void onVideoSizeChanged(String channelId, String userId, int width, int height, int rotation)`
+
+当远端视频的分辨率发生变化时触发。
+
+**参数**：
+
+- `channelId`: 频道 ID。
+- `userId`: 远端用户 ID。
+- `width`: 宽度（像素）。
+- `height`: 高度（像素）。
+- `rotation`: 旋转角度（参见 {@link Constants.VideoOrientation}）。
+
 ##### `void onAudioVolumeIndication(String channelId, SpeakVolumeInfo[] speakers, int speakerNumber)`
 
 报告哪些用户正在讲话及其音量。
@@ -970,6 +982,43 @@ Token 已过期时触发。
 **参数**:
 
 - `channelId`: 频道 ID。
+
+### IRecorderVideoFrameObserver
+
+用于接收录制器捕获的视频帧的观察者接口。
+
+#### 主要回调方法
+
+##### `void onYuvFrameCaptured(String channelId, String userId, VideoFrame frame)`
+
+当捕获到 YUV 视频帧时触发。
+
+**参数**：
+
+- `channelId`: 频道 ID。
+- `userId`: 远端用户 ID。
+- `frame`: 捕获到的 YUV 帧。参见 [VideoFrame](#videoframe)。
+
+##### `void onEncodedFrameReceived(String channelId, String userId, byte[] imageBuffer, EncodedVideoFrameInfo info)`
+
+当捕获到编码视频帧时触发。
+
+**参数**：
+
+- `channelId`: 频道 ID。
+- `userId`: 远端用户 ID。
+- `imageBuffer`: 编码帧字节数组。
+- `info`: 编码帧信息。参见 [EncodedVideoFrameInfo](#encodedvideoframeinfo)。
+
+##### `void onJPGFileSaved(String channelId, String userId, String filename)`
+
+当以 `VIDEO_FORMAT_JPG_FILE_TYPE` 模式保存 JPG 文件到磁盘后触发。
+
+**参数**：
+
+- `channelId`: 频道 ID。
+- `userId`: 远端用户 ID。
+- `filename`: 已保存 JPG 文件的绝对路径。
 
 ## 数据结构
 
@@ -1254,6 +1303,45 @@ Token 已过期时触发。
 - `LocalAccessPointConfiguration` 可用于 `AgoraService#setGlobalLocalAccessPoint` 方法，影响同一进程下所有录制实例。
 - `AdvancedConfigInfo` 目前主要用于日志上传服务器配置，后续可扩展更多高级参数。
 - `LogUploadServerInfo` 支持自定义日志上传服务器的域名、路径、端口及 HTTPS 设置。
+  
+### RecorderVideoFrameCaptureConfig
+
+用于配置录制器视频帧捕获。
+
+#### 主要属性
+
+- **videoFrameType**: 捕获类型。参见 {@link Constants.VideoFrameCaptureType}。
+- **jpgFileStorePath**: 当使用 `VIDEO_FORMAT_JPG_FILE_TYPE` 时用于保存 JPG 文件的绝对目录路径。
+- **jpgCaptureIntervalInSec**: JPG 捕获的间隔秒数。默认：`5`（最小 `1`）。
+- **observer**: 帧观察者 `IRecorderVideoFrameObserver`。
+
+### VideoFrame
+
+表示回调到观察者的原始 YUV 视频帧。
+
+#### 主要属性
+
+- **width/height**: 帧宽高（像素）。
+- **yStride/uStride/vStride**: Y/U/V 平面步长。
+- **yBuffer/uBuffer/vBuffer**: 平面数据。
+- **timestampMs**: 捕获/渲染时间戳（毫秒）。
+- **rotation**: 旋转角度（参见 {@link Constants.VideoOrientation}）。
+
+### EncodedVideoFrameInfo
+
+表示编码视频帧的信息。
+
+#### 主要属性
+
+- **uid**: 发送该帧的用户 ID。
+- **codecType**: 编码类型（参见 {@link Constants.VideoCodecType}）。
+- **width/height**: 编码帧尺寸。
+- **framesPerSecond**: 帧率（fps）。
+- **frameType**: 帧类型（参见 {@link Constants.VideoFrameType}）。
+- **rotation**: 旋转角度（参见 {@link Constants.VideoOrientation}）。
+- **trackId**: 轨道 ID。
+- **captureTimeMs/decodeTimeMs/presentationMs**: 各时间戳（毫秒）。
+- **streamType**: 流类型（参见 {@link Constants.VideoStreamType}）。
 
 ## 实用工具类
 
@@ -1272,7 +1360,10 @@ Token 已过期时触发。
 - **`ErrorCodeType`**: 定义 SDK 返回的错误代码。
 - **`LogLevel`**: 定义日志记录级别。
 - **`EncryptionMode`**: 定义媒体流加密模式。
-- **`VideoStreamType`**: 定义视频流类型（高、低）。
+- **`VideoStreamType`**: 定义视频流类型（高、低，以及分层：layer_1 ~ layer_6）。
+- **`VideoCodecType`**: 定义视频编码类型（NONE、VP8、H264、H265、GENERIC、GENERIC_H264、AV1、VP9、GENERIC_JPEG）。
+- **`VideoFrameType`**: 定义视频帧类型（BLANK、KEY、DELTA、B、DROPPABLE、UNKNOW）。
+- **`VideoOrientation`**: 定义视频旋转角度（0、90、180、270）。
 - **`MediaRecorderContainerFormat`**: 定义录制文件容器格式（例如 MP4）。
 - **`MediaRecorderStreamType`**: 定义要录制的内容（音频、视频、两者）。
 - **`VideoSourceType`**: 定义视频流的来源（摄像头、屏幕等）。
