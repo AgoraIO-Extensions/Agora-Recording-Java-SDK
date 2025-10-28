@@ -1,6 +1,7 @@
 package io.agora.example.recording.agora;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RecorderConfig {
@@ -37,6 +38,7 @@ public class RecorderConfig {
     private Encryption encryption;
     private List<Rotation> rotation;
     private StressTest stressTest;
+    private LocalAccessPoint localAccessPoint;
 
     public RecorderConfig() {
         audio = new AudioConfig();
@@ -56,6 +58,7 @@ public class RecorderConfig {
         stressTest = new StressTest();
         recordEncodedOnly = false;
         subscribeEncodedFrameOnly = false;
+        localAccessPoint = new LocalAccessPoint();
     }
 
     public static class AudioConfig {
@@ -374,6 +377,35 @@ public class RecorderConfig {
         }
     }
 
+    public static class LocalAccessPoint {
+        private List<String> ipList;
+        private String verifyDomainName;
+
+        public List<String> getIpList() {
+            return ipList;
+        }
+
+        public void setIpList(List<String> ipList) {
+            this.ipList = ipList;
+        }
+
+        public String getVerifyDomainName() {
+            return verifyDomainName;
+        }
+
+        public void setVerifyDomainName(String verifyDomainName) {
+            this.verifyDomainName = verifyDomainName;
+        }
+
+        @Override
+        public String toString() {
+            return "LocalAccessPoint{" +
+                    "ipList=" + ipList +
+                    ", verifyDomainName='" + verifyDomainName + '\'' +
+                    '}';
+        }
+    }
+
     public String getAppId() {
         return appId;
     }
@@ -638,6 +670,14 @@ public class RecorderConfig {
         this.stressTest = stressTest;
     }
 
+    public LocalAccessPoint getLocalAccessPoint() {
+        return localAccessPoint;
+    }
+
+    public void setLocalAccessPoint(LocalAccessPoint localAccessPoint) {
+        this.localAccessPoint = localAccessPoint;
+    }
+
     @Override
     public String toString() {
         return "RecorderConfig{" +
@@ -674,6 +714,7 @@ public class RecorderConfig {
                 ", encryption=" + encryption +
                 ", rotation=" + rotation +
                 ", stressTest=" + stressTest +
+                ", localAccessPoint=" + localAccessPoint +
                 '}';
     }
 }
