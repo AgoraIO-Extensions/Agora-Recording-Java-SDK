@@ -3,6 +3,7 @@ package io.agora.example.recording.agora;
 import io.agora.recording.AgoraParameter;
 import io.agora.recording.AgoraService;
 import io.agora.recording.AgoraServiceConfiguration;
+import io.agora.recording.LocalAccessPointConfiguration;
 import io.agora.recording.LogConfig;
 import java.io.File;
 import lombok.extern.slf4j.Slf4j;
@@ -21,14 +22,17 @@ public class AgoraServiceInitializer {
             log.info("AgoraService initService SDK Version: " + AgoraService.getSdkVersion());
             agoraService = new AgoraService();
 
-            // LocalAccessPointConfiguration localAccessPointConfig = new
-            // LocalAccessPointConfiguration();
-            // localAccessPointConfig.setMode(Constants.LocalProxyMode.LocalOnly);
-            // localAccessPointConfig.setIpList(new String[] { "10.xx.xx.xx" });
-            // localAccessPointConfig.setIpListSize(1);
-            // localAccessPointConfig.setVerifyDomainName("ap.xxx.agora.local");
-            // int setGlobalLocalAccessPointRet =
-            // agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
+            if (recorderConfig.getLocalAccessPoint() != null && recorderConfig.getLocalAccessPoint().getIpList() != null
+                    && recorderConfig.getLocalAccessPoint().getIpList().size() > 0) {
+                LocalAccessPointConfiguration localAccessPointConfig = new LocalAccessPointConfiguration();
+                localAccessPointConfig.setMode(io.agora.recording.Constants.LocalProxyMode.LocalOnly);
+                localAccessPointConfig
+                        .setIpList(recorderConfig.getLocalAccessPoint().getIpList().toArray(new String[0]));
+                localAccessPointConfig.setIpListSize(recorderConfig.getLocalAccessPoint().getIpList().size());
+                localAccessPointConfig.setVerifyDomainName(recorderConfig.getLocalAccessPoint().getVerifyDomainName());
+                int setGlobalLocalAccessPointRet = agoraService.setGlobalLocalAccessPoint(localAccessPointConfig);
+                log.info("setGlobalLocalAccessPointRet: " + setGlobalLocalAccessPointRet);
+            }
 
             AgoraServiceConfiguration config = new AgoraServiceConfiguration();
             config.setEnableAudioDevice(false);
@@ -56,6 +60,13 @@ public class AgoraServiceInitializer {
             if (recorderConfig.isRecoverFile()) {
                 if (parameter != null) {
                     parameter.setBool("che.media_recorder_recover_files", true);
+                }
+            }
+
+            if (recorderConfig.getLocalAccessPoint() != null && recorderConfig.getLocalAccessPoint().getIpList() != null
+                    && recorderConfig.getLocalAccessPoint().getIpList().size() > 0) {
+                if (parameter != null) {
+                    parameter.setParameters("{\"rtc.enable_nasa2\":false}");
                 }
             }
             initData(recorderConfig);
